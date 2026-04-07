@@ -1,4 +1,10 @@
-import { fetchAuthSession, getCurrentUser, signInWithRedirect, signOut } from 'aws-amplify/auth';
+import {
+    fetchAuthSession,
+    fetchUserAttributes,
+    getCurrentUser,
+    signInWithRedirect,
+    signOut
+} from 'aws-amplify/auth';
 import { Hub } from 'aws-amplify/utils';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { isCognitoConfigured } from './configureAmplify';
@@ -36,10 +42,47 @@ function parseEpochClaim(value: unknown): number | undefined {
   return undefined;
 }
 
+function parseStringClaim(value: unknown): string | undefined {
+  return typeof value === 'string' && value.trim().length > 0 ? value : undefined;
+}
+
+function inferProvider(username: string, identitiesClaim: unknown): string {
+  if (typeof identitiesClaim === 'string') {
+    try {
+      const parsed = JSON.parse(identitiesClaim) as Array<{ providerName?: unknown }>;
+      const providerName = parsed[0]?.providerName;
+      if (typeof providerName === 'string' && providerName.length > 0) {
+        return providerName;
+      }
+    } catch {
+      // Ignore malformed identities claim and fallback below.
+    }
+  }
+
+  if (username.startsWith('google_')) {
+    return 'Google';
+  }
+
+  if (username.startsWith('facebook_')) {
+    return 'Facebook';
+  }
+
+  if (username.startsWith('signinwithapple_')) {
+    return 'Apple';
+  }
+
+  return 'Cognito';
+}
+
 type AuthUser = {
   username: string;
   userId: string;
+  name?: string;
+  givenName?: string;
+  familyName?: string;
   email?: string;
+  picture?: string;
+  provider: string;
 };
 
 type AuthContextValue = {
@@ -81,23 +124,52 @@ export function AuthProvider({ children }: { children: React.ReactNode }): React
     setIsLoading(true);
 
     try {
-      const [currentUser, session] = await Promise.all([getCurrentUser(), fetchAuthSession()]);
-      const emailClaim = session.tokens?.idToken?.payload?.email;
-      const email = typeof emailClaim === 'string' ? emailClaim : undefined;
+      const [currentUser, session, attributes] = await Promise.all([
+        getCurrentUser(),
+        fetchAuthSession(),
+        fetchUserAttributes()
+      ]);
+
+      const idTokenPayload = session.tokens?.idToken?.payload;
+      const email =
+        attributes.email ??
+        parseStringClaim(idTokenPayload?.email) ??
+        parseStringClaim(idTokenPayload?.['cognito:email_alias']);
+      const givenName =
+        attributes.given_name ?? parseStringClaim(idTokenPayload?.given_name) ?? undefined;
+      const familyName =
+        attributes.family_name ?? parseStringClaim(idTokenPayload?.family_name) ?? undefined;
+      const fullNameFromParts = [givenName, familyName].filter(Boolean).join(' ');
+      const name =
+        attributes.name ??
+        parseStringClaim(idTokenPayload?.name) ??
+        (fullNameFromParts || undefined);
+      const picture = attributes.picture ?? parseStringClaim(idTokenPayload?.picture) ?? undefined;
+      const provider = inferProvider(
+        currentUser.username,
+        idTokenPayload?.identities ?? idTokenPayload?.identities
+      );
       const idTokenExp = parseEpochClaim(session.tokens?.idToken?.payload?.exp);
       const accessTokenExp = parseEpochClaim(session.tokens?.accessToken?.payload?.exp);
 
       setUser({
         username: currentUser.username,
         userId: currentUser.userId,
-        email
+        name,
+        givenName,
+        familyName,
+        email,
+        picture,
+        provider
       });
       setIsAuthenticated(true);
 
       authLog('session active', {
         userId: currentUser.userId,
         username: currentUser.username,
+        name,
         email,
+        provider,
         idTokenExpiresAt: idTokenExp ? new Date(idTokenExp * 1000).toISOString() : 'unknown',
         accessTokenExpiresAt: accessTokenExp ? new Date(accessTokenExp * 1000).toISOString() : 'unknown'
       });

@@ -1,17 +1,18 @@
 import {
-  IonButton,
-  IonContent,
-  IonHeader,
-  IonPage,
-  IonText,
-  IonTitle,
-  IonToolbar
+    IonButton,
+    IonContent,
+    IonHeader,
+    IonPage,
+    IonText,
+    IonTitle,
+    IonToolbar
 } from '@ionic/react';
 import { useAuth } from '../auth/AuthContext';
 import './Home.css';
 
 const Home: React.FC = () => {
   const { user, signOutUser } = useAuth();
+  const displayName = user?.name ?? user?.email ?? user?.username ?? 'Usuario autenticado';
 
   return (
     <IonPage>
@@ -25,8 +26,11 @@ const Home: React.FC = () => {
           <h2>Sesion autenticada</h2>
         </IonText>
         <IonText color="medium">
-          <p>Usuario: {user?.email ?? user?.username ?? 'Sin datos de perfil'}</p>
-          <p>ID: {user?.userId ?? 'No disponible'}</p>
+          <p>Nombre: {displayName}</p>
+          <p>Correo: {user?.email ?? 'No disponible'}</p>
+          <p>Proveedor: {user?.provider ?? 'No disponible'}</p>
+          <p>Usuario: {user?.username ?? 'No disponible'}</p>
+          {user?.userId && <p>ID interno: {user.userId}</p>}
         </IonText>
 
         <IonButton
