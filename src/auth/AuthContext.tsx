@@ -66,8 +66,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }): React
   useEffect(() => {
     void refreshSession();
 
-    const unsubscribe = Hub.listen('auth', ({ payload }) => {
-      const authEvent = payload.event;
+    const unsubscribe = Hub.listen('auth', (capsule: { payload: { event: string } }) => {
+      const authEvent = capsule.payload.event;
       if (authEvent === 'signedIn' || authEvent === 'signedOut' || authEvent === 'tokenRefresh') {
         void refreshSession();
       }

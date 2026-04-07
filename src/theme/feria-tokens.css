@@ -1,0 +1,59 @@
+/*
+ * Feria design tokens
+ * -------------------
+ * Shared primitives for spacing, motion, typography scale, and “disk” surfaces
+ * (voice orb core, quiet icon buttons). Prefer these over ad-hoc values in pages.
+ * Extend this file as the product language evolves.
+ */
+
+:root {
+  /* Motion */
+  --feria-duration-normal: 0.35s;
+  --feria-ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Layout */
+  --feria-space-page: 1.25rem;
+  --feria-space-stack-lg: 2rem;
+  --feria-space-stack-sm: 0.75rem;
+  --feria-fab-offset: 0.75rem;
+
+  /* Typography (hierarchy on top of Ionic defaults) */
+  --feria-font-caption: 0.8125rem;
+  --feria-font-body-sm: 0.9375rem;
+  --feria-font-label: 0.75rem;
+  --feria-weight-medium: 500;
+  --feria-letter-wide: 0.02em;
+  --feria-letter-label: 0.08em;
+
+  /* Touch targets */
+  --feria-control-min: 44px;
+
+  /* “Disk” surfaces: same family as the voice orb inner core */
+  --feria-disk-shadow-inner: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --feria-disk-shadow-elev: 0 8px 32px rgba(0, 0, 0, 0.06);
+  --feria-disk-border: 1px solid rgba(146, 148, 156, 0.22);
+
+  /* Voice orb size cap (pages may still use vw for responsiveness) */
+  --feria-orb-size-max: 220px;
+
+  /*
+   * Modals / sheets (shadcn-like: generous radius, hairline border, soft shadow)
+   */
+  --feria-modal-radius: 16px;
+  --feria-modal-radius-inner: 10px;
+  --feria-modal-border-color: rgba(15, 23, 42, 0.08);
+  --feria-modal-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.18);
+  --feria-modal-backdrop-opacity: 0.45;
+  --feria-modal-field-bg: rgba(15, 23, 42, 0.04);
+}
+
+.ion-palette-dark {
+  --feria-disk-shadow-inner: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --feria-disk-shadow-elev: 0 8px 32px rgba(0, 0, 0, 0.35);
+  --feria-disk-border: 1px solid rgba(255, 255, 255, 0.12);
+
+  --feria-modal-border-color: rgba(255, 255, 255, 0.1);
+  --feria-modal-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.55);
+  --feria-modal-backdrop-opacity: 0.6;
+  --feria-modal-field-bg: rgba(255, 255, 255, 0.06);
+}

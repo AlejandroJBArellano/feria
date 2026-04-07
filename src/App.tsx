@@ -34,6 +34,9 @@ import '@ionic/react/css/palettes/dark.system.css';
 
 /* Theme variables */
 import './theme/variables.css';
+import './theme/feria-tokens.css';
+import './theme/feria-components.css';
+import './theme/feria-overlays.css';
 
 setupIonicReact();
 

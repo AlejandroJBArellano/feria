@@ -1,214 +1,150 @@
-/* ================================================
-   FactorSocial Login — Home.css
-   Matches the design from the provided screenshot
-   ================================================ */
-
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-
-/* ─── Reset for Ionic page/content ─── */
-.login-page,
-.login-content {
-  --background: transparent;
+.home-page {
+  --home-orb-size: min(56vw, var(--feria-orb-size-max));
 }
 
-/* ─── Full-screen layout wrapper ─── */
-.login-layout {
+.home-content {
+  --background: var(--ion-background-color, #fff);
+}
+
+.home-layout {
   min-height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 60px 28px 48px;
-
-  /* Background: light blue-white gradient with teal glow in bottom-right */
-  background:
-    radial-gradient(ellipse 80% 55% at 75% 100%, rgba(100, 220, 210, 0.48) 0%, transparent 60%),
-    linear-gradient(165deg, #eef3fd 0%, #f5f9ff 45%, #f0fafc 100%);
-
-  font-family: 'Inter', 'Segoe UI', sans-serif;
-  color: #0d1b46;
+  padding: 2rem var(--feria-space-page);
+  box-sizing: border-box;
 }
 
-/* ─── Brand section ─── */
-.login-brand {
-  text-align: center;
-  margin-bottom: 36px;
+.home-intro {
+  margin: 0 0 var(--feria-space-stack-lg);
 }
 
-.login-brand__title {
-  margin: 0;
-  font-size: clamp(2rem, 7vw, 2.5rem);
-  font-weight: 800;
-  letter-spacing: -0.025em;
-  color: #0d1b3e;
-  line-height: 1.1;
-}
-
-.login-brand__tagline {
-  margin: 10px 0 0;
-  font-size: clamp(0.9rem, 3.5vw, 1rem);
-  font-weight: 400;
-  color: #6b7a99;
-  letter-spacing: 0;
-}
-
-/* ─── Card ─── */
-.login-card {
-  width: min(88vw, 340px);
-  background: #ffffff;
-  border-radius: 20px;
-  box-shadow:
-    0 4px 6px rgba(0, 0, 0, 0.04),
-    0 10px 30px rgba(13, 27, 78, 0.08);
-  padding: 20px 18px 18px;
-}
-
-/* ─── Google button ─── */
-.google-button {
-  width: 100%;
-  height: 52px;
-  border: none;
-  border-radius: 10px;
-  background: #0d1f5c;
-  color: #ffffff;
-  font-family: 'Inter', sans-serif;
-  font-size: 0.98rem;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
+/* Siri-style orb: layered glow + rotating spectrum ring */
+.siri-orb-wrap {
+  position: relative;
+  width: var(--home-orb-size);
+  height: var(--home-orb-size);
   cursor: pointer;
-  transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
-  box-shadow: 0 4px 14px rgba(13, 31, 92, 0.3);
-  -webkit-tap-highlight-color: transparent;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
-.google-button:hover {
-  background: #112370;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(13, 31, 92, 0.38);
-}
-
-.google-button:active {
-  transform: translateY(0);
-  box-shadow: 0 3px 10px rgba(13, 31, 92, 0.25);
-}
-
-.google-icon {
-  width: 30px;
-  height: 30px;
+.siri-orb-wrap:focus-visible {
+  outline: 2px solid var(--ion-color-primary, #3880ff);
+  outline-offset: 6px;
   border-radius: 50%;
-  background: #ffffff;
+}
+
+.siri-orb-glow {
+  position: absolute;
+  inset: -18%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(99, 102, 241, 0.35) 0%,
+    rgba(56, 189, 248, 0.12) 45%,
+    transparent 70%
+  );
+  filter: blur(16px);
+  opacity: 0.65;
+  transition: opacity 0.35s ease, transform 0.35s ease;
+  pointer-events: none;
+}
+
+.siri-orb-wrap--active .siri-orb-glow {
+  opacity: 1;
+  transform: scale(1.08);
+  animation: home-glow-pulse 1.2s ease-in-out infinite;
+}
+
+.siri-orb-ring {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    #6366f1,
+    #22d3ee,
+    #a78bfa,
+    #f472b6,
+    #fb923c,
+    #6366f1
+  );
+  animation: home-ring-rotate 8s linear infinite;
+  pointer-events: none;
+}
+
+.siri-orb-wrap--active .siri-orb-ring {
+  animation-duration: 2.5s;
+  filter: brightness(1.15);
+}
+
+.siri-orb-core {
+  position: absolute;
+  inset: 10px;
+  z-index: 1;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
+  background: var(--ion-background-color, #fff);
+  border: var(--feria-disk-border);
+  box-shadow: var(--feria-disk-shadow-inner), var(--feria-disk-shadow-elev);
+  box-sizing: border-box;
 }
 
-.google-button__label {
-  letter-spacing: 0.01em;
+.siri-orb-core .feria-text-hint {
+  padding: 0 0.75rem;
 }
 
-/* ─── Feature grid ─── */
-.feature-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-top: 14px;
+@keyframes home-ring-rotate {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-.feature-item {
-  background: #f7f9fc;
-  border: 1px solid rgba(13, 27, 78, 0.07);
-  border-radius: 10px;
-  padding: 14px 12px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-height: 90px;
-  justify-content: center;
+@keyframes home-glow-pulse {
+  0%,
+  100% {
+    transform: scale(1.05);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.12);
+    opacity: 1;
+  }
 }
 
-.feature-icon {
-  display: flex;
-  align-items: center;
+.home-voice-unsupported {
+  margin-top: 1.25rem;
+  font-size: 0.875rem;
+  text-align: center;
+  max-width: 280px;
 }
 
-.feature-item__label {
-  margin: 0;
-  font-size: 0.625rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  color: #4d5b78;
-  line-height: 1.35;
-  text-transform: uppercase;
-}
-
-/* ─── Footer ─── */
-.login-footer {
-  margin-top: 36px;
+.home-transcript {
+  margin-top: 2rem;
+  width: 100%;
+  max-width: 320px;
   text-align: center;
 }
 
-.login-footer__signup {
+.home-transcript-text {
   margin: 0;
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: #5a6a88;
+  font-size: 1rem;
+  line-height: 1.45;
+  color: var(--ion-text-color, #000);
 }
 
-.login-footer__signup a {
-  color: #15756e;
-  font-weight: 700;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-  text-decoration-thickness: 1.5px;
+.home-transcript-interim {
+  opacity: 0.45;
 }
 
-.legal-links {
-  margin-top: 24px;
-  display: flex;
-  justify-content: center;
-  gap: 22px;
+.home-modal-intro {
+  margin: 0 0 0.75rem;
+  font-size: 0.8125rem;
 }
 
-.legal-links a {
-  font-size: 0.65rem;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  color: #a0aabb;
-  text-decoration: none;
-  text-transform: uppercase;
-  transition: color 0.15s;
-}
-
-.legal-links a:hover {
-  color: #6b7a99;
-}
-
-/* ─── Responsive tweaks ─── */
-@media (max-width: 400px) {
-  .login-layout {
-    padding: 48px 20px 36px;
-  }
-
-  .login-card {
-    width: 92vw;
-    padding: 18px 14px 14px;
-  }
-
-  .google-button {
-    height: 50px;
-    font-size: 0.95rem;
-  }
-
-  .feature-item {
-    min-height: 80px;
-    padding: 12px 10px;
-  }
-
-  .feature-item__label {
-    font-size: 0.6rem;
-  }
-}
