@@ -3,7 +3,6 @@ import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import Home from './pages/Home';
 import Login from './pages/Login';
-import RequireAuth from './auth/RequireAuth';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -34,6 +33,9 @@ import '@ionic/react/css/palettes/dark.system.css';
 
 /* Theme variables */
 import './theme/variables.css';
+import './theme/feria-tokens.css';
+import './theme/feria-components.css';
+import './theme/feria-overlays.css';
 
 setupIonicReact();
 
@@ -45,9 +47,7 @@ const App: React.FC = () => (
           <Login />
         </Route>
         <Route exact path="/home">
-          <RequireAuth>
-            <Home />
-          </RequireAuth>
+          <Home />
         </Route>
         <Route exact path="/">
           <Redirect to="/home" />

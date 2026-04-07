@@ -1,0 +1,231 @@
+/* ================================================
+   FactorSocial — Login.css
+   Pixel-match of the FactorSocial login screenshot
+   ================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+/* ── Ionic overrides ── */
+.login-page,
+.login-content {
+  --background: transparent;
+}
+
+/* ── Full-screen layout ── */
+.login-layout {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 28px 52px;
+  box-sizing: border-box;
+
+  /* Background: off-white → white with teal radial glow at bottom-right */
+  background:
+    radial-gradient(ellipse 90% 50% at 80% 100%, rgba(82, 222, 208, 0.46) 0%, transparent 58%),
+    linear-gradient(170deg, #edf2fc 0%, #f6f9ff 50%, #eff9fb 100%);
+
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  color: #0d1b46;
+}
+
+/* ── Brand ── */
+.login-brand {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.login-brand__title {
+  margin: 0;
+  font-size: clamp(1.9rem, 6vw, 2.45rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #0b1840;
+  line-height: 1.1;
+}
+
+.login-brand__tagline {
+  margin: 12px 0 0;
+  font-size: clamp(0.88rem, 3vw, 0.98rem);
+  font-weight: 400;
+  color: #6c7b9a;
+  letter-spacing: 0;
+}
+
+/* ── Card ── */
+.login-card {
+  width: min(88vw, 328px);
+  background: #ffffff;
+  border-radius: 22px;
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.04),
+    0 8px 28px rgba(13, 27, 78, 0.09);
+  padding: 20px 18px 18px;
+}
+
+/* ── Google button ── */
+.google-btn {
+  width: 100%;
+  height: 52px;
+  border: none;
+  border-radius: 11px;
+  background: #0d1f5c;
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.975rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(11, 27, 90, 0.32);
+  transition:
+    background   0.18s ease,
+    transform    0.14s ease,
+    box-shadow   0.18s ease;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+
+.google-btn:hover {
+  background: #10266e;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(11, 27, 90, 0.40);
+}
+
+.google-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 3px 10px rgba(11, 27, 90, 0.26);
+}
+
+.google-btn:focus-visible {
+  outline: 3px solid rgba(66, 133, 244, 0.45);
+  outline-offset: 2px;
+}
+
+/* White circle housing the Google G */
+.google-btn__icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ── Feature grid ── */
+.feature-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.feature-item {
+  background: #f5f7fb;
+  border: 1px solid rgba(13, 24, 76, 0.07);
+  border-radius: 10px;
+  padding: 14px 12px 13px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 88px;
+  justify-content: center;
+}
+
+.feature-item__icon {
+  display: flex;
+  align-items: center;
+}
+
+.feature-item__label {
+  margin: 0;
+  font-size: 0.615rem;
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  color: #4a5670;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+/* ── Footer ── */
+.login-footer {
+  margin-top: 38px;
+  text-align: center;
+}
+
+.login-footer__signup {
+  margin: 0;
+  font-size: 0.94rem;
+  font-weight: 500;
+  color: #5a6a88;
+}
+
+.login-footer__signup a {
+  color: #147a73;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1.5px;
+  transition: color 0.15s;
+}
+
+.login-footer__signup a:hover {
+  color: #0f5f5a;
+}
+
+.legal-links {
+  margin-top: 22px;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.legal-links a {
+  font-size: 0.64rem;
+  font-weight: 500;
+  letter-spacing: 0.09em;
+  color: #9faabf;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color 0.15s;
+}
+
+.legal-links a:hover {
+  color: #6b7a99;
+}
+
+/* ── Responsive ── */
+@media (max-width: 390px) {
+  .login-layout {
+    padding: 52px 20px 40px;
+  }
+
+  .login-brand__title {
+    font-size: 1.85rem;
+  }
+
+  .login-card {
+    width: 92vw;
+    padding: 18px 14px 16px;
+  }
+
+  .google-btn {
+    height: 50px;
+    font-size: 0.93rem;
+  }
+
+  .feature-item {
+    min-height: 80px;
+    padding: 12px 10px;
+  }
+
+  .feature-item__label {
+    font-size: 0.58rem;
+  }
+}

@@ -215,8 +215,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }): React
     authLog('AuthProvider mounted');
     void refreshSession();
 
-    const unsubscribe = Hub.listen('auth', ({ payload }) => {
-      const authEvent = payload.event;
+    const unsubscribe = Hub.listen('auth', (capsule: { payload: { event: string } }) => {
+      const authEvent = capsule.payload.event;
       authLog('auth hub event', {
         event: authEvent
       });
