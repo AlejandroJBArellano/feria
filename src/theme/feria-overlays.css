@@ -101,6 +101,8 @@ ion-modal.feria-modal ion-item.feria-modal-field::part(native) {
 
 /* Primary action */
 ion-modal.feria-modal ion-button.feria-modal-primary {
+  --background: var(--ion-color-primary);
+  --color: var(--ion-color-primary-contrast);
   --border-radius: var(--feria-modal-radius-inner);
   margin-top: 1.5rem;
   font-weight: 600;

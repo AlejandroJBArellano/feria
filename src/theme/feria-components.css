@@ -85,3 +85,17 @@ ion-button.feria-icon-btn-quiet {
 ion-button.feria-icon-btn-quiet::part(native) {
   padding: 0;
 }
+
+/* Route-level loading (BootstrapRedirect, RequireAuth) */
+.bootstrap-redirect-page,
+ion-page.bootstrap-redirect-page {
+  --background: var(--ion-background-color);
+}
+
+.bootstrap-redirect-content {
+  --background: var(--ion-background-color);
+}
+
+.feria-route-loading {
+  --background: var(--ion-background-color);
+}

@@ -1,0 +1,75 @@
+.onboarding-page {
+  --background: var(--feria-color-page);
+}
+
+.onboarding-content {
+  --background: var(--feria-color-page);
+}
+
+.onboarding-inner {
+  min-height: 100%;
+  box-sizing: border-box;
+  padding: max(1.25rem, env(safe-area-inset-top))
+    max(1.25rem, env(safe-area-inset-right))
+    max(1.5rem, env(safe-area-inset-bottom))
+    max(1.25rem, env(safe-area-inset-left));
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  max-width: 28rem;
+  margin: 0 auto;
+}
+
+.onboarding-eyebrow {
+  margin: 0 0 0.5rem;
+  font-size: var(--feria-font-label);
+  font-weight: 600;
+  letter-spacing: var(--feria-letter-label);
+  text-transform: uppercase;
+  color: var(--feria-color-text-muted);
+}
+
+.onboarding-title {
+  margin: 0 0 0.75rem;
+  font-size: clamp(1.5rem, 5vw, 1.85rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--feria-color-text);
+}
+
+.onboarding-title span {
+  color: var(--feria-color-primary);
+}
+
+.onboarding-copy {
+  margin: 0 0 1.75rem;
+  font-size: var(--feria-font-body-sm);
+  line-height: 1.5;
+  color: var(--feria-color-text-secondary);
+}
+
+.onboarding-primary {
+  --background: var(--feria-color-primary);
+  --background-hover: var(--feria-color-primary-shade);
+  --background-activated: var(--feria-color-primary-shade);
+  --color: var(--feria-color-on-primary);
+  --border-radius: 12px;
+  min-height: var(--feria-control-min);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin: 0;
+}
+
+.onboarding-primary:focus-visible {
+  outline: 2px solid var(--ion-color-primary);
+  outline-offset: 3px;
+}
+
+.onboarding-hint {
+  margin: 1rem 0 0;
+  font-size: var(--feria-font-caption);
+  color: var(--feria-color-text-hint);
+  text-align: center;
+  line-height: 1.4;
+}

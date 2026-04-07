@@ -3,7 +3,7 @@
 }
 
 .home-content {
-  --background: var(--ion-background-color, #fff);
+  --background: var(--ion-background-color, var(--feria-color-page));
 }
 
 .home-layout {

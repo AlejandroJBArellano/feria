@@ -8,7 +8,7 @@ export default function RequireAuth({ children }: { children: React.ReactNode })
   if (isLoading) {
     return (
       <IonPage>
-        <IonContent className="ion-padding ion-text-center">
+        <IonContent className="ion-padding ion-text-center feria-route-loading">
           <IonSpinner name="crescent" />
         </IonContent>
       </IonPage>

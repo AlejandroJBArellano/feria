@@ -1,4 +1,6 @@
 /* For information on how to create your own theme, please refer to:
 http://ionicframework.com/docs/theming/ */
 
+@import './feria-palette.css';
+
 /* App-specific tokens and UI patterns: feria-tokens, feria-components, feria-overlays */

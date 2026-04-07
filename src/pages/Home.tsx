@@ -10,12 +10,14 @@ import {
     IonPage,
     IonSegment,
     IonSegmentButton,
+    IonSpinner,
     IonText,
     IonTitle,
     IonToolbar,
 } from '@ionic/react';
 import { logOutOutline } from 'ionicons/icons';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import KeyboardClassicIcon from '../components/icons/KeyboardClassicIcon';
 import './Home.css';
@@ -71,7 +73,9 @@ function createSpeechRecognition(): SpeechRecognitionInstance | null {
 }
 
 const Home: React.FC = () => {
+  const history = useHistory();
   const { user, signOutUser } = useAuth();
+  const [signingOut, setSigningOut] = useState(false);
   const displayName = user?.name ?? user?.email ?? user?.username ?? 'Usuario autenticado';
   const [listening, setListening] = useState(false);
   const [voiceSupported, setVoiceSupported] = useState(true);
@@ -187,6 +191,18 @@ const Home: React.FC = () => {
     resetForm();
   };
 
+  const handleSignOut = async () => {
+    if (signingOut) return;
+    setSigningOut(true);
+    try {
+      await signOutUser();
+      // Hosted UI global sign-out may navigate away entirely; when staying in SPA, sync URL with auth.
+      history.replace('/login');
+    } catch {
+      setSigningOut(false);
+    }
+  };
+
   return (
     <IonPage className="home-page">
       <IonContent fullscreen className="home-content">
@@ -250,11 +266,12 @@ const Home: React.FC = () => {
           fill="solid"
           shape="round"
           aria-label="Cerrar sesión"
+          disabled={signingOut}
           onClick={() => {
-            void signOutUser();
+            void handleSignOut();
           }}
         >
-          <IonIcon icon={logOutOutline} aria-hidden />
+          {signingOut ? <IonSpinner name="crescent" /> : <IonIcon icon={logOutOutline} aria-hidden />}
         </IonButton>
       </div>
 
