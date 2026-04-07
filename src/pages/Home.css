@@ -1,0 +1,214 @@
+/* ================================================
+   FactorSocial Login — Home.css
+   Matches the design from the provided screenshot
+   ================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+/* ─── Reset for Ionic page/content ─── */
+.login-page,
+.login-content {
+  --background: transparent;
+}
+
+/* ─── Full-screen layout wrapper ─── */
+.login-layout {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 28px 48px;
+
+  /* Background: light blue-white gradient with teal glow in bottom-right */
+  background:
+    radial-gradient(ellipse 80% 55% at 75% 100%, rgba(100, 220, 210, 0.48) 0%, transparent 60%),
+    linear-gradient(165deg, #eef3fd 0%, #f5f9ff 45%, #f0fafc 100%);
+
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  color: #0d1b46;
+}
+
+/* ─── Brand section ─── */
+.login-brand {
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+.login-brand__title {
+  margin: 0;
+  font-size: clamp(2rem, 7vw, 2.5rem);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: #0d1b3e;
+  line-height: 1.1;
+}
+
+.login-brand__tagline {
+  margin: 10px 0 0;
+  font-size: clamp(0.9rem, 3.5vw, 1rem);
+  font-weight: 400;
+  color: #6b7a99;
+  letter-spacing: 0;
+}
+
+/* ─── Card ─── */
+.login-card {
+  width: min(88vw, 340px);
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow:
+    0 4px 6px rgba(0, 0, 0, 0.04),
+    0 10px 30px rgba(13, 27, 78, 0.08);
+  padding: 20px 18px 18px;
+}
+
+/* ─── Google button ─── */
+.google-button {
+  width: 100%;
+  height: 52px;
+  border: none;
+  border-radius: 10px;
+  background: #0d1f5c;
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.98rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 14px rgba(13, 31, 92, 0.3);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.google-button:hover {
+  background: #112370;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(13, 31, 92, 0.38);
+}
+
+.google-button:active {
+  transform: translateY(0);
+  box-shadow: 0 3px 10px rgba(13, 31, 92, 0.25);
+}
+
+.google-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.google-button__label {
+  letter-spacing: 0.01em;
+}
+
+/* ─── Feature grid ─── */
+.feature-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.feature-item {
+  background: #f7f9fc;
+  border: 1px solid rgba(13, 27, 78, 0.07);
+  border-radius: 10px;
+  padding: 14px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 90px;
+  justify-content: center;
+}
+
+.feature-icon {
+  display: flex;
+  align-items: center;
+}
+
+.feature-item__label {
+  margin: 0;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #4d5b78;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+/* ─── Footer ─── */
+.login-footer {
+  margin-top: 36px;
+  text-align: center;
+}
+
+.login-footer__signup {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #5a6a88;
+}
+
+.login-footer__signup a {
+  color: #15756e;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1.5px;
+}
+
+.legal-links {
+  margin-top: 24px;
+  display: flex;
+  justify-content: center;
+  gap: 22px;
+}
+
+.legal-links a {
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: #a0aabb;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color 0.15s;
+}
+
+.legal-links a:hover {
+  color: #6b7a99;
+}
+
+/* ─── Responsive tweaks ─── */
+@media (max-width: 400px) {
+  .login-layout {
+    padding: 48px 20px 36px;
+  }
+
+  .login-card {
+    width: 92vw;
+    padding: 18px 14px 14px;
+  }
+
+  .google-button {
+    height: 50px;
+    font-size: 0.95rem;
+  }
+
+  .feature-item {
+    min-height: 80px;
+    padding: 12px 10px;
+  }
+
+  .feature-item__label {
+    font-size: 0.6rem;
+  }
+}
