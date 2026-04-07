@@ -1,0 +1,269 @@
+.onboarding-page {
+    min-height: 100vh;
+    background-color: #f9f9f9;
+  }
+
+.onboarding {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 32px 20px 110px;
+    min-height: calc(100vh - 72px);
+    box-sizing: border-box;
+  }
+  
+  /* Header */
+  .onboarding__header {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  
+  .onboarding__title {
+    font-size: 24px;
+    font-weight: 800;
+    color: #1a1a1a;
+    margin: 0 0 6px;
+  }
+  
+  .onboarding__title span {
+    color: #4caf50;
+  }
+  
+  .onboarding__subtitle {
+    font-size: 14px;
+    color: #888;
+    margin: 0;
+  }
+  
+  /* Progress */
+  .onboarding__progress-bar {
+    width: 100%;
+    max-width: 400px;
+    height: 6px;
+    background-color: #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 6px;
+  }
+  
+  .onboarding__progress-fill {
+    height: 100%;
+    background-color: #4caf50;
+    border-radius: 10px;
+    transition: width 0.4s ease;
+  }
+  
+  .onboarding__progress-text {
+    font-size: 12px;
+    color: #aaa;
+    margin-bottom: 28px;
+  }
+  
+  /* AI bubble */
+  .onboarding__bubble-wrapper {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    width: 100%;
+    max-width: 400px;
+    margin-bottom: 32px;
+  }
+  
+  .onboarding__ai-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: #c8e6c9;
+    color: #2e7d32;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  
+  .onboarding__bubble {
+    background-color: #ffffff;
+    border-radius: 0 16px 16px 16px;
+    padding: 14px 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    font-size: 15px;
+    color: #1a1a1a;
+    line-height: 1.5;
+  }
+  
+  /* Mode selector */
+  .onboarding__mode {
+    text-align: center;
+  }
+  
+  .onboarding__mode p {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 16px;
+  }
+  
+  .onboarding__mode-btns {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .onboarding__mode-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    background-color: #ffffff;
+    border: 2px solid #e0e0e0;
+    border-radius: 16px;
+    padding: 20px 32px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #1a1a1a;
+    transition: all 0.2s ease;
+  }
+  
+  .onboarding__mode-btn:hover {
+    border-color: #4caf50;
+    color: #4caf50;
+  }
+  
+  /* Text input */
+  .onboarding__input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    max-width: 400px;
+  }
+  
+  .onboarding__input {
+    flex: 1;
+    padding: 14px 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    font-size: 15px;
+    outline: none;
+    background-color: #fff;
+    color: #1a1a1a;
+    transition: border-color 0.2s;
+  }
+  
+  .onboarding__input:focus {
+    border-color: #4caf50;
+  }
+  
+  .onboarding__send-btn {
+    background-color: #4caf50;
+    border: none;
+    border-radius: 12px;
+    padding: 14px;
+    cursor: pointer;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Voice */
+  .onboarding__voice {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  
+  .onboarding__mic-btn {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: #4caf50;
+    border: none;
+    cursor: pointer;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s;
+  }
+  
+  .onboarding__mic-btn--recording {
+    background-color: #e53935;
+    animation: pulse 1s infinite;
+  }
+  
+  .onboarding__mic-btn:disabled {
+    cursor: not-allowed;
+  }
+  
+  .onboarding__voice p {
+    font-size: 14px;
+    color: #666;
+  }
+  
+  @keyframes pulse {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.1); }
+    100% { transform: scale(1); }
+  }
+  
+  /* Cambiar modo */
+  .onboarding__change-mode {
+    margin-top: 24px;
+    background: none;
+    border: none;
+    color: #4caf50;
+    font-size: 13px;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+  
+  /* Finished */
+  .onboarding__finished {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 16px;
+    padding-top: 60px;
+  }
+  
+  .onboarding__finished h2 {
+    font-size: 22px;
+    font-weight: 800;
+    color: #1a1a1a;
+  }
+  
+  .onboarding__finished p {
+    font-size: 15px;
+    color: #666;
+    max-width: 300px;
+  }
+  
+  /* Responsive */
+  @media (min-width: 768px) {
+    .onboarding {
+      padding: 48px 32px 100px;
+    }
+  
+    .onboarding__title {
+      font-size: 28px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .onboarding__mode-btns {
+      width: 100%;
+      gap: 12px;
+    }
+
+    .onboarding__mode-btn {
+      flex: 1;
+      min-width: 130px;
+      padding: 16px 18px;
+    }
+  }
