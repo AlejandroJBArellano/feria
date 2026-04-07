@@ -1,0 +1,7 @@
+{
+  "name": "feria",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite"
+}
