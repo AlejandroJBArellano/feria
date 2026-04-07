@@ -6,7 +6,7 @@ import {
     signOut
 } from 'aws-amplify/auth';
 import { Hub } from 'aws-amplify/utils';
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { isCognitoConfigured } from './configureAmplify';
 
 const authDebugEnabled = import.meta.env.VITE_AUTH_DEBUG === 'true';
@@ -114,6 +114,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }): React
       return;
     }
 
+    if (oauthError) {
+      authLog('OAuth error in redirect URL', {
+        oauthError,
+        oauthErrorDescription
+      });
+      console.warn('[auth] OAuth error:', oauthError, oauthErrorDescription ?? '');
+      setUser(null);
+      setIsAuthenticated(false);
+      setIsLoading(false);
+      window.history.replaceState({}, document.title, window.location.pathname + window.location.hash);
+      authLog('refreshSession finished');
+      return;
+    }
+
     authLog('refreshSession started', {
       path: window.location.pathname,
       hasAuthCode: window.location.search.includes('code='),
@@ -124,13 +138,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }): React
     setIsLoading(true);
 
     try {
-      const [currentUser, session, attributes] = await Promise.all([
-        getCurrentUser(),
-        fetchAuthSession(),
-        fetchUserAttributes()
-      ]);
+      const currentUser = await getCurrentUser();
+      const session = await fetchAuthSession();
 
       const idTokenPayload = session.tokens?.idToken?.payload;
+
+      // GetUser (fetchUserAttributes) requires access-token scopes in some pools; fall back to ID token claims.
+      type AttrSlice = {
+        email?: string;
+        given_name?: string;
+        family_name?: string;
+        name?: string;
+        picture?: string;
+      };
+      let attributes: AttrSlice = {};
+      try {
+        attributes = (await fetchUserAttributes()) as AttrSlice;
+      } catch (attrErr) {
+        authLog('fetchUserAttributes failed; using ID token claims only', {
+          error: attrErr instanceof Error ? attrErr.message : String(attrErr)
+        });
+      }
+
       const email =
         attributes.email ??
         parseStringClaim(idTokenPayload?.email) ??
@@ -183,26 +212,45 @@ export function AuthProvider({ children }: { children: React.ReactNode }): React
     }
   }, []);
 
-  const signIn = useCallback(async (provider?: 'Google' | 'Amazon' | 'Apple' | 'Facebook') => {
-    authLog('signIn requested', {
-      provider: provider ?? 'CognitoHostedUI',
-      origin: window.location.origin
-    });
+  const signIn = useCallback(
+    async (provider?: 'Google' | 'Amazon' | 'Apple' | 'Facebook') => {
+      authLog('signIn requested', {
+        provider: provider ?? 'CognitoHostedUI',
+        origin: window.location.origin
+      });
 
-    try {
-      if (provider) {
-        await signInWithRedirect({ provider });
+      if (!isCognitoConfigured) {
         return;
       }
 
-      await signInWithRedirect();
-    } catch (error) {
-      authLog('signIn failed', {
-        error: error instanceof Error ? error.message : String(error)
-      });
-      throw error;
-    }
-  }, []);
+      // Do not call refreshSession() before redirect — it toggles global isLoading and breaks Hosted UI / Ionic routing.
+
+      try {
+        if (provider) {
+          await signInWithRedirect({ provider });
+          return;
+        }
+        await signInWithRedirect();
+      } catch (error) {
+        const err = error as Error & { name?: string };
+        const alreadySignedIn =
+          err?.name === 'UserAlreadyAuthenticatedException' ||
+          (typeof err?.message === 'string' && err.message.includes('already a signed in user'));
+
+        if (alreadySignedIn) {
+          authLog('signIn: already signed in — syncing session');
+          await refreshSession();
+          return;
+        }
+
+        authLog('signIn failed', {
+          error: error instanceof Error ? error.message : String(error)
+        });
+        throw error;
+      }
+    },
+    [refreshSession]
+  );
 
   const signOutUser = useCallback(async () => {
     authLog('signOut requested');
@@ -211,9 +259,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }): React
     await refreshSession();
   }, [refreshSession]);
 
+  const hubDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   useEffect(() => {
     authLog('AuthProvider mounted');
     void refreshSession();
+
+    const scheduleHubRefresh = () => {
+      if (hubDebounceRef.current !== null) {
+        clearTimeout(hubDebounceRef.current);
+      }
+      hubDebounceRef.current = setTimeout(() => {
+        hubDebounceRef.current = null;
+        void refreshSession();
+      }, 120);
+    };
 
     const unsubscribe = Hub.listen('auth', (capsule: { payload: { event: string } }) => {
       const authEvent = capsule.payload.event;
@@ -222,11 +282,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }): React
       });
 
       if (authEvent === 'signedIn' || authEvent === 'signedOut' || authEvent === 'tokenRefresh') {
-        void refreshSession();
+        scheduleHubRefresh();
       }
     });
 
-    return unsubscribe;
+    return () => {
+      if (hubDebounceRef.current !== null) {
+        clearTimeout(hubDebounceRef.current);
+      }
+      unsubscribe();
+    };
   }, [refreshSession]);
 
   const value = useMemo(

@@ -1,17 +1,78 @@
-import { IonContent, IonPage } from '@ionic/react';
+import { IonContent, IonPage, IonSpinner } from '@ionic/react';
+import { useEffect, useLayoutEffect, useState } from 'react';
+import { Redirect, useHistory, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { isCognitoConfigured } from '../auth/configureAmplify';
+import ThemeToggle from '../components/ThemeToggle';
+import { isOnboardingComplete } from '../onboarding/onboardingStorage';
 import './Login.css';
 
 const Login: React.FC = () => {
-  const { signIn, isLoading } = useAuth();
+  const history = useHistory();
+  const location = useLocation();
+  const { signIn, isLoading, isAuthenticated } = useAuth();
+
+  // After Hosted UI redirect (?code=), keep spinner until Amplify finishes exchange (avoids flashing the form).
+  const [oauthReturnPending, setOauthReturnPending] = useState(() => /[?&]code=/.test(location.search));
+
+  useEffect(() => {
+    if (!oauthReturnPending) {
+      return;
+    }
+    if (isAuthenticated) {
+      setOauthReturnPending(false);
+      return;
+    }
+    if (!isLoading && !isAuthenticated) {
+      setOauthReturnPending(false);
+    }
+  }, [oauthReturnPending, isLoading, isAuthenticated]);
+
+  useLayoutEffect(() => {
+    if (isLoading || !isAuthenticated) {
+      return;
+    }
+    if (history.location.pathname !== '/login') {
+      return;
+    }
+    history.replace('/home');
+  }, [isLoading, isAuthenticated, history]);
+
+  if (isLoading || oauthReturnPending) {
+    return (
+      <IonPage className="login-page">
+        <IonContent fullscreen className="login-content ion-padding ion-text-center feria-route-loading">
+          <IonSpinner name="crescent" />
+        </IonContent>
+      </IonPage>
+    );
+  }
+
+  if (isAuthenticated) {
+    return (
+      <IonPage className="login-page">
+        <IonContent fullscreen className="login-content ion-padding ion-text-center feria-route-loading">
+          <IonSpinner name="crescent" />
+        </IonContent>
+      </IonPage>
+    );
+  }
+
+  if (!isOnboardingComplete()) {
+    return <Redirect to="/onboarding" />;
+  }
 
   return (
     <IonPage className="login-page">
       <IonContent fullscreen className="login-content">
         <main className="login-layout">
+          <div className="login-theme-slot">
+            <ThemeToggle />
+          </div>
           <section className="login-brand">
-            <h1 className="login-brand__title">FactorSocial</h1>
+            <h1 className="login-brand__title">
+              Bienvenido a <span className="login-brand__accent">FerIA</span>
+            </h1>
             <p className="login-brand__tagline">Tu confianza digital, tu libertad financiera.</p>
           </section>
 
@@ -59,18 +120,18 @@ const Login: React.FC = () => {
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none">
                     <path
                       d="M12 2L3 6v6c0 5.25 3.75 10.15 9 11.25C17.25 22.15 21 17.25 21 12V6l-9-4z"
-                      fill="#1e7e6b"
+                      fill="currentColor"
                       opacity="0.18"
                     />
                     <path
                       d="M12 2L3 6v6c0 5.25 3.75 10.15 9 11.25C17.25 22.15 21 17.25 21 12V6l-9-4z"
-                      stroke="#1e7e6b"
+                      stroke="currentColor"
                       strokeWidth="1.6"
                       fill="none"
                     />
                     <path
                       d="M9 12l2 2 4-4"
-                      stroke="#1e7e6b"
+                      stroke="currentColor"
                       strokeWidth="1.6"
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -85,14 +146,14 @@ const Login: React.FC = () => {
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none">
                     <polyline
                       points="23 6 13.5 15.5 8.5 10.5 1 18"
-                      stroke="#1e7e6b"
+                      stroke="currentColor"
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     />
                     <polyline
                       points="17 6 23 6 23 12"
-                      stroke="#1e7e6b"
+                      stroke="currentColor"
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -110,7 +171,17 @@ const Login: React.FC = () => {
 
           <section className="login-footer">
             <p className="login-footer__signup">
-              No tienes cuenta? <a href="#registro" id="link-registro">Registrate</a>
+              ¿No tienes cuenta?{' '}
+              <button
+                type="button"
+                id="link-registro"
+                className="login-footer__register-link"
+                disabled={!isCognitoConfigured}
+                onClick={() => void signIn('Google')}
+              >
+                Continuar con Google
+              </button>
+              <span className="login-footer__signup-hint"> La primera vez se crea tu cuenta al completar el acceso.</span>
             </p>
             <nav aria-label="Legal" className="legal-links">
               <a href="#privacidad" id="link-privacidad">PRIVACIDAD</a>

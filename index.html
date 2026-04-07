@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Ionic App</title>
+    <title>FerIA</title>
     
     <base href="/" />
     
@@ -13,6 +13,21 @@
     />
     <meta name="format-detection" content="telephone=no" />
     <meta name="msapplication-tap-highlight" content="no" />
+    <script>
+      (function () {
+        try {
+          var k = 'feria_theme_mode';
+          var m = localStorage.getItem(k);
+          if (m === 'dark') document.documentElement.classList.add('ion-palette-dark');
+          else if (m === 'light') document.documentElement.classList.remove('ion-palette-dark');
+          else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('ion-palette-dark');
+          }
+        } catch (e) {
+          /* ignore */
+        }
+      })();
+    </script>
     
     <link rel="manifest" href="/manifest.json" />
     
@@ -20,7 +35,7 @@
     
     <!-- add to homescreen for ios -->
     <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-title" content="Ionic App" />
+    <meta name="apple-mobile-web-app-title" content="FerIA" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   </head>
   <body>
