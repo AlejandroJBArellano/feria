@@ -1,13 +1,16 @@
 import React from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import './Footer.css';
+import { AiOutlineHome } from 'react-icons/ai';
+import { MdOutlineAccountBalanceWallet } from 'react-icons/md';
+import { IoChatbubbleOutline } from 'react-icons/io5';
+import { CgProfile } from 'react-icons/cg';
 
 const tabs = [
-  { label: 'Inicio',    icon: '🏠', path: '/home' },
-  { label: 'Finanzas',  icon: '💳', path: '/finanzas' },
-  { label: 'Negocio',   icon: '📊', path: '/negocio' },
-  { label: 'Coach',     icon: '💬', path: '/coach' },
-  { label: 'Perfil',    icon: '👤', path: '/perfil' },
+  { label: 'Inicio',    icon: <AiOutlineHome size={24} />,                  path: '/home' },
+  { label: 'Finanzas',  icon: <MdOutlineAccountBalanceWallet size={24} />,  path: '/finanzas' },
+  { label: 'Coach',     icon: <IoChatbubbleOutline size={24} />,            path: '/coach' },
+  { label: 'Perfil',    icon: <CgProfile size={24} />,                      path: '/perfil' },
 ];
 
 const Footer: React.FC = () => {

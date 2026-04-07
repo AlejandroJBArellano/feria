@@ -23,15 +23,27 @@
     padding: 4px 12px;
     color: #9e9e9e;
     flex: 1;
+    transition: none;
   }
   
   .footer__icon {
     font-size: 22px;
+    transition: color 180ms ease 40ms, transform 180ms ease 40ms;
   }
   
   .footer__label {
     font-size: 11px;
     font-weight: 500;
+    transition: color 180ms ease 40ms;
+  }
+
+  .footer__tab:hover .footer__icon {
+    color: #4caf50;
+    transform: scale(1.08);
+  }
+
+  .footer__tab:hover .footer__label {
+    color: #4caf50;
   }
   
   .footer__tab--active .footer__icon,

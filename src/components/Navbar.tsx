@@ -1,5 +1,6 @@
 import React from 'react';
 import './Navbar.css';
+import { IoNotificationsOutline, IoSettingsOutline } from 'react-icons/io5';
 
 interface NavbarProps {
   userName?: string;
@@ -31,13 +32,13 @@ const Navbar: React.FC<NavbarProps> = ({
 
       <div className="navbar__right">
         <button className="navbar__icon-btn" aria-label="Notificaciones">
-          <span className="navbar__icon">🔔</span>
+          <IoNotificationsOutline size={24} />
           {notificationCount > 0 && (
             <span className="navbar__badge">{notificationCount}</span>
           )}
         </button>
         <button className="navbar__icon-btn" aria-label="Configuración">
-          <span className="navbar__icon">⚙️</span>
+          <IoSettingsOutline size={24} />
         </button>
       </div>
     </header>
