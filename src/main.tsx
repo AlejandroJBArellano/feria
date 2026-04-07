@@ -1,11 +1,18 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
+import 'aws-amplify/auth/enable-oauth-listener';
+import { AuthProvider } from './auth/AuthContext';
+import { configureAmplify } from './auth/configureAmplify';
+
+configureAmplify();
 
 const container = document.getElementById('root');
 const root = createRoot(container!);
 root.render(
   <React.StrictMode>
-    <App />
+    <AuthProvider>
+      <App />
+    </AuthProvider>
   </React.StrictMode>
 );

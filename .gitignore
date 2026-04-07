@@ -4,6 +4,7 @@
 /node_modules
 /.pnp
 .pnp.js
+.npm-cache
 
 # testing
 /coverage
@@ -29,3 +30,5 @@ yarn-error.log*
 
 # Optional eslint cache
 .eslintcache
+
+.env
