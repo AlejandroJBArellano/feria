@@ -1,0 +1,150 @@
+.home-page {
+  --home-orb-size: min(56vw, var(--feria-orb-size-max));
+}
+
+.home-content {
+  --background: var(--ion-background-color, #fff);
+}
+
+.home-layout {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem var(--feria-space-page);
+  box-sizing: border-box;
+}
+
+.home-intro {
+  margin: 0 0 var(--feria-space-stack-lg);
+}
+
+/* Siri-style orb: layered glow + rotating spectrum ring */
+.siri-orb-wrap {
+  position: relative;
+  width: var(--home-orb-size);
+  height: var(--home-orb-size);
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.siri-orb-wrap:focus-visible {
+  outline: 2px solid var(--ion-color-primary, #3880ff);
+  outline-offset: 6px;
+  border-radius: 50%;
+}
+
+.siri-orb-glow {
+  position: absolute;
+  inset: -18%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(99, 102, 241, 0.35) 0%,
+    rgba(56, 189, 248, 0.12) 45%,
+    transparent 70%
+  );
+  filter: blur(16px);
+  opacity: 0.65;
+  transition: opacity 0.35s ease, transform 0.35s ease;
+  pointer-events: none;
+}
+
+.siri-orb-wrap--active .siri-orb-glow {
+  opacity: 1;
+  transform: scale(1.08);
+  animation: home-glow-pulse 1.2s ease-in-out infinite;
+}
+
+.siri-orb-ring {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    #6366f1,
+    #22d3ee,
+    #a78bfa,
+    #f472b6,
+    #fb923c,
+    #6366f1
+  );
+  animation: home-ring-rotate 8s linear infinite;
+  pointer-events: none;
+}
+
+.siri-orb-wrap--active .siri-orb-ring {
+  animation-duration: 2.5s;
+  filter: brightness(1.15);
+}
+
+.siri-orb-core {
+  position: absolute;
+  inset: 10px;
+  z-index: 1;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ion-background-color, #fff);
+  border: var(--feria-disk-border);
+  box-shadow: var(--feria-disk-shadow-inner), var(--feria-disk-shadow-elev);
+  box-sizing: border-box;
+}
+
+.siri-orb-core .feria-text-hint {
+  padding: 0 0.75rem;
+}
+
+@keyframes home-ring-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes home-glow-pulse {
+  0%,
+  100% {
+    transform: scale(1.05);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.12);
+    opacity: 1;
+  }
+}
+
+.home-voice-unsupported {
+  margin-top: 1.25rem;
+  font-size: 0.875rem;
+  text-align: center;
+  max-width: 280px;
+}
+
+.home-transcript {
+  margin-top: 2rem;
+  width: 100%;
+  max-width: 320px;
+  text-align: center;
+}
+
+.home-transcript-text {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.45;
+  color: var(--ion-text-color, #000);
+}
+
+.home-transcript-interim {
+  opacity: 0.45;
+}
+
+.home-modal-intro {
+  margin: 0 0 0.75rem;
+  font-size: 0.8125rem;
+}
+

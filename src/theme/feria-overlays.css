@@ -1,0 +1,112 @@
+/*
+ * Feria overlays (modals, sheets)
+ * -------------------------------
+ * Ionic defaults skew Material-sharp on tablet (2px radius). These rules align
+ * overlays with a calmer, shadcn-like language: large radius, light border,
+ * diffuse shadow, optional sheet handle. Use class `feria-modal` on IonModal.
+ *
+ * Sheet modals: set breakpoints + initialBreakpoint so the shell is not a
+ * full-bleed rectangle on phones (rounded top reads “floating card”).
+ */
+
+ion-modal.feria-modal {
+  --backdrop-opacity: var(--feria-modal-backdrop-opacity);
+  --background: var(--ion-background-color);
+  /* Avoid double border vs ::part(content) */
+  --border-width: 0;
+  --box-shadow: none;
+}
+
+ion-modal.feria-modal::part(backdrop) {
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+ion-modal.feria-modal::part(content) {
+  border: 1px solid var(--feria-modal-border-color);
+  box-shadow: var(--feria-modal-shadow);
+  overflow: hidden;
+}
+
+/* Bottom sheet: round top only (flush to safe area at bottom) */
+ion-modal.feria-modal.modal-sheet::part(content) {
+  border-start-start-radius: var(--feria-modal-radius);
+  border-start-end-radius: var(--feria-modal-radius);
+  border-end-end-radius: 0;
+  border-end-start-radius: 0;
+}
+
+/*
+ * Tablet / desktop: Ionic uses an inset “card” for modal-default (override MD 2px).
+ * Sheets stay anchored to the bottom — keep only top corners rounded.
+ */
+@media (min-width: 768px) and (min-height: 600px) {
+  ion-modal.feria-modal {
+    --border-radius: var(--feria-modal-radius);
+    --box-shadow: var(--feria-modal-shadow);
+  }
+
+  ion-modal.feria-modal.modal-default::part(content) {
+    border-radius: var(--feria-modal-radius);
+  }
+}
+
+/* Header: minimal separator, no heavy toolbar chrome */
+ion-modal.feria-modal ion-header ion-toolbar {
+  --background: transparent;
+  --border-width: 0;
+  --min-height: 52px;
+  padding-top: 4px;
+}
+
+ion-modal.feria-modal ion-title {
+  font-size: 1.0625rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/* Toggle group: pill track (shadcn toggle-group feel) */
+ion-modal.feria-modal ion-segment {
+  --background: var(--feria-modal-field-bg);
+  border-radius: var(--feria-modal-radius-inner);
+  padding: 4px;
+  min-height: 42px;
+}
+
+ion-modal.feria-modal ion-segment-button {
+  --indicator-border-radius: calc(var(--feria-modal-radius-inner) - 2px);
+  --border-radius: calc(var(--feria-modal-radius-inner) - 2px);
+  --padding-top: 8px;
+  --padding-bottom: 8px;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* Stacked fields: soft filled blocks */
+ion-modal.feria-modal ion-item.feria-modal-field {
+  --background: var(--feria-modal-field-bg);
+  --border-radius: var(--feria-modal-radius-inner);
+  --padding-start: 14px;
+  --padding-end: 14px;
+  --inner-padding-end: 0;
+  --min-height: 56px;
+  margin-top: 12px;
+  border: 1px solid var(--feria-modal-border-color);
+}
+
+ion-modal.feria-modal ion-item.feria-modal-field::part(native) {
+  border-radius: var(--feria-modal-radius-inner);
+}
+
+/* Primary action */
+ion-modal.feria-modal ion-button.feria-modal-primary {
+  --border-radius: var(--feria-modal-radius-inner);
+  margin-top: 1.5rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+ion-modal.feria-modal .feria-modal-body {
+  padding-top: 0.25rem;
+}

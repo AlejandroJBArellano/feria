@@ -1,0 +1,79 @@
+/*
+ * Feria component patterns
+ * ------------------------
+ * Reusable classes built from feria-tokens.css. New screens should compose these
+ * before adding page-specific CSS.
+ */
+
+/* Muted supporting copy (taglines, helper text) */
+.feria-text-muted {
+  margin: 0;
+  font-size: var(--feria-font-body-sm);
+  font-weight: var(--feria-weight-medium);
+  letter-spacing: var(--feria-letter-wide);
+  color: var(--ion-color-medium-shade, #666);
+  text-align: center;
+}
+
+/* Short hint inside circular controls (voice orb, etc.) */
+.feria-text-hint {
+  font-size: var(--feria-font-caption);
+  font-weight: var(--feria-weight-medium);
+  color: var(--ion-color-medium, #92949c);
+  text-align: center;
+  line-height: 1.3;
+}
+
+.feria-text-hint--active {
+  color: var(--ion-color-primary, #3880ff);
+}
+
+/* Small caps section label */
+.feria-text-label-caps {
+  margin: 0 0 0.35rem;
+  font-size: var(--feria-font-label);
+  text-transform: uppercase;
+  letter-spacing: var(--feria-letter-label);
+  color: var(--ion-color-medium, #92949c);
+}
+
+/* Fixed corner anchor (secondary actions, FAB siblings) */
+.feria-fixed-corner-br {
+  position: fixed;
+  bottom: max(var(--feria-fab-offset), env(safe-area-inset-bottom));
+  right: max(var(--feria-fab-offset), env(safe-area-inset-right));
+  z-index: 10;
+  pointer-events: auto;
+}
+
+/*
+ * Quiet circular button — same “disk” language as the voice orb core:
+ * page background fill, soft elevation, hairline border. No heavy fills.
+ */
+ion-button.feria-icon-btn-quiet {
+  --padding-start: 0;
+  --padding-end: 0;
+  --border-radius: 50%;
+  --background: var(--ion-background-color);
+  --background-hover: var(--ion-background-color);
+  --background-activated: color-mix(in srgb, var(--ion-color-medium) 10%, var(--ion-background-color));
+  --box-shadow: var(--feria-disk-shadow-inner), var(--feria-disk-shadow-elev);
+  --border-width: 1px;
+  --border-style: solid;
+  --border-color: rgba(146, 148, 156, 0.28);
+  --color: var(--ion-color-medium-shade, #6e6e73);
+  width: var(--feria-control-min);
+  height: var(--feria-control-min);
+  min-height: var(--feria-control-min);
+  margin: 0;
+  font-size: 1.125rem;
+}
+
+.ion-palette-dark ion-button.feria-icon-btn-quiet {
+  --border-color: rgba(255, 255, 255, 0.14);
+  --color: var(--ion-color-step-600, #abacae);
+}
+
+ion-button.feria-icon-btn-quiet::part(native) {
+  padding: 0;
+}
