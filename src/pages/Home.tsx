@@ -1,21 +1,21 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
 import {
-  IonButton,
-  IonContent,
-  IonHeader,
-  IonIcon,
-  IonInput,
-  IonItem,
-  IonLabel,
-  IonModal,
-  IonPage,
-  IonSegment,
-  IonSegmentButton,
-  IonText,
-  IonTitle,
-  IonToolbar,
+    IonButton,
+    IonContent,
+    IonHeader,
+    IonIcon,
+    IonInput,
+    IonItem,
+    IonLabel,
+    IonModal,
+    IonPage,
+    IonSegment,
+    IonSegmentButton,
+    IonText,
+    IonTitle,
+    IonToolbar,
 } from '@ionic/react';
 import { logOutOutline } from 'ionicons/icons';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAuth } from '../auth/AuthContext';
 import KeyboardClassicIcon from '../components/icons/KeyboardClassicIcon';
 import './Home.css';
