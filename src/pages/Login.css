@@ -1,38 +1,31 @@
 /* ================================================
-   FactorSocial Login — Login.css
-   Matches the design from the provided screenshot
+   FactorSocial — Login (email + password UI)
    ================================================ */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-/* ─── Reset for Ionic page/content ─── */
 .login-page,
 .login-content {
   --background: transparent;
 }
 
-/* ─── Full-screen layout wrapper ─── */
 .login-layout {
   min-height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 60px 28px 48px;
-
-  /* Background: light blue-white gradient with teal glow in bottom-right */
+  padding: 48px 24px 40px;
   background:
     radial-gradient(ellipse 80% 55% at 75% 100%, rgba(100, 220, 210, 0.48) 0%, transparent 60%),
     linear-gradient(165deg, #eef3fd 0%, #f5f9ff 45%, #f0fafc 100%);
-
   font-family: 'Inter', 'Segoe UI', sans-serif;
   color: #0d1b46;
 }
 
-/* ─── Brand section ─── */
 .login-brand {
   text-align: center;
-  margin-bottom: 36px;
+  margin-bottom: 28px;
 }
 
 .login-brand__title {
@@ -49,119 +42,117 @@
   font-size: clamp(0.9rem, 3.5vw, 1rem);
   font-weight: 400;
   color: #6b7a99;
-  letter-spacing: 0;
 }
 
-/* ─── Card ─── */
 .login-card {
-  width: min(88vw, 340px);
+  width: min(92vw, 380px);
   background: #ffffff;
   border-radius: 20px;
   box-shadow:
     0 4px 6px rgba(0, 0, 0, 0.04),
     0 10px 30px rgba(13, 27, 78, 0.08);
-  padding: 20px 18px 18px;
+  padding: 24px 20px 20px;
 }
 
-.login-config-warning {
-  margin: 0 0 12px;
-  font-size: 0.85rem;
-  line-height: 1.35;
+.login-card__heading {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #0d1b3e;
+}
+
+.login-card__sub {
+  margin: 6px 0 0;
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: #6b7a99;
+}
+
+.login-form {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.login-field {
+  --background: #f4f7fb;
+  --border-radius: 12px;
+  --padding-start: 14px;
+  --padding-end: 14px;
+  --inner-padding-end: 0;
+  --min-height: auto;
+  margin-bottom: 10px;
+  border: 1px solid rgba(13, 27, 78, 0.08);
+  border-radius: 12px;
+}
+
+.login-field::part(native) {
+  border-radius: 12px;
+}
+
+.login-form__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 4px 0 16px;
+  flex-wrap: wrap;
+}
+
+.login-remember {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #4d5b78;
+  user-select: none;
+}
+
+.login-remember__input {
+  width: 16px;
+  height: 16px;
+  accent-color: #15756e;
+  border-radius: 4px;
+}
+
+.login-forgot {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #15756e;
+  text-decoration: none;
+}
+
+.login-forgot:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.login-submit {
+  --background: #0d1f5c;
+  --background-activated: #0a1848;
+  --background-hover: #112370;
+  --border-radius: 12px;
+  --box-shadow: 0 4px 14px rgba(13, 31, 92, 0.28);
+  margin: 0;
+  height: 50px;
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+}
+
+.login-demo-hint {
+  margin: 16px 0 0;
+  font-size: 0.75rem;
+  line-height: 1.4;
   text-align: center;
 }
 
-/* ─── Google button ─── */
-.google-button {
-  width: 100%;
-  height: 52px;
-  border: none;
-  border-radius: 10px;
-  background: #0d1f5c;
-  color: #ffffff;
-  font-family: 'Inter', sans-serif;
-  font-size: 0.98rem;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  cursor: pointer;
-  transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
-  box-shadow: 0 4px 14px rgba(13, 31, 92, 0.3);
-  -webkit-tap-highlight-color: transparent;
-}
-
-.google-button:hover {
-  background: #112370;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(13, 31, 92, 0.38);
-}
-
-.google-button:active {
-  transform: translateY(0);
-  box-shadow: 0 3px 10px rgba(13, 31, 92, 0.25);
-}
-
-.google-button:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-}
-
-.google-icon {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.google-button__label {
-  letter-spacing: 0.01em;
-}
-
-/* ─── Feature grid ─── */
-.feature-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-top: 14px;
-}
-
-.feature-item {
-  background: #f7f9fc;
-  border: 1px solid rgba(13, 27, 78, 0.07);
-  border-radius: 10px;
-  padding: 14px 12px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-height: 90px;
-  justify-content: center;
-}
-
-.feature-icon {
-  display: flex;
-  align-items: center;
-}
-
-.feature-item__label {
-  margin: 0;
-  font-size: 0.625rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  color: #4d5b78;
-  line-height: 1.35;
-  text-transform: uppercase;
-}
-
-/* ─── Footer ─── */
 .login-footer {
-  margin-top: 36px;
+  margin-top: 32px;
   text-align: center;
 }
 
@@ -201,28 +192,17 @@
   color: #6b7a99;
 }
 
-/* ─── Responsive tweaks ─── */
 @media (max-width: 400px) {
   .login-layout {
-    padding: 48px 20px 36px;
+    padding: 40px 18px 32px;
   }
 
   .login-card {
-    width: 92vw;
-    padding: 18px 14px 14px;
+    padding: 20px 16px 16px;
   }
 
-  .google-button {
-    height: 50px;
-    font-size: 0.95rem;
-  }
-
-  .feature-item {
-    min-height: 80px;
-    padding: 12px 10px;
-  }
-
-  .feature-item__label {
-    font-size: 0.6rem;
+  .login-form__row {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
