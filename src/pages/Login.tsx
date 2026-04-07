@@ -3,6 +3,7 @@ import { useEffect, useLayoutEffect, useState } from 'react';
 import { Redirect, useHistory, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { isCognitoConfigured } from '../auth/configureAmplify';
+import ThemeToggle from '../components/ThemeToggle';
 import { isOnboardingComplete } from '../onboarding/onboardingStorage';
 import './Login.css';
 
@@ -65,6 +66,9 @@ const Login: React.FC = () => {
     <IonPage className="login-page">
       <IonContent fullscreen className="login-content">
         <main className="login-layout">
+          <div className="login-theme-slot">
+            <ThemeToggle />
+          </div>
           <section className="login-brand">
             <h1 className="login-brand__title">
               Bienvenido a <span className="login-brand__accent">FerIA</span>

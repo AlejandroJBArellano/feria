@@ -8,6 +8,7 @@
 }
 
 .login-layout {
+  position: relative;
   min-height: 100%;
   display: flex;
   flex-direction: column;
@@ -31,6 +32,13 @@
     -apple-system,
     sans-serif;
   color: var(--feria-color-ink);
+}
+
+.login-theme-slot {
+  position: absolute;
+  top: max(0.5rem, env(safe-area-inset-top));
+  right: max(0.25rem, env(safe-area-inset-right));
+  z-index: 2;
 }
 
 .login-brand {

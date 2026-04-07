@@ -59,6 +59,16 @@
 
   --ion-background-color: var(--feria-color-surface);
   --ion-text-color: var(--feria-color-text);
+
+  /* Voice orb — brand greens (avoid generic purple/cyan “assistant” look) */
+  --feria-orb-glow-mid: rgba(76, 175, 80, 0.42);
+  --feria-orb-glow-edge: rgba(129, 199, 132, 0.2);
+  --feria-orb-ring-a: #2e7d32;
+  --feria-orb-ring-b: #43a047;
+  --feria-orb-ring-c: #66bb6a;
+  --feria-orb-ring-d: #388e3c;
+  --feria-orb-ring-e: #81c784;
+  --feria-orb-ring-f: #1b5e20;
 }
 
 .ion-palette-dark {
@@ -81,4 +91,13 @@
 
   --ion-background-color: var(--feria-color-page);
   --ion-text-color: var(--feria-color-text);
+
+  --feria-orb-glow-mid: rgba(102, 187, 106, 0.38);
+  --feria-orb-glow-edge: rgba(46, 125, 50, 0.28);
+  --feria-orb-ring-a: #66bb6a;
+  --feria-orb-ring-b: #81c784;
+  --feria-orb-ring-c: #43a047;
+  --feria-orb-ring-d: #a5d6a7;
+  --feria-orb-ring-e: #2e7d32;
+  --feria-orb-ring-f: #c8e6c9;
 }

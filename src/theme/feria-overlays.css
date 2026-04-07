@@ -81,6 +81,13 @@ ion-modal.feria-modal ion-segment-button {
   font-weight: 500;
   text-transform: none;
   letter-spacing: 0;
+  --color: var(--ion-color-medium-shade);
+}
+
+/* Selected tab uses brand primary (fixes mismatched default blue / gray) */
+ion-modal.feria-modal ion-segment-button.segment-button-checked {
+  --indicator-color: var(--ion-color-primary);
+  --color: var(--ion-color-primary-contrast);
 }
 
 /* Stacked fields: soft filled blocks */

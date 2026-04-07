@@ -13,6 +13,21 @@
     />
     <meta name="format-detection" content="telephone=no" />
     <meta name="msapplication-tap-highlight" content="no" />
+    <script>
+      (function () {
+        try {
+          var k = 'feria_theme_mode';
+          var m = localStorage.getItem(k);
+          if (m === 'dark') document.documentElement.classList.add('ion-palette-dark');
+          else if (m === 'light') document.documentElement.classList.remove('ion-palette-dark');
+          else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('ion-palette-dark');
+          }
+        } catch (e) {
+          /* ignore */
+        }
+      })();
+    </script>
     
     <link rel="manifest" href="/manifest.json" />
     

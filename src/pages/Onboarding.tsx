@@ -1,6 +1,7 @@
 import { IonButton, IonContent, IonPage, IonSpinner } from '@ionic/react';
 import { Redirect, useHistory } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
+import ThemeToggle from '../components/ThemeToggle';
 import { isOnboardingComplete, markOnboardingComplete } from '../onboarding/onboardingStorage';
 import './Onboarding.css';
 
@@ -33,20 +34,49 @@ const Onboarding: React.FC = () => {
 
   return (
     <IonPage className="onboarding-page">
+      <div className="onboarding-ai-bg" aria-hidden />
+      <div className="feria-fixed-corner-tr">
+        <ThemeToggle />
+      </div>
       <IonContent fullscreen className="onboarding-content">
-        <div className="onboarding-inner">
-          <p className="onboarding-eyebrow">Bienvenida</p>
-          <h1 className="onboarding-title">
-            Conoce a <span>FerIA</span>
-          </h1>
-          <p className="onboarding-copy">
-            Tu asistente para ordenar ingresos y gastos. Pronto personalizaremos la experiencia contigo; por ahora
-            solo confirma para continuar.
-          </p>
-          <IonButton expand="block" className="onboarding-primary" onClick={handleContinue}>
-            Continuar
-          </IonButton>
-          <p className="onboarding-hint">En versiones futuras aquí recopilaremos tus preferencias.</p>
+        <div className="onboarding-ai-layout">
+          <div className="onboarding-ai-hero">
+            <div className="onboarding-ai-orb" aria-hidden>
+              <span className="onboarding-ai-orb__core" />
+              <span className="onboarding-ai-orb__ring" />
+            </div>
+            <p className="onboarding-ai-eyebrow">Asistente financiero</p>
+            <h1 className="onboarding-ai-title">
+              Habla con <span className="onboarding-ai-title__brand">FerIA</span>
+            </h1>
+            <p className="onboarding-ai-lead">
+              Registra ingresos y gastos con voz o teclado. Un solo estilo, claro u oscuro, pensado para sentirse
+              ligero y moderno.
+            </p>
+          </div>
+
+          <div className="onboarding-ai-glass">
+            <ul className="onboarding-ai-pills" aria-label="Capacidades">
+              <li className="onboarding-ai-pill">
+                <span className="onboarding-ai-pill__dot" aria-hidden />
+                Dictado natural
+              </li>
+              <li className="onboarding-ai-pill">
+                <span className="onboarding-ai-pill__dot" aria-hidden />
+                Movimientos rápidos
+              </li>
+              <li className="onboarding-ai-pill">
+                <span className="onboarding-ai-pill__dot" aria-hidden />
+                Privacidad primero
+              </li>
+            </ul>
+            <IonButton expand="block" className="onboarding-ai-cta" onClick={handleContinue}>
+              Empezar
+            </IonButton>
+            <p className="onboarding-ai-footnote">
+              Puedes cambiar el tema arriba a la derecha en cualquier momento.
+            </p>
+          </div>
         </div>
       </IonContent>
     </IonPage>

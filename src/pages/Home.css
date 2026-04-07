@@ -32,7 +32,7 @@
 }
 
 .siri-orb-wrap:focus-visible {
-  outline: 2px solid var(--ion-color-primary, #3880ff);
+  outline: 2px solid var(--ion-color-primary);
   outline-offset: 6px;
   border-radius: 50%;
 }
@@ -43,8 +43,8 @@
   border-radius: 50%;
   background: radial-gradient(
     circle,
-    rgba(99, 102, 241, 0.35) 0%,
-    rgba(56, 189, 248, 0.12) 45%,
+    var(--feria-orb-glow-mid) 0%,
+    var(--feria-orb-glow-edge) 45%,
     transparent 70%
   );
   filter: blur(16px);
@@ -66,12 +66,13 @@
   border-radius: 50%;
   background: conic-gradient(
     from 0deg,
-    #6366f1,
-    #22d3ee,
-    #a78bfa,
-    #f472b6,
-    #fb923c,
-    #6366f1
+    var(--feria-orb-ring-a),
+    var(--feria-orb-ring-b),
+    var(--feria-orb-ring-c),
+    var(--feria-orb-ring-d),
+    var(--feria-orb-ring-e),
+    var(--feria-orb-ring-f),
+    var(--feria-orb-ring-a)
   );
   animation: home-ring-rotate 8s linear infinite;
   pointer-events: none;
@@ -146,5 +147,40 @@
 .home-modal-intro {
   margin: 0 0 0.75rem;
   font-size: 0.8125rem;
+}
+
+/* Quick expense tags (gasto) — same token family as modal fields */
+.home-modal-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.home-modal-chip {
+  appearance: none;
+  border: 1px solid var(--feria-modal-border-color);
+  background: var(--feria-modal-field-bg);
+  color: var(--ion-text-color);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  padding: 8px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    background var(--feria-duration-normal) var(--feria-ease-standard),
+    border-color var(--feria-duration-normal) var(--feria-ease-standard),
+    color var(--feria-duration-normal) var(--feria-ease-standard);
+}
+
+.home-modal-chip:hover {
+  border-color: color-mix(in srgb, var(--ion-color-primary) 45%, var(--feria-modal-border-color));
+  background: color-mix(in srgb, var(--ion-color-primary) 12%, var(--feria-modal-field-bg));
+}
+
+.home-modal-chip:focus-visible {
+  outline: 2px solid var(--ion-color-primary);
+  outline-offset: 2px;
 }
 

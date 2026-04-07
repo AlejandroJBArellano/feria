@@ -1,75 +1,212 @@
+/* Onboarding — “AI” landing: mesh, glass, brand orb; theme-aware via feria-palette */
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
+
 .onboarding-page {
   --background: var(--feria-color-page);
+  position: relative;
+  font-family:
+    'IBM Plex Sans',
+    system-ui,
+    -apple-system,
+    sans-serif;
 }
 
 .onboarding-content {
-  --background: var(--feria-color-page);
+  --background: transparent;
+  position: relative;
+  z-index: 1;
 }
 
-.onboarding-inner {
+.onboarding-ai-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 120% 80% at 20% -10%, color-mix(in srgb, var(--feria-color-primary) 22%, transparent) 0%, transparent 55%),
+    radial-gradient(ellipse 90% 60% at 100% 30%, color-mix(in srgb, var(--feria-color-accent-soft) 55%, transparent) 0%, transparent 50%),
+    linear-gradient(165deg, var(--feria-color-page) 0%, var(--feria-color-surface-muted) 48%, var(--feria-color-page) 100%);
+  opacity: 1;
+}
+
+.ion-palette-dark .onboarding-ai-bg {
+  background:
+    radial-gradient(ellipse 120% 80% at 15% 0%, color-mix(in srgb, var(--feria-color-primary) 18%, transparent) 0%, transparent 52%),
+    radial-gradient(ellipse 80% 50% at 100% 20%, rgba(46, 125, 50, 0.2) 0%, transparent 48%),
+    linear-gradient(170deg, var(--feria-color-page) 0%, #1a1a1c 55%, var(--feria-color-page) 100%);
+}
+
+.onboarding-ai-layout {
   min-height: 100%;
   box-sizing: border-box;
-  padding: max(1.25rem, env(safe-area-inset-top))
-    max(1.25rem, env(safe-area-inset-right))
-    max(1.5rem, env(safe-area-inset-bottom))
-    max(1.25rem, env(safe-area-inset-left));
+  padding: max(1.5rem, env(safe-area-inset-top)) max(1.25rem, env(safe-area-inset-right))
+    max(1.5rem, env(safe-area-inset-bottom)) max(1.25rem, env(safe-area-inset-left));
   display: flex;
   flex-direction: column;
   justify-content: center;
-  max-width: 28rem;
+  gap: 1.75rem;
+  max-width: 26rem;
   margin: 0 auto;
 }
 
-.onboarding-eyebrow {
-  margin: 0 0 0.5rem;
-  font-size: var(--feria-font-label);
-  font-weight: 600;
-  letter-spacing: var(--feria-letter-label);
+.onboarding-ai-hero {
+  text-align: center;
+}
+
+.onboarding-ai-orb {
+  position: relative;
+  width: 88px;
+  height: 88px;
+  margin: 0 auto 1.25rem;
+}
+
+.onboarding-ai-orb__ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    var(--feria-orb-ring-a),
+    var(--feria-orb-ring-b),
+    var(--feria-orb-ring-c),
+    var(--feria-orb-ring-d),
+    var(--feria-orb-ring-e),
+    var(--feria-orb-ring-f),
+    var(--feria-orb-ring-a)
+  );
+  animation: onboarding-orb-spin 10s linear infinite;
+  filter: saturate(1.05);
+}
+
+.onboarding-ai-orb__core {
+  position: absolute;
+  inset: 14px;
+  z-index: 1;
+  border-radius: 50%;
+  background: var(--ion-background-color);
+  border: var(--feria-disk-border);
+  box-shadow: var(--feria-disk-shadow-inner), var(--feria-disk-shadow-elev);
+  display: block;
+}
+
+@keyframes onboarding-orb-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.onboarding-ai-eyebrow {
+  margin: 0 0 0.4rem;
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--feria-color-text-muted);
 }
 
-.onboarding-title {
-  margin: 0 0 0.75rem;
-  font-size: clamp(1.5rem, 5vw, 1.85rem);
+.onboarding-ai-title {
+  margin: 0 0 0.65rem;
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: clamp(1.65rem, 6vw, 2.05rem);
   font-weight: 800;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
   color: var(--feria-color-text);
 }
 
-.onboarding-title span {
-  color: var(--feria-color-primary);
+.onboarding-ai-title__brand {
+  background: linear-gradient(
+    120deg,
+    var(--feria-color-primary) 0%,
+    var(--feria-color-accent-dark) 50%,
+    var(--ion-color-primary-tint) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
-.onboarding-copy {
-  margin: 0 0 1.75rem;
-  font-size: var(--feria-font-body-sm);
-  line-height: 1.5;
+.onboarding-ai-lead {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  font-weight: 400;
   color: var(--feria-color-text-secondary);
 }
 
-.onboarding-primary {
+.onboarding-ai-glass {
+  border-radius: 20px;
+  padding: 1.25rem 1.15rem 1.1rem;
+  border: 1px solid color-mix(in srgb, var(--feria-color-border) 85%, transparent);
+  background: color-mix(in srgb, var(--feria-color-surface) 88%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 24px 48px -28px rgba(0, 0, 0, 0.2);
+}
+
+.ion-palette-dark .onboarding-ai-glass {
+  background: color-mix(in srgb, var(--feria-color-surface) 72%, transparent);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.05) inset,
+    0 28px 56px -32px rgba(0, 0, 0, 0.55);
+}
+
+.onboarding-ai-pills {
+  list-style: none;
+  margin: 0 0 1.15rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.onboarding-ai-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--feria-color-text);
+  letter-spacing: 0.01em;
+}
+
+.onboarding-ai-pill__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, var(--feria-color-primary), var(--feria-color-accent-dark));
+  box-shadow: 0 0 12px color-mix(in srgb, var(--feria-color-primary) 45%, transparent);
+}
+
+.onboarding-ai-cta {
   --background: var(--feria-color-primary);
   --background-hover: var(--feria-color-primary-shade);
   --background-activated: var(--feria-color-primary-shade);
   --color: var(--feria-color-on-primary);
-  --border-radius: 12px;
+  --border-radius: 14px;
   min-height: var(--feria-control-min);
-  font-weight: 600;
-  letter-spacing: 0.02em;
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: none;
   margin: 0;
 }
 
-.onboarding-primary:focus-visible {
+.onboarding-ai-cta:focus-visible {
   outline: 2px solid var(--ion-color-primary);
   outline-offset: 3px;
 }
 
-.onboarding-hint {
-  margin: 1rem 0 0;
+.onboarding-ai-footnote {
+  margin: 0.85rem 0 0;
   font-size: var(--feria-font-caption);
-  color: var(--feria-color-text-hint);
+  line-height: 1.45;
   text-align: center;
-  line-height: 1.4;
+  color: var(--feria-color-text-hint);
 }
