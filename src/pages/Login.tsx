@@ -1,32 +1,27 @@
 import { IonContent, IonPage } from '@ionic/react';
 import { useAuth } from '../auth/AuthContext';
+import { isCognitoConfigured } from '../auth/configureAmplify';
 import './Login.css';
 
 const Login: React.FC = () => {
-  const { signIn } = useAuth();
+  const { signIn, isLoading } = useAuth();
 
   return (
     <IonPage className="login-page">
       <IonContent fullscreen className="login-content">
         <main className="login-layout">
-
-          {/* ── Brand ── */}
           <section className="login-brand">
             <h1 className="login-brand__title">FactorSocial</h1>
-            <p className="login-brand__tagline">
-              Tu confianza digital, tu libertad financiera.
-            </p>
+            <p className="login-brand__tagline">Tu confianza digital, tu libertad financiera.</p>
           </section>
 
-          {/* ── Card ── */}
           <section className="login-card">
-
-            {/* Google button */}
             <button
               type="button"
               id="btn-google-login"
               className="google-btn"
-              onClick={() => void signIn()}
+              disabled={!isCognitoConfigured || isLoading}
+              onClick={() => void signIn('Google')}
             >
               <span className="google-btn__icon" aria-hidden="true">
                 <svg
@@ -58,12 +53,9 @@ const Login: React.FC = () => {
               <span className="google-btn__label">Continuar con Google</span>
             </button>
 
-            {/* Feature badges */}
             <div className="feature-grid">
-
               <article className="feature-item">
                 <span className="feature-item__icon" aria-hidden="true">
-                  {/* Shield + checkmark */}
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none">
                     <path
                       d="M12 2L3 6v6c0 5.25 3.75 10.15 9 11.25C17.25 22.15 21 17.25 21 12V6l-9-4z"
@@ -85,12 +77,11 @@ const Login: React.FC = () => {
                     />
                   </svg>
                 </span>
-                <p className="feature-item__label">BÓVEDA CIFRADA</p>
+                <p className="feature-item__label">BOVEDA CIFRADA</p>
               </article>
 
               <article className="feature-item">
                 <span className="feature-item__icon" aria-hidden="true">
-                  {/* Trending-up arrow */}
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none">
                     <polyline
                       points="23 6 13.5 15.5 8.5 10.5 1 18"
@@ -108,25 +99,25 @@ const Login: React.FC = () => {
                     />
                   </svg>
                 </span>
-                <p className="feature-item__label">CRECIMIENTO<br />SOCIAL</p>
+                <p className="feature-item__label">CRECIMIENTO SOCIAL</p>
               </article>
-
             </div>
+
+            {!isCognitoConfigured && (
+              <p className="login-footer__signup">Faltan variables VITE_COGNITO_* para iniciar sesion.</p>
+            )}
           </section>
 
-          {/* ── Footer ── */}
           <section className="login-footer">
             <p className="login-footer__signup">
-              ¿No tienes cuenta?{' '}
-              <a href="#registro" id="link-registro">Regístrate</a>
+              No tienes cuenta? <a href="#registro" id="link-registro">Registrate</a>
             </p>
             <nav aria-label="Legal" className="legal-links">
               <a href="#privacidad" id="link-privacidad">PRIVACIDAD</a>
-              <a href="#terminos"   id="link-terminos">TÉRMINOS</a>
-              <a href="#ayuda"      id="link-ayuda">AYUDA</a>
+              <a href="#terminos" id="link-terminos">TERMINOS</a>
+              <a href="#ayuda" id="link-ayuda">AYUDA</a>
             </nav>
           </section>
-
         </main>
       </IonContent>
     </IonPage>

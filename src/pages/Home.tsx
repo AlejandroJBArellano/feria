@@ -1,21 +1,21 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
 import {
-  IonButton,
-  IonContent,
-  IonHeader,
-  IonIcon,
-  IonInput,
-  IonItem,
-  IonLabel,
-  IonModal,
-  IonPage,
-  IonSegment,
-  IonSegmentButton,
-  IonText,
-  IonTitle,
-  IonToolbar,
+    IonButton,
+    IonContent,
+    IonHeader,
+    IonIcon,
+    IonInput,
+    IonItem,
+    IonLabel,
+    IonModal,
+    IonPage,
+    IonSegment,
+    IonSegmentButton,
+    IonText,
+    IonTitle,
+    IonToolbar,
 } from '@ionic/react';
 import { logOutOutline } from 'ionicons/icons';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAuth } from '../auth/AuthContext';
 import KeyboardClassicIcon from '../components/icons/KeyboardClassicIcon';
 import './Home.css';
@@ -71,7 +71,8 @@ function createSpeechRecognition(): SpeechRecognitionInstance | null {
 }
 
 const Home: React.FC = () => {
-  const { signOutUser } = useAuth();
+  const { user, signOutUser } = useAuth();
+  const displayName = user?.name ?? user?.email ?? user?.username ?? 'Usuario autenticado';
   const [listening, setListening] = useState(false);
   const [voiceSupported, setVoiceSupported] = useState(true);
   const [voiceTranscript, setVoiceTranscript] = useState('');
@@ -190,6 +191,7 @@ const Home: React.FC = () => {
     <IonPage className="home-page">
       <IonContent fullscreen className="home-content">
         <div className="home-layout">
+          <p className="feria-text-label-caps">Hola, {displayName}</p>
           <p className="feria-text-muted home-intro">Registra un ingreso o un gasto</p>
 
           <div
