@@ -59,6 +59,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }): React
   const [user, setUser] = useState<AuthUser | null>(null);
 
   const refreshSession = useCallback(async () => {
+    const queryParams = new URLSearchParams(window.location.search);
+    const oauthError = queryParams.get('error');
+    const oauthErrorDescription = queryParams.get('error_description');
+
     if (!isCognitoConfigured) {
       authLog('refreshSession skipped: Cognito not configured');
       setUser(null);
@@ -69,7 +73,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }): React
 
     authLog('refreshSession started', {
       path: window.location.pathname,
-      hasAuthCode: window.location.search.includes('code=')
+      hasAuthCode: window.location.search.includes('code='),
+      oauthError,
+      oauthErrorDescription
     });
 
     setIsLoading(true);
