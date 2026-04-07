@@ -1,14 +1,64 @@
-import { IonContent, IonPage } from '@ionic/react';
-import { Redirect } from 'react-router-dom';
+import { IonContent, IonPage, IonSpinner } from '@ionic/react';
+import { useEffect, useLayoutEffect, useState } from 'react';
+import { Redirect, useHistory, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { isCognitoConfigured } from '../auth/configureAmplify';
+import { isOnboardingComplete } from '../onboarding/onboardingStorage';
 import './Login.css';
 
 const Login: React.FC = () => {
+  const history = useHistory();
+  const location = useLocation();
   const { signIn, isLoading, isAuthenticated } = useAuth();
 
-  if (!isLoading && isAuthenticated) {
-    return <Redirect to="/home" />;
+  // After Hosted UI redirect (?code=), keep spinner until Amplify finishes exchange (avoids flashing the form).
+  const [oauthReturnPending, setOauthReturnPending] = useState(() => /[?&]code=/.test(location.search));
+
+  useEffect(() => {
+    if (!oauthReturnPending) {
+      return;
+    }
+    if (isAuthenticated) {
+      setOauthReturnPending(false);
+      return;
+    }
+    if (!isLoading && !isAuthenticated) {
+      setOauthReturnPending(false);
+    }
+  }, [oauthReturnPending, isLoading, isAuthenticated]);
+
+  useLayoutEffect(() => {
+    if (isLoading || !isAuthenticated) {
+      return;
+    }
+    if (history.location.pathname !== '/login') {
+      return;
+    }
+    history.replace('/home');
+  }, [isLoading, isAuthenticated, history]);
+
+  if (isLoading || oauthReturnPending) {
+    return (
+      <IonPage className="login-page">
+        <IonContent fullscreen className="login-content ion-padding ion-text-center feria-route-loading">
+          <IonSpinner name="crescent" />
+        </IonContent>
+      </IonPage>
+    );
+  }
+
+  if (isAuthenticated) {
+    return (
+      <IonPage className="login-page">
+        <IonContent fullscreen className="login-content ion-padding ion-text-center feria-route-loading">
+          <IonSpinner name="crescent" />
+        </IonContent>
+      </IonPage>
+    );
+  }
+
+  if (!isOnboardingComplete()) {
+    return <Redirect to="/onboarding" />;
   }
 
   return (
@@ -117,7 +167,17 @@ const Login: React.FC = () => {
 
           <section className="login-footer">
             <p className="login-footer__signup">
-              No tienes cuenta? <a href="#registro" id="link-registro">Registrate</a>
+              ¿No tienes cuenta?{' '}
+              <button
+                type="button"
+                id="link-registro"
+                className="login-footer__register-link"
+                disabled={!isCognitoConfigured}
+                onClick={() => void signIn('Google')}
+              >
+                Continuar con Google
+              </button>
+              <span className="login-footer__signup-hint"> La primera vez se crea tu cuenta al completar el acceso.</span>
             </p>
             <nav aria-label="Legal" className="legal-links">
               <a href="#privacidad" id="link-privacidad">PRIVACIDAD</a>
