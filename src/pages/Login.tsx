@@ -1,11 +1,11 @@
 import {
-  IonButton,
-  IonContent,
-  IonHeader,
-  IonPage,
-  IonText,
-  IonTitle,
-  IonToolbar
+    IonButton,
+    IonContent,
+    IonHeader,
+    IonPage,
+    IonText,
+    IonTitle,
+    IonToolbar
 } from '@ionic/react';
 import { Redirect } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
@@ -46,10 +46,21 @@ const Login: React.FC = () => {
           expand="block"
           disabled={!isCognitoConfigured || isLoading}
           onClick={() => {
+            void signIn('Google');
+          }}
+        >
+          Continuar con Google
+        </IonButton>
+
+        <IonButton
+          expand="block"
+          fill="clear"
+          disabled={!isCognitoConfigured || isLoading}
+          onClick={() => {
             void signIn();
           }}
         >
-          Continuar con Cognito
+          Usar portal de Cognito
         </IonButton>
       </IonContent>
     </IonPage>
