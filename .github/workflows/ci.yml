@@ -1,0 +1,55 @@
+name: CI - Seguridad y Calidad FerIA
+
+on:
+  push:
+    branches: [ main, layout ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  seguridad-y-calidad:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v3
+
+      - name: Instalar Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - name: Instalar dependencias
+        run: npm install
+
+      # --- SEGURIDAD ---
+      - name: Vulnerabilidades en dependencias
+        run: npm audit --audit-level=moderate
+
+      - name: Detectar secrets expuestos
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: main
+          head: HEAD
+
+      - name: Análisis OWASP y React security
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: >-
+            p/react
+            p/typescript
+            p/owasp-top-ten
+            p/secrets
+
+      # --- CALIDAD ---
+      - name: Buenas prácticas ESLint
+        run: npx eslint src/ --ext .ts,.tsx --max-warnings=0
+
+      - name: Verificar TypeScript
+        run: npx tsc --noEmit
+
+      # --- BUILD ---
+      - name: Build limpio
+        run: npm run build
