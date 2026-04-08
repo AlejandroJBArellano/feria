@@ -1,0 +1,302 @@
+name: Deploy webapp to S3 + CloudFront
+
+on:
+  push:
+    branches:
+      - develop
+      - master
+    paths:
+      - 'src/**'
+      - 'public/**'
+      - 'index.html'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'tsconfig*.json'
+      - 'vite.config.ts'
+      - '.github/workflows/deploy-webapp-ecs.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  AWS_REGION: mx-central-1
+  AWS_ROLE_TO_ASSUME: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+  S3_BUCKET_NAME: ${{ vars.S3_BUCKET_NAME }}
+  CLOUDFRONT_DISTRIBUTION_ID: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}
+  CLOUDFRONT_COMMENT: feria-webapp
+  PUBLIC_BASE_URL: ${{ vars.PUBLIC_BASE_URL }}
+  VITE_COGNITO_REGION: ${{ vars.VITE_COGNITO_REGION }}
+  VITE_COGNITO_USER_POOL_ID: ${{ vars.VITE_COGNITO_USER_POOL_ID }}
+  VITE_COGNITO_USER_POOL_CLIENT_ID: ${{ vars.VITE_COGNITO_USER_POOL_CLIENT_ID }}
+  VITE_COGNITO_DOMAIN: ${{ vars.VITE_COGNITO_DOMAIN }}
+  VITE_COGNITO_REDIRECT_SIGN_IN: ${{ vars.VITE_COGNITO_REDIRECT_SIGN_IN }}
+  VITE_COGNITO_REDIRECT_SIGN_OUT: ${{ vars.VITE_COGNITO_REDIRECT_SIGN_OUT }}
+  VITE_COGNITO_OAUTH_SCOPES: ${{ vars.VITE_COGNITO_OAUTH_SCOPES }}
+  VITE_AUTH_DEBUG: ${{ vars.VITE_AUTH_DEBUG }}
+  VITE_FERIA_API_URL: ${{ vars.VITE_FERIA_API_URL }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate required configuration
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          required_values=(
+            AWS_REGION
+            VITE_COGNITO_REGION
+            VITE_COGNITO_USER_POOL_ID
+            VITE_COGNITO_USER_POOL_CLIENT_ID
+            VITE_COGNITO_DOMAIN
+            VITE_COGNITO_REDIRECT_SIGN_IN
+            VITE_COGNITO_REDIRECT_SIGN_OUT
+            VITE_COGNITO_OAUTH_SCOPES
+            VITE_FERIA_API_URL
+          )
+
+          for name in "${required_values[@]}"; do
+            if [[ -z "${!name:-}" ]]; then
+              echo "::error::$name is required as a GitHub repository variable or secret."
+              exit 1
+            fi
+          done
+
+          has_oidc_role="false"
+          if [[ -n "${AWS_ROLE_TO_ASSUME:-}" ]]; then
+            has_oidc_role="true"
+          fi
+
+          has_access_keys="false"
+          if [[ -n "${AWS_ACCESS_KEY_ID:-}" && -n "${AWS_SECRET_ACCESS_KEY:-}" ]]; then
+            has_access_keys="true"
+          fi
+
+          if [[ "$has_oidc_role" != "true" && "$has_access_keys" != "true" ]]; then
+            echo "::error::Configure AWS auth using either AWS_ROLE_TO_ASSUME (OIDC) or AWS_ACCESS_KEY_ID/AWS_SECRET_ACCESS_KEY (Secrets)."
+            exit 1
+          fi
+
+      - name: Configure AWS credentials (OIDC)
+        if: env.AWS_ROLE_TO_ASSUME != ''
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Configure AWS credentials (Access Keys)
+        if: env.AWS_ROLE_TO_ASSUME == ''
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ env.AWS_SESSION_TOKEN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build webapp
+        run: npm run build
+
+      - name: Create/resolve S3 + CloudFront
+        id: infra
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          account_id="$(aws sts get-caller-identity --query 'Account' --output text)"
+          if [[ -n "${S3_BUCKET_NAME:-}" ]]; then
+            bucket_name="$S3_BUCKET_NAME"
+          else
+            bucket_name="feria-webapp-${account_id}-${AWS_REGION}"
+          fi
+          cf_comment="${CLOUDFRONT_COMMENT:-feria-webapp}"
+
+          aws s3api head-bucket --bucket "$bucket_name" >/dev/null 2>&1 || {
+            if [[ "$AWS_REGION" == "us-east-1" ]]; then
+              aws s3api create-bucket --bucket "$bucket_name" >/dev/null
+            else
+              aws s3api create-bucket \
+                --bucket "$bucket_name" \
+                --create-bucket-configuration "LocationConstraint=$AWS_REGION" >/dev/null
+            fi
+          }
+
+          aws s3api put-bucket-versioning \
+            --bucket "$bucket_name" \
+            --versioning-configuration Status=Enabled >/dev/null
+
+          distribution_id="${CLOUDFRONT_DISTRIBUTION_ID:-}"
+
+          if [[ -z "$distribution_id" ]]; then
+            distribution_id=$(aws cloudfront list-distributions \
+              --query "DistributionList.Items[?Comment=='$cf_comment'] | [0].Id" \
+              --output text 2>/dev/null || true)
+          fi
+
+          if [[ -z "$distribution_id" || "$distribution_id" == "None" ]]; then
+            oac_id=$(aws cloudfront create-origin-access-control \
+              --origin-access-control-config "Name=${cf_comment}-oac,Description=OAC for ${bucket_name},SigningProtocol=sigv4,SigningBehavior=always,OriginAccessControlOriginType=s3" \
+              --query 'OriginAccessControl.Id' \
+              --output text)
+
+            cat > distribution-config.json <<EOF
+            {
+              "CallerReference": "${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}",
+              "Comment": "${cf_comment}",
+              "Enabled": true,
+              "DefaultRootObject": "index.html",
+              "Origins": {
+                "Quantity": 1,
+                "Items": [
+                  {
+                    "Id": "s3-origin-${bucket_name}",
+                    "DomainName": "${bucket_name}.s3.${AWS_REGION}.amazonaws.com",
+                    "S3OriginConfig": {
+                      "OriginAccessIdentity": ""
+                    },
+                    "OriginAccessControlId": "${oac_id}"
+                  }
+                ]
+              },
+              "DefaultCacheBehavior": {
+                "TargetOriginId": "s3-origin-${bucket_name}",
+                "ViewerProtocolPolicy": "redirect-to-https",
+                "AllowedMethods": {
+                  "Quantity": 2,
+                  "Items": ["GET", "HEAD"],
+                  "CachedMethods": {
+                    "Quantity": 2,
+                    "Items": ["GET", "HEAD"]
+                  }
+                },
+                "Compress": true,
+                "CachePolicyId": "658327ea-f89d-4fab-a63d-7e88639e58f6"
+              },
+              "CustomErrorResponses": {
+                "Quantity": 2,
+                "Items": [
+                  {
+                    "ErrorCode": 403,
+                    "ResponseCode": "200",
+                    "ResponsePagePath": "/index.html",
+                    "ErrorCachingMinTTL": 0
+                  },
+                  {
+                    "ErrorCode": 404,
+                    "ResponseCode": "200",
+                    "ResponsePagePath": "/index.html",
+                    "ErrorCachingMinTTL": 0
+                  }
+                ]
+              },
+              "PriceClass": "PriceClass_100",
+              "ViewerCertificate": {
+                "CloudFrontDefaultCertificate": true
+              }
+            }
+          EOF
+
+            distribution_id=$(aws cloudfront create-distribution \
+              --distribution-config file://distribution-config.json \
+              --query 'Distribution.Id' \
+              --output text)
+
+            aws cloudfront wait distribution-deployed --id "$distribution_id"
+          fi
+
+          distribution_domain=$(aws cloudfront get-distribution \
+            --id "$distribution_id" \
+            --query 'Distribution.DomainName' \
+            --output text)
+
+          cat > bucket-policy.json <<EOF
+          {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Sid": "AllowCloudFrontServicePrincipalReadOnly",
+                "Effect": "Allow",
+                "Principal": {
+                  "Service": "cloudfront.amazonaws.com"
+                },
+                "Action": "s3:GetObject",
+                "Resource": "arn:aws:s3:::${bucket_name}/*",
+                "Condition": {
+                  "StringEquals": {
+                    "AWS:SourceArn": "arn:aws:cloudfront::${account_id}:distribution/${distribution_id}"
+                  }
+                }
+              }
+            ]
+          }
+          EOF
+
+          aws s3api put-bucket-policy \
+            --bucket "$bucket_name" \
+            --policy file://bucket-policy.json
+
+          {
+            echo "bucket_name=$bucket_name"
+            echo "distribution_id=$distribution_id"
+            echo "distribution_domain=$distribution_domain"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Upload build to S3
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          aws s3 sync dist/ "s3://${{ steps.infra.outputs.bucket_name }}" --delete
+
+      - name: Invalidate CloudFront cache
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          aws cloudfront create-invalidation \
+            --distribution-id "${{ steps.infra.outputs.distribution_id }}" \
+            --paths '/*' >/dev/null
+
+      - name: Publish deployment summary
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ -n "${PUBLIC_BASE_URL:-}" ]]; then
+            if [[ "$PUBLIC_BASE_URL" =~ ^https?:// ]]; then
+              public_url="$PUBLIC_BASE_URL"
+            else
+              public_url="https://$PUBLIC_BASE_URL"
+            fi
+          else
+            public_url="https://${{ steps.infra.outputs.distribution_domain }}"
+          fi
+
+          {
+            echo "## Webapp desplegada (S3 + CloudFront)"
+            echo
+            echo "URL pública: $public_url"
+            echo
+            echo "S3 bucket: ${{ steps.infra.outputs.bucket_name }}"
+            echo "CloudFront distribution: ${{ steps.infra.outputs.distribution_id }}"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          echo "Webapp URL: $public_url"
