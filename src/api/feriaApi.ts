@@ -14,8 +14,8 @@ type SessionTokens = {
   idToken: string | null;
 };
 
-async function authTokens(): Promise<SessionTokens> {
-  const session = await fetchAuthSession();
+async function authTokens(forceRefresh: boolean): Promise<SessionTokens> {
+  const session = await fetchAuthSession(forceRefresh ? { forceRefresh: true } : {});
   const access = session.tokens?.accessToken;
   const id = session.tokens?.idToken;
   return {
@@ -24,38 +24,54 @@ async function authTokens(): Promise<SessionTokens> {
   };
 }
 
+/** Prefer id token first — API Gateway Cognito authorizer expects the same pool; MVP uses ID token. */
+function tokenCandidates(tokens: SessionTokens): string[] {
+  return [tokens.idToken, tokens.accessToken].filter(
+    (value, idx, arr): value is string => Boolean(value) && arr.indexOf(value) === idx
+  );
+}
+
 function withBearer(headers: HeadersInit | undefined, token: string): Headers {
   const h = new Headers(headers);
   h.set('Authorization', `Bearer ${token}`);
   return h;
 }
 
-async function fetchWithAuthRetry(input: RequestInfo | URL, init: RequestInit): Promise<Response> {
-  const { accessToken, idToken } = await authTokens();
-  const candidates = [accessToken, idToken].filter(
-    (value, idx, arr): value is string => Boolean(value) && arr.indexOf(value) === idx
-  );
-
-  if (candidates.length === 0) {
-    throw new Error('Not authenticated');
-  }
-
-  let lastResponse: Response | null = null;
-
-  for (const token of candidates) {
-    const res = await fetch(input, {
-      ...init,
-      headers: withBearer(init.headers, token),
-    });
-
-    if (res.status !== 401) {
-      return res;
+/**
+ * Calls the Feria API with Cognito tokens. Tries ID token before access token, then refreshes
+ * the session once if API Gateway returns 401/403 (expired session).
+ */
+async function authorizedFetch(input: RequestInfo | URL, init: RequestInit): Promise<Response> {
+  const run = async (forceRefresh: boolean): Promise<Response | null> => {
+    const tokens = await authTokens(forceRefresh);
+    const candidates = tokenCandidates(tokens);
+    if (candidates.length === 0) {
+      return null;
     }
-
-    lastResponse = res;
+    let last: Response | null = null;
+    for (const token of candidates) {
+      const res = await fetch(input, {
+        ...init,
+        headers: withBearer(init.headers, token),
+      });
+      if (res.status !== 401 && res.status !== 403) {
+        return res;
+      }
+      last = res;
+    }
+    return last;
   };
 
-  return lastResponse as Response;
+  const first = await run(false);
+  if (first === null) {
+    throw new Error('Not authenticated');
+  }
+  if (first.status !== 401 && first.status !== 403) {
+    return first;
+  }
+
+  const second = await run(true);
+  return second ?? first;
 }
 
 export type VoiceJobCreateResponse = {
@@ -70,7 +86,7 @@ export type VoiceJobCreateResponse = {
 export async function createVoiceJob(contentType?: string): Promise<VoiceJobCreateResponse> {
   const base = apiBase();
   if (!base) throw new Error('VITE_FERIA_API_URL is not set');
-  const res = await fetchWithAuthRetry(`${base}/voice-jobs`, {
+  const res = await authorizedFetch(`${base}/voice-jobs`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -97,7 +113,7 @@ export type VoiceJobStatusResponse = {
 export async function getVoiceJob(jobId: string): Promise<VoiceJobStatusResponse> {
   const base = apiBase();
   if (!base) throw new Error('VITE_FERIA_API_URL is not set');
-  const res = await fetchWithAuthRetry(`${base}/voice-jobs/${encodeURIComponent(jobId)}`, {
+  const res = await authorizedFetch(`${base}/voice-jobs/${encodeURIComponent(jobId)}`, {
     method: 'GET',
     headers: {},
   });
@@ -123,7 +139,7 @@ export type ApiMovement = {
 export async function listMovements(): Promise<ApiMovement[]> {
   const base = apiBase();
   if (!base) throw new Error('VITE_FERIA_API_URL is not set');
-  const res = await fetchWithAuthRetry(`${base}/movements`, {
+  const res = await authorizedFetch(`${base}/movements`, {
     method: 'GET',
     headers: {},
   });
@@ -148,7 +164,14 @@ export async function uploadAudioToPresignedUrl(
     body: blob,
   });
   if (!res.ok) {
-    throw new Error(`Upload failed: ${res.status}`);
+    const hint = res.status === 401 || res.status === 403
+      ? ' (check presigned URL expiry or Content-Type match with API)'
+      : '';
+    const detail = await res.text().catch(() => '');
+    const trimmed = detail.replace(/\s+/g, ' ').slice(0, 200);
+    throw new Error(
+      `S3 upload failed: HTTP ${res.status}${hint}${trimmed ? ` — ${trimmed}` : ''}`
+    );
   }
 }
 
