@@ -19,6 +19,7 @@ import { logOutOutline } from 'ionicons/icons';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
+import { FeriaAppShell } from '../components/FeriaAppShell';
 import KeyboardClassicIcon from '../components/icons/KeyboardClassicIcon';
 import ThemeToggle from '../components/ThemeToggle';
 import './Home.css';
@@ -222,7 +223,26 @@ const Home: React.FC = () => {
 
   return (
     <IonPage className="home-page">
-      <IonContent fullscreen className="home-content">
+      <FeriaAppShell
+        contentClassName="home-content"
+        headerEnd={
+          <>
+            <ThemeToggle />
+            <IonButton
+              className="feria-icon-btn-quiet"
+              fill="solid"
+              shape="round"
+              aria-label="Cerrar sesión"
+              disabled={signingOut}
+              onClick={() => {
+                void handleSignOut();
+              }}
+            >
+              {signingOut ? <IonSpinner name="crescent" /> : <IonIcon icon={logOutOutline} aria-hidden />}
+            </IonButton>
+          </>
+        }
+      >
         <div className="home-layout">
           <p className="feria-text-label-caps">Hola, {displayName}</p>
           <p className="feria-text-muted home-intro">Registra un ingreso o un gasto</p>
@@ -275,26 +295,7 @@ const Home: React.FC = () => {
             </div>
           )}
         </div>
-      </IonContent>
-
-      <div className="feria-fixed-corner-tr">
-        <ThemeToggle />
-      </div>
-
-      <div className="feria-fixed-corner-tl">
-        <IonButton
-          className="feria-icon-btn-quiet"
-          fill="solid"
-          shape="round"
-          aria-label="Cerrar sesión"
-          disabled={signingOut}
-          onClick={() => {
-            void handleSignOut();
-          }}
-        >
-          {signingOut ? <IonSpinner name="crescent" /> : <IonIcon icon={logOutOutline} aria-hidden />}
-        </IonButton>
-      </div>
+      </FeriaAppShell>
 
       <div className="feria-fixed-corner-br">
         <IonButton

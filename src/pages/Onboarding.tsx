@@ -1,6 +1,7 @@
 import { IonButton, IonContent, IonPage, IonSpinner } from '@ionic/react';
 import { Redirect, useHistory } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
+import { FeriaAppShell } from '../components/FeriaAppShell';
 import ThemeToggle from '../components/ThemeToggle';
 import { isOnboardingComplete, markOnboardingComplete } from '../onboarding/onboardingStorage';
 import './Onboarding.css';
@@ -35,10 +36,7 @@ const Onboarding: React.FC = () => {
   return (
     <IonPage className="onboarding-page">
       <div className="onboarding-ai-bg" aria-hidden />
-      <div className="feria-fixed-corner-tr">
-        <ThemeToggle />
-      </div>
-      <IonContent fullscreen className="onboarding-content">
+      <FeriaAppShell headerEnd={<ThemeToggle />} contentClassName="onboarding-content">
         <div className="onboarding-ai-layout">
           <div className="onboarding-ai-hero">
             <div className="onboarding-ai-orb" aria-hidden>
@@ -73,12 +71,10 @@ const Onboarding: React.FC = () => {
             <IonButton expand="block" className="onboarding-ai-cta" onClick={handleContinue}>
               Empezar
             </IonButton>
-            <p className="onboarding-ai-footnote">
-              Puedes cambiar el tema arriba a la derecha en cualquier momento.
-            </p>
+            <p className="onboarding-ai-footnote">Puedes cambiar el tema en la barra superior cuando quieras.</p>
           </div>
         </div>
-      </IonContent>
+      </FeriaAppShell>
     </IonPage>
   );
 };

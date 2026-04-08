@@ -40,7 +40,11 @@
 /* Fixed corner anchor (secondary actions, FAB siblings) */
 .feria-fixed-corner-br {
   position: fixed;
-  bottom: max(var(--feria-fab-offset), env(safe-area-inset-bottom));
+  /* Clear bottom tab bar when shell footer is present (e.g. Home). */
+  bottom: max(
+    calc(var(--feria-fab-offset) + var(--feria-app-footer-clear, 0px)),
+    env(safe-area-inset-bottom)
+  );
   right: max(var(--feria-fab-offset), env(safe-area-inset-right));
   z-index: 10;
   pointer-events: auto;

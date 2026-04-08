@@ -14,7 +14,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 64px 28px 52px;
+  /* Header + footer chrome: less top padding than full-bleed marketing */
+  padding: 28px 28px 40px;
   box-sizing: border-box;
 
   background:
@@ -32,13 +33,6 @@
     -apple-system,
     sans-serif;
   color: var(--feria-color-ink);
-}
-
-.login-theme-slot {
-  position: absolute;
-  top: max(0.5rem, env(safe-area-inset-top));
-  right: max(0.25rem, env(safe-area-inset-right));
-  z-index: 2;
 }
 
 .login-brand {

@@ -1,5 +1,7 @@
 .home-page {
   --home-orb-size: min(56vw, var(--feria-orb-size-max));
+  /* Lifts keyboard FAB above footer nav */
+  --feria-app-footer-clear: 52px;
 }
 
 .home-content {
@@ -85,16 +87,21 @@
 
 .siri-orb-core {
   position: absolute;
-  inset: 10px;
+  /* Slightly wider colored ring + thicker inner disk edge */
+  inset: 8px;
   z-index: 1;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   background: var(--ion-background-color, #fff);
-  border: var(--feria-disk-border);
+  border: 2.5px solid color-mix(in srgb, var(--ion-color-primary) 32%, rgba(146, 148, 156, 0.38));
   box-shadow: var(--feria-disk-shadow-inner), var(--feria-disk-shadow-elev);
   box-sizing: border-box;
+}
+
+.ion-palette-dark .siri-orb-core {
+  border-color: color-mix(in srgb, var(--ion-color-primary) 38%, rgba(255, 255, 255, 0.22));
 }
 
 .siri-orb-core .feria-text-hint {

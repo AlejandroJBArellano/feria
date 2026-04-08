@@ -39,6 +39,7 @@ import './theme/variables.css';
 import './theme/feria-tokens.css';
 import './theme/feria-components.css';
 import './theme/feria-overlays.css';
+import './theme/feria-app-shell.css';
 
 setupIonicReact();
 

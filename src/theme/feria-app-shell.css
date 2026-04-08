@@ -1,0 +1,104 @@
+/*
+ * App shell — header wordmark + footer section nav
+ * -------------------------------------------------
+ * Used by Home, Login, Onboarding for consistent layout.
+ */
+
+.feria-app-header ion-toolbar.feria-app-toolbar {
+  --background: var(--ion-background-color);
+  --border-width: 0 0 1px 0;
+  --border-style: solid;
+  --border-color: var(--feria-color-border);
+  --min-height: 52px;
+  padding-inline: max(4px, env(safe-area-inset-left)) max(4px, env(safe-area-inset-right));
+  padding-top: max(0px, env(safe-area-inset-top));
+}
+
+.feria-app-logo {
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--feria-color-text);
+  margin-inline-start: 4px;
+}
+
+.feria-app-logo__accent {
+  color: var(--feria-color-primary);
+}
+
+.feria-app-header__end {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-inline-end: 4px;
+}
+
+.feria-app-header__end ion-segment.feria-theme-toggle {
+  max-width: 200px;
+}
+
+/* Main scroll area sits between header and footer */
+ion-content.feria-shell-content {
+  --background: var(--ion-background-color, var(--feria-color-page));
+}
+
+.feria-app-footer ion-toolbar.feria-app-footer-toolbar {
+  --background: var(--ion-background-color);
+  --border-width: 1px 0 0 0;
+  --border-style: solid;
+  --border-color: var(--feria-color-border);
+  --min-height: 56px;
+  --padding-top: 0;
+  --padding-bottom: max(6px, env(safe-area-inset-bottom));
+  padding-inline: max(8px, env(safe-area-inset-left)) max(8px, env(safe-area-inset-right));
+}
+
+.feria-app-footer__nav {
+  display: flex;
+  width: 100%;
+  align-items: stretch;
+  justify-content: space-around;
+  gap: 4px;
+}
+
+.feria-app-footer__link {
+  flex: 1;
+  text-align: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--feria-color-text-muted);
+  padding: 10px 6px 8px;
+  border-radius: 10px;
+  max-width: 120px;
+  margin-inline: auto;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease;
+}
+
+.feria-app-footer__link:hover {
+  color: var(--feria-color-text-secondary);
+  background: color-mix(in srgb, var(--feria-color-primary) 8%, transparent);
+}
+
+.feria-app-footer__link.is-active {
+  color: var(--feria-color-primary);
+  background: color-mix(in srgb, var(--feria-color-primary) 14%, transparent);
+}
+
+.feria-app-footer__link--soon {
+  cursor: not-allowed;
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.ion-palette-dark .feria-app-footer__link.is-active {
+  background: color-mix(in srgb, var(--feria-color-primary) 18%, transparent);
+}

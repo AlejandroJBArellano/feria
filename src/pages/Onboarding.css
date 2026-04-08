@@ -81,13 +81,17 @@
 
 .onboarding-ai-orb__core {
   position: absolute;
-  inset: 14px;
+  inset: 12px;
   z-index: 1;
   border-radius: 50%;
   background: var(--ion-background-color);
-  border: var(--feria-disk-border);
+  border: 2.5px solid color-mix(in srgb, var(--ion-color-primary) 32%, rgba(146, 148, 156, 0.38));
   box-shadow: var(--feria-disk-shadow-inner), var(--feria-disk-shadow-elev);
   display: block;
+}
+
+.ion-palette-dark .onboarding-ai-orb__core {
+  border-color: color-mix(in srgb, var(--ion-color-primary) 38%, rgba(255, 255, 255, 0.22));
 }
 
 @keyframes onboarding-orb-spin {
