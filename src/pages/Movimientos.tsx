@@ -1,16 +1,17 @@
-import type { ReactElement } from 'react';
 import { IonIcon, IonPage, IonRefresher, IonRefresherContent, IonSpinner, IonText } from '@ionic/react';
 import { sparklesOutline } from 'ionicons/icons';
+import type { ReactElement } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { listMovements, isFeriaApiConfigured } from '../api/feriaApi';
 import type { ApiMovement } from '../api/feriaApi';
-import {
-  DUMMY_MOVEMENTS,
-  type DummyMovement,
-  groupByDate,
-  summarizeMovements,
-} from '../data/dummyMovements';
+import { getVoiceJob, isFeriaApiConfigured, listMovements } from '../api/feriaApi';
 import { FeriaAppShell } from '../components/FeriaAppShell';
+import {
+    DUMMY_MOVEMENTS,
+    type DummyMovement,
+    groupByDate,
+    summarizeMovements,
+} from '../data/dummyMovements';
+import { clearPendingVoiceJobId, getPendingVoiceJobId } from '../voice/voiceJobStorage';
 import './Movimientos.css';
 
 const currencyFmt = new Intl.NumberFormat('es-MX', {
@@ -79,6 +80,7 @@ const Movimientos: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [demoMode, setDemoMode] = useState(!isFeriaApiConfigured());
+  const [pendingVoiceJobId, setPendingVoiceJobId] = useState<string | null>(() => getPendingVoiceJobId());
 
   const load = useCallback(async () => {
     if (!isFeriaApiConfigured()) {
@@ -105,8 +107,78 @@ const Movimientos: React.FC = () => {
     void load();
   }, [load]);
 
+  useEffect(() => {
+    if (!isFeriaApiConfigured() && pendingVoiceJobId) {
+      clearPendingVoiceJobId();
+      setPendingVoiceJobId(null);
+    }
+  }, [pendingVoiceJobId]);
+
+  useEffect(() => {
+    if (!pendingVoiceJobId || !isFeriaApiConfigured()) {
+      return;
+    }
+
+    let cancelled = false;
+    const delay = (ms: number) => new Promise<void>((resolve) => {
+      window.setTimeout(resolve, ms);
+    });
+
+    const pollVoiceJob = async () => {
+      try {
+        let attempts = 0;
+        while (!cancelled && attempts < 180) {
+          attempts += 1;
+          try {
+            const job = await getVoiceJob(pendingVoiceJobId);
+            setError(null);
+            if (job.status === 'completed') {
+              for (let attempt = 0; attempt < 4 && !cancelled; attempt += 1) {
+                await load();
+                if (attempt < 3) {
+                  await delay(1500);
+                }
+              }
+              clearPendingVoiceJobId();
+              setPendingVoiceJobId(null);
+              return;
+            }
+            if (job.status === 'failed') {
+              clearPendingVoiceJobId();
+              setPendingVoiceJobId(null);
+              setError(job.error || 'No se pudo procesar el audio');
+              return;
+            }
+          } catch (e) {
+            if (!cancelled) {
+              setError(e instanceof Error ? e.message : 'No se pudo consultar el estado del audio');
+            }
+          }
+          await delay(2000);
+        }
+
+        if (!cancelled) {
+          clearPendingVoiceJobId();
+          setPendingVoiceJobId(null);
+          setError('El procesamiento tardó demasiado. Intenta grabar de nuevo.');
+        }
+      } catch (e) {
+        if (!cancelled) {
+          setError(e instanceof Error ? e.message : 'No se pudo consultar el estado del audio');
+        }
+      }
+    };
+
+    void pollVoiceJob();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [load, pendingVoiceJobId]);
+
   const summary = useMemo(() => summarizeMovements(rows), [rows]);
   const grouped = useMemo(() => groupByDate(rows), [rows]);
+  const isProcessingVoice = Boolean(pendingVoiceJobId);
 
   return (
     <IonPage className="movimientos-page">
@@ -124,11 +196,22 @@ const Movimientos: React.FC = () => {
           <div className="movimientos-ai-strip">
             <IonIcon icon={sparklesOutline} aria-hidden />
             <span>
-              {demoMode
+              {isProcessingVoice
+                ? 'Resumen asistido · procesando audio reciente'
+                : demoMode
                 ? 'Resumen asistido · datos de demostración'
                 : 'Resumen asistido · tus movimientos'}
             </span>
           </div>
+
+          {isProcessingVoice && (
+            <div className="movimientos-insight movimientos-processing">
+              <IonSpinner name="crescent" />
+              <p className="movimientos-insight__text">
+                Estamos procesando tu audio en segundo plano. Los movimientos aparecerán aquí cuando termine.
+              </p>
+            </div>
+          )}
 
           {loading && (
             <div className="movimientos-loading">
@@ -142,7 +225,7 @@ const Movimientos: React.FC = () => {
             </IonText>
           )}
 
-          {!loading && !demoMode && (
+          {!loading && !demoMode && !isProcessingVoice && (
             <div className="movimientos-insight">
               <p className="movimientos-insight__text">
                 Lista actualizada desde la API. Tira hacia abajo para refrescar.
@@ -150,7 +233,7 @@ const Movimientos: React.FC = () => {
             </div>
           )}
 
-          {demoMode && !loading && (
+          {demoMode && !loading && !isProcessingVoice && (
             <div className="movimientos-insight">
               <p className="movimientos-insight__text">
                 Esta semana tus gastos en <strong>transporte</strong> están un{' '}
@@ -188,7 +271,7 @@ const Movimientos: React.FC = () => {
               </section>
             ))}
 
-          {!loading && rows.length === 0 && !demoMode && !error && (
+          {!loading && rows.length === 0 && !demoMode && !error && !isProcessingVoice && (
             <IonText color="medium">
               <p>No hay movimientos aún. Graba una nota en Inicio.</p>
             </IonText>

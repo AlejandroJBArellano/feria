@@ -1,39 +1,39 @@
 import {
-  IonButton,
-  IonContent,
-  IonHeader,
-  IonIcon,
-  IonInput,
-  IonItem,
-  IonLabel,
-  IonModal,
-  IonPage,
-  IonSegment,
-  IonSegmentButton,
-  IonSpinner,
-  IonText,
-  IonTitle,
-  IonToolbar,
-  useIonToast,
+    IonButton,
+    IonContent,
+    IonHeader,
+    IonIcon,
+    IonInput,
+    IonItem,
+    IonLabel,
+    IonModal,
+    IonPage,
+    IonSegment,
+    IonSegmentButton,
+    IonSpinner,
+    IonText,
+    IonTitle,
+    IonToolbar,
+    useIonToast,
 } from '@ionic/react';
 import { logOutOutline } from 'ionicons/icons';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
-  createVoiceJob,
-  isFeriaApiConfigured,
-  pollVoiceJobUntilDone,
-  uploadAudioToPresignedUrl,
+    createVoiceJob,
+    isFeriaApiConfigured,
+    uploadAudioToPresignedUrl,
 } from '../api/feriaApi';
 import { useAuth } from '../auth/AuthContext';
 import { getUserDisplayLabel } from '../auth/userDisplay';
 import { FeriaAppShell } from '../components/FeriaAppShell';
 import KeyboardClassicIcon from '../components/icons/KeyboardClassicIcon';
+import { setPendingVoiceJobId } from '../voice/voiceJobStorage';
 import './Home.css';
 
 type MovementKind = 'ingreso' | 'gasto';
 
-type VoicePhase = 'idle' | 'recording' | 'uploading' | 'processing' | 'error';
+type VoicePhase = 'idle' | 'recording' | 'uploading' | 'error';
 
 function pickRecorderMime(): { mime: string; label: string } {
   const candidates = [
@@ -118,7 +118,6 @@ const Home: React.FC = () => {
     }
 
     recordingRef.current = false;
-    const recordedMime = rec.mimeType || pickRecorderMime().mime || 'audio/webm';
 
     await new Promise<void>((resolve, reject) => {
       rec.onstop = () => resolve();
@@ -133,8 +132,9 @@ const Home: React.FC = () => {
     cleanupStream();
     mediaRecorderRef.current = null;
 
+    const recordedContentType = rec.mimeType || pickRecorderMime().mime || 'audio/webm';
     const blob = new Blob(chunksRef.current, {
-      type: recordedMime,
+      type: recordedContentType,
     });
     chunksRef.current = [];
 
@@ -150,16 +150,12 @@ const Home: React.FC = () => {
 
     try {
       setVoicePhase('uploading');
-      const job = await createVoiceJob();
-      const ct = job.contentType || blob.type || 'audio/webm';
+      const job = await createVoiceJob(recordedContentType);
+      const ct = job.contentType || recordedContentType;
       await uploadAudioToPresignedUrl(job.uploadUrl, blob, ct);
-      setVoicePhase('processing');
-      const result = await pollVoiceJobUntilDone(job.jobId);
-      if (result.status === 'failed') {
-        throw new Error(result.error || 'Falló el procesamiento');
-      }
+      setPendingVoiceJobId(job.jobId);
       void presentToast({
-        message: 'Movimiento registrado',
+        message: 'Audio recibido. Procesando en segundo plano.',
         duration: 2000,
         color: 'success',
       });
@@ -224,7 +220,7 @@ const Home: React.FC = () => {
   };
 
   const listening = voicePhase === 'recording';
-  const busy = voicePhase === 'uploading' || voicePhase === 'processing';
+  const busy = voicePhase === 'uploading';
 
   return (
     <IonPage className="home-page">
@@ -262,7 +258,7 @@ const Home: React.FC = () => {
             aria-label={
               apiReady
                 ? busy
-                  ? 'Procesando…'
+                  ? 'Subiendo audio…'
                   : 'Mantén pulsado para grabar una nota de voz'
                 : 'Configura VITE_FERIA_API_URL para grabar notas'
             }
@@ -282,9 +278,7 @@ const Home: React.FC = () => {
             <div className="siri-orb-core">
               <span className={`home-orb-hint ${listening ? 'home-orb-hint--active' : ''}`}>
                 {busy
-                  ? voicePhase === 'uploading'
-                    ? 'Subiendo…'
-                    : 'Procesando…'
+                  ? 'Subiendo…'
                   : listening
                     ? 'Grabando…'
                     : 'Mantén pulsado'}

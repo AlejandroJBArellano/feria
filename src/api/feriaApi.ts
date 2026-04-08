@@ -32,15 +32,16 @@ export type VoiceJobCreateResponse = {
   s3Key: string;
   expiresInSeconds: number;
   contentType: string;
+  mediaFormat: string;
 };
 
-export async function createVoiceJob(): Promise<VoiceJobCreateResponse> {
+export async function createVoiceJob(contentType?: string): Promise<VoiceJobCreateResponse> {
   const base = apiBase();
   if (!base) throw new Error('VITE_FERIA_API_URL is not set');
   const res = await fetch(`${base}/voice-jobs`, {
     method: 'POST',
     headers: await authHeaders(),
-    body: '{}',
+    body: JSON.stringify({ contentType }),
   });
   if (!res.ok) {
     const text = await res.text();
@@ -53,6 +54,8 @@ export type VoiceJobStatusResponse = {
   jobId: string;
   status: string;
   movementId: string | null;
+  movementIds?: string[];
+  movementCount?: number;
   error: string | null;
   updatedAt: string;
 };
