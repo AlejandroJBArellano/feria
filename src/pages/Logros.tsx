@@ -8,19 +8,27 @@ import {
   useIonViewWillEnter,
 } from '@ionic/react';
 import { lockClosedOutline, trophyOutline } from 'ionicons/icons';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   getEngagementSummary,
   isFeriaApiConfigured,
   type EngagementSummary,
 } from '../api/feriaApi';
+import LogrosDashboard from '../components/LogrosDashboard';
 import { FeriaAppShell } from '../components/FeriaAppShell';
+import {
+  computeVisitDeltas,
+  persistVisitSnapshot,
+  readVisitSnapshot,
+  type VisitDeltas,
+} from './logrosSnapshot';
 import './Logros.css';
 
 const Logros: React.FC = () => {
   const [data, setData] = useState<EngagementSummary | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [visitDeltas, setVisitDeltas] = useState<VisitDeltas | null>(null);
   const apiReady = isFeriaApiConfigured();
 
   const load = useCallback(async () => {
@@ -45,6 +53,22 @@ const Logros: React.FC = () => {
   useIonViewWillEnter(() => {
     void load();
   });
+
+  useEffect(() => {
+    if (!data) {
+      setVisitDeltas(null);
+      return;
+    }
+    const unlockedCount = data.achievements.filter((a) => a.unlocked).length;
+    const current = {
+      clarityScore: data.axes.clarityScore,
+      controlScore: data.axes.controlScore,
+      unlockedCount,
+    };
+    const prev = readVisitSnapshot();
+    setVisitDeltas(computeVisitDeltas(current, prev));
+    persistVisitSnapshot(current);
+  }, [data]);
 
   const unlockedCount = data?.achievements.filter((a) => a.unlocked).length ?? 0;
   const total = data?.achievements.length ?? 0;
@@ -87,26 +111,37 @@ const Logros: React.FC = () => {
                 </p>
               </IonText>
 
-              <div className="logros-axes">
-                <div className="logros-axis">
-                  <span className="logros-axis__label">Claridad</span>
-                  <div className="logros-axis__track">
-                    <div
-                      className="logros-axis__fill"
-                      style={{ width: `${data.axes.clarityScore}%` }}
-                    />
+              {data.dashboard ? (
+                <LogrosDashboard
+                  dashboard={data.dashboard}
+                  clarityScore={data.axes.clarityScore}
+                  controlScore={data.axes.controlScore}
+                  visitDeltas={visitDeltas}
+                />
+              ) : (
+                <div className="logros-axes">
+                  <div className="logros-axis">
+                    <span className="logros-axis__label">Claridad</span>
+                    <div className="logros-axis__track">
+                      <div
+                        className="logros-axis__fill"
+                        style={{ width: `${data.axes.clarityScore}%` }}
+                      />
+                    </div>
+                  </div>
+                  <div className="logros-axis">
+                    <span className="logros-axis__label">Control del mes</span>
+                    <div className="logros-axis__track">
+                      <div
+                        className="logros-axis__fill"
+                        style={{ width: `${data.axes.controlScore}%` }}
+                      />
+                    </div>
                   </div>
                 </div>
-                <div className="logros-axis">
-                  <span className="logros-axis__label">Control del mes</span>
-                  <div className="logros-axis__track">
-                    <div
-                      className="logros-axis__fill"
-                      style={{ width: `${data.axes.controlScore}%` }}
-                    />
-                  </div>
-                </div>
-              </div>
+              )}
+
+              <h2 className="logros-section-title">Medallas</h2>
 
               <div className="logros-grid" role="list">
                 {data.achievements.map((a) => {

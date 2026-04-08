@@ -268,9 +268,21 @@ export type EngagementActiveReminder = {
   ctaPath: string;
 };
 
+export type EngagementDashboard = {
+  streakDays: number;
+  hasMovementToday: boolean;
+  movementCountLast7d: number;
+  movementCountPrev7d: number;
+  registrationWeekTrend: 'up' | 'down' | 'same';
+  hasUsedTutor: boolean;
+  impulseIndex: number;
+};
+
 export type EngagementSummary = {
   achievements: EngagementAchievementRow[];
   axes: { clarityScore: number; controlScore: number };
+  /** Gamified pulse: streak, week-over-week activity, impulse index. Omitted if API is older. */
+  dashboard?: EngagementDashboard;
   activeReminder: EngagementActiveReminder | null;
 };
 

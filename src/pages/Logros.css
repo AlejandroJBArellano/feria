@@ -7,6 +7,264 @@
   color: var(--feria-color-text);
 }
 
+.logros-page .logros-section-title {
+  margin: 0 0 12px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--feria-color-text-muted);
+}
+
+/* ─── Gamified dashboard ─── */
+.logros-page .logros-dash {
+  margin-bottom: 24px;
+  padding: 16px 14px 18px;
+  border-radius: 16px;
+  background: var(--feria-color-surface-muted);
+  border: 1px solid var(--feria-color-border);
+}
+
+.logros-page .logros-dash__heading {
+  margin: 0 0 4px;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--feria-color-text);
+}
+
+.logros-page .logros-dash__lede {
+  margin: 0 0 16px;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: var(--feria-color-text-muted);
+}
+
+.logros-page .logros-dash__hero {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.logros-page .logros-dash__ring {
+  --logros-impulse-pct: 0;
+  flex-shrink: 0;
+  width: 108px;
+  height: 108px;
+  border-radius: 50%;
+  padding: 5px;
+  background: conic-gradient(
+    var(--feria-color-primary) calc(var(--logros-impulse-pct) * 3.6deg),
+    var(--feria-color-border) 0
+  );
+  box-shadow: 0 4px 14px rgba(76, 175, 80, 0.12);
+}
+
+.logros-page .logros-dash__ring-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: var(--feria-color-surface);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.logros-page .logros-dash__ring-value {
+  font-size: 1.65rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--feria-color-text);
+}
+
+.logros-page .logros-dash__ring-label {
+  margin-top: 4px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--feria-color-text-muted);
+  max-width: 72px;
+  line-height: 1.2;
+}
+
+.logros-page .logros-dash__hero-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.logros-page .logros-dash__tier {
+  margin: 0 0 6px;
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--feria-color-accent-dark);
+}
+
+.logros-page .logros-dash__tier-sub {
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.4;
+  color: var(--feria-color-text-secondary);
+}
+
+.logros-page .logros-dash__tiles {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.logros-page .logros-dash__tile {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  padding: 12px 12px;
+  border-radius: 12px;
+  background: var(--feria-color-surface);
+  border: 1px solid var(--feria-color-border);
+}
+
+.logros-page .logros-dash__tile-icon {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  color: var(--feria-color-primary);
+  margin-top: 2px;
+}
+
+.logros-page .logros-dash__tile-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.logros-page .logros-dash__tile-kicker {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--feria-color-text-muted);
+}
+
+.logros-page .logros-dash__tile-value {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--feria-color-text);
+}
+
+.logros-page .logros-dash__tile-meta {
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: var(--feria-color-text-secondary);
+}
+
+.logros-page .logros-dash__trend {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.logros-page .logros-dash__trend ion-icon {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+}
+
+.logros-page .logros-dash__trend--up {
+  color: var(--feria-color-primary-shade);
+}
+
+.logros-page .logros-dash__trend--down {
+  color: #c62828;
+}
+
+.logros-page .logros-dash__trend--same {
+  color: var(--feria-color-text-muted);
+}
+
+.ion-palette-dark .logros-page .logros-dash__trend--down {
+  color: #ef9a9a;
+}
+
+.logros-page .logros-dash__axes-mini {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.logros-page .logros-dash__axis-mini {
+  display: grid;
+  grid-template-columns: 72px 1fr 40px;
+  align-items: center;
+  gap: 8px;
+}
+
+.logros-page .logros-dash__axis-mini-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--feria-color-text-muted);
+}
+
+.logros-page .logros-dash__axis-mini-track {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--feria-color-border);
+  overflow: hidden;
+}
+
+.logros-page .logros-dash__axis-mini-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.35s ease;
+}
+
+.logros-page .logros-dash__axis-mini-fill--clarity {
+  background: linear-gradient(90deg, var(--feria-color-primary-tint), var(--feria-color-primary));
+}
+
+.logros-page .logros-dash__axis-mini-fill--control {
+  background: linear-gradient(90deg, #42a5f5, #1565c0);
+}
+
+.logros-page .logros-dash__axis-mini-pct {
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-align: right;
+  color: var(--feria-color-text);
+}
+
+.logros-page .logros-dash__visit-footnote {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: var(--feria-color-text-secondary);
+}
+
+.logros-page .logros-dash__visit-footnote--muted {
+  color: var(--feria-color-text-muted);
+  font-style: italic;
+}
+
+.ion-palette-dark .logros-page .logros-dash {
+  background: var(--feria-color-surface-muted);
+}
+
+.ion-palette-dark .logros-page .logros-dash__ring-inner {
+  background: var(--feria-color-surface);
+}
+
 .logros-page .logros-axes {
   display: flex;
   flex-direction: column;
