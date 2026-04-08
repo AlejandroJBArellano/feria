@@ -236,15 +236,17 @@ jobs:
             exit 1
           fi
 
-          subnet_ids_csv=$(aws ec2 describe-subnets \
+          read -r -a subnet_ids <<< "$(aws ec2 describe-subnets \
             --filters Name=vpc-id,Values="$vpc_id" Name=default-for-az,Values=true \
             --query 'Subnets[].SubnetId' \
-            --output text | tr '\t' ',')
+            --output text)"
 
-          if [[ -z "$subnet_ids_csv" ]]; then
+          if [[ ${#subnet_ids[@]} -eq 0 ]]; then
             echo "::error::No encontré subnets default en la VPC $vpc_id."
             exit 1
           fi
+
+          subnet_ids_csv=$(IFS=,; echo "${subnet_ids[*]}")
 
           iam_assume_policy='{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"Service":"ecs-tasks.amazonaws.com"},"Action":"sts:AssumeRole"}]}'
 
@@ -316,7 +318,7 @@ jobs:
               --type application \
               --scheme "$ALB_SCHEME" \
               --security-groups "$alb_sg_id" \
-              --subnets "${subnet_ids_csv//,/ }" \
+              --subnets "${subnet_ids[@]}" \
               --query 'LoadBalancers[0].LoadBalancerArn' \
               --output text)
             aws elbv2 wait load-balancer-available --load-balancer-arns "$alb_arn"
