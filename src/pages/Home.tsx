@@ -24,6 +24,7 @@ import {
     createManualMovement,
     createVoiceJob,
     dismissEngagementReminder,
+    ensureUserProfileSynced,
     getEngagementSummary,
     isFeriaApiConfigured,
     uploadAudioToPresignedUrl,
@@ -94,6 +95,11 @@ const Home: React.FC = () => {
 
   useIonViewWillEnter(() => {
     void loadEngagement();
+    if (apiReady && user?.userId) {
+      void ensureUserProfileSynced().catch(() => {
+        /* row may exist; ignore */
+      });
+    }
   });
 
   const cleanupStream = useCallback(() => {

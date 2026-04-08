@@ -81,17 +81,39 @@ export type VoiceJobCreateResponse = {
   expiresInSeconds: number;
   contentType: string;
   mediaFormat: string;
+  purpose?: 'movement' | 'onboarding';
+  onboardingStep?: number;
 };
 
-export async function createVoiceJob(contentType?: string): Promise<VoiceJobCreateResponse> {
+export type CreateVoiceJobOptions = {
+  contentType?: string;
+  purpose?: 'movement' | 'onboarding';
+  onboardingStep?: number;
+};
+
+export async function createVoiceJob(
+  contentTypeOrOpts?: string | CreateVoiceJobOptions
+): Promise<VoiceJobCreateResponse> {
   const base = apiBase();
   if (!base) throw new Error('VITE_FERIA_API_URL is not set');
+  const opts: CreateVoiceJobOptions =
+    typeof contentTypeOrOpts === 'string' || contentTypeOrOpts === undefined
+      ? { contentType: contentTypeOrOpts }
+      : contentTypeOrOpts;
+  const body: Record<string, unknown> = {};
+  if (opts.contentType) {
+    body.contentType = opts.contentType;
+  }
+  if (opts.purpose === 'onboarding' && opts.onboardingStep !== undefined) {
+    body.purpose = 'onboarding';
+    body.onboardingStep = opts.onboardingStep;
+  }
   const res = await authorizedFetch(`${base}/voice-jobs`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ contentType }),
+    body: JSON.stringify(body),
   });
   if (!res.ok) {
     const text = await res.text();
@@ -103,9 +125,12 @@ export async function createVoiceJob(contentType?: string): Promise<VoiceJobCrea
 export type VoiceJobStatusResponse = {
   jobId: string;
   status: string;
+  purpose?: 'movement' | 'onboarding';
   movementId: string | null;
   movementIds?: string[];
   movementCount?: number;
+  onboardingStep?: number;
+  onboardingSummary?: string | null;
   error: string | null;
   updatedAt: string;
 };
@@ -373,4 +398,48 @@ export async function pollVoiceJobUntilDone(
     await new Promise((r) => setTimeout(r, intervalMs));
   }
   throw new Error('Processing timed out');
+}
+
+/**
+ * POST /profile/sync — creates DynamoDB Users row for Cognito sub if missing (signup alone does not).
+ * Call after login so `context` and tutor profile have a stable row.
+ */
+export async function syncUserProfile(): Promise<{ ok: boolean; created: boolean }> {
+  const base = apiBase();
+  if (!base) throw new Error('VITE_FERIA_API_URL is not set');
+  const res = await authorizedFetch(`${base}/profile/sync`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({}),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || `syncUserProfile failed: ${res.status}`);
+  }
+  return res.json() as Promise<{ ok: boolean; created: boolean }>;
+}
+
+/** Ensures Cognito user has a Users row (call after auth, before onboarding voice). */
+export async function ensureUserProfileSynced(): Promise<{ ok: boolean; created: boolean }> {
+  return syncUserProfile();
+}
+
+/** POST /onboarding/complete — Bedrock fuses voice answers into Users.context */
+export async function completeOnboarding(): Promise<{ ok: boolean; contextLength: number }> {
+  const base = apiBase();
+  if (!base) throw new Error('VITE_FERIA_API_URL is not set');
+  const res = await authorizedFetch(`${base}/onboarding/complete`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({}),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || `completeOnboarding failed: ${res.status}`);
+  }
+  return res.json() as Promise<{ ok: boolean; contextLength: number }>;
 }
