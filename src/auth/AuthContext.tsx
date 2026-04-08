@@ -149,7 +149,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }): React
         given_name?: string;
         family_name?: string;
         name?: string;
+        nickname?: string;
         picture?: string;
+        preferred_username?: string;
       };
       let attributes: AttrSlice = {};
       try {
@@ -160,20 +162,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }): React
         });
       }
 
+      const idPayload = idTokenPayload as Record<string, unknown> | undefined;
+
       const email =
         attributes.email ??
-        parseStringClaim(idTokenPayload?.email) ??
-        parseStringClaim(idTokenPayload?.['cognito:email_alias']);
+        parseStringClaim(idPayload?.email) ??
+        parseStringClaim(idPayload?.['cognito:email_alias']);
+
       const givenName =
-        attributes.given_name ?? parseStringClaim(idTokenPayload?.given_name) ?? undefined;
+        attributes.given_name ??
+        parseStringClaim(idPayload?.given_name) ??
+        undefined;
       const familyName =
-        attributes.family_name ?? parseStringClaim(idTokenPayload?.family_name) ?? undefined;
+        attributes.family_name ??
+        parseStringClaim(idPayload?.family_name) ??
+        undefined;
       const fullNameFromParts = [givenName, familyName].filter(Boolean).join(' ');
+      const nickname =
+        attributes.nickname ?? parseStringClaim(idPayload?.nickname) ?? undefined;
+      const preferredUsername =
+        attributes.preferred_username ?? parseStringClaim(idPayload?.preferred_username) ?? undefined;
+
       const name =
         attributes.name ??
-        parseStringClaim(idTokenPayload?.name) ??
-        (fullNameFromParts || undefined);
-      const picture = attributes.picture ?? parseStringClaim(idTokenPayload?.picture) ?? undefined;
+        parseStringClaim(idPayload?.name) ??
+        (fullNameFromParts || undefined) ??
+        nickname ??
+        preferredUsername;
+      const picture = attributes.picture ?? parseStringClaim(idPayload?.picture) ?? undefined;
       const provider = inferProvider(
         currentUser.username,
         idTokenPayload?.identities ?? idTokenPayload?.identities

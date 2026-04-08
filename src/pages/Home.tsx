@@ -19,6 +19,7 @@ import { logOutOutline } from 'ionicons/icons';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
+import { getUserDisplayLabel } from '../auth/userDisplay';
 import { FeriaAppShell } from '../components/FeriaAppShell';
 import KeyboardClassicIcon from '../components/icons/KeyboardClassicIcon';
 import './Home.css';
@@ -80,7 +81,7 @@ const Home: React.FC = () => {
   const history = useHistory();
   const { user, signOutUser } = useAuth();
   const [signingOut, setSigningOut] = useState(false);
-  const displayName = user?.name ?? user?.email ?? user?.username ?? 'Usuario autenticado';
+  const displayName = getUserDisplayLabel(user);
   const [listening, setListening] = useState(false);
   const [voiceSupported, setVoiceSupported] = useState(true);
   const [voiceTranscript, setVoiceTranscript] = useState('');
