@@ -9,21 +9,53 @@ export function isFeriaApiConfigured(): boolean {
   return apiBase().length > 0;
 }
 
-async function idToken(): Promise<string | null> {
+type SessionTokens = {
+  accessToken: string | null;
+  idToken: string | null;
+};
+
+async function authTokens(): Promise<SessionTokens> {
   const session = await fetchAuthSession();
-  const t = session.tokens?.idToken;
-  return t ? t.toString() : null;
+  const access = session.tokens?.accessToken;
+  const id = session.tokens?.idToken;
+  return {
+    accessToken: access ? access.toString() : null,
+    idToken: id ? id.toString() : null,
+  };
 }
 
-async function authHeaders(): Promise<HeadersInit> {
-  const token = await idToken();
-  if (!token) {
+function withBearer(headers: HeadersInit | undefined, token: string): Headers {
+  const h = new Headers(headers);
+  h.set('Authorization', `Bearer ${token}`);
+  return h;
+}
+
+async function fetchWithAuthRetry(input: RequestInfo | URL, init: RequestInit): Promise<Response> {
+  const { accessToken, idToken } = await authTokens();
+  const candidates = [accessToken, idToken].filter(
+    (value, idx, arr): value is string => Boolean(value) && arr.indexOf(value) === idx
+  );
+
+  if (candidates.length === 0) {
     throw new Error('Not authenticated');
   }
-  return {
-    Authorization: `Bearer ${token}`,
-    'Content-Type': 'application/json',
+
+  let lastResponse: Response | null = null;
+
+  for (const token of candidates) {
+    const res = await fetch(input, {
+      ...init,
+      headers: withBearer(init.headers, token),
+    });
+
+    if (res.status !== 401) {
+      return res;
+    }
+
+    lastResponse = res;
   };
+
+  return lastResponse as Response;
 }
 
 export type VoiceJobCreateResponse = {
@@ -38,9 +70,11 @@ export type VoiceJobCreateResponse = {
 export async function createVoiceJob(contentType?: string): Promise<VoiceJobCreateResponse> {
   const base = apiBase();
   if (!base) throw new Error('VITE_FERIA_API_URL is not set');
-  const res = await fetch(`${base}/voice-jobs`, {
+  const res = await fetchWithAuthRetry(`${base}/voice-jobs`, {
     method: 'POST',
-    headers: await authHeaders(),
+    headers: {
+      'Content-Type': 'application/json',
+    },
     body: JSON.stringify({ contentType }),
   });
   if (!res.ok) {
@@ -63,9 +97,9 @@ export type VoiceJobStatusResponse = {
 export async function getVoiceJob(jobId: string): Promise<VoiceJobStatusResponse> {
   const base = apiBase();
   if (!base) throw new Error('VITE_FERIA_API_URL is not set');
-  const res = await fetch(`${base}/voice-jobs/${encodeURIComponent(jobId)}`, {
+  const res = await fetchWithAuthRetry(`${base}/voice-jobs/${encodeURIComponent(jobId)}`, {
     method: 'GET',
-    headers: await authHeaders(),
+    headers: {},
   });
   if (!res.ok) {
     const text = await res.text();
@@ -89,9 +123,9 @@ export type ApiMovement = {
 export async function listMovements(): Promise<ApiMovement[]> {
   const base = apiBase();
   if (!base) throw new Error('VITE_FERIA_API_URL is not set');
-  const res = await fetch(`${base}/movements`, {
+  const res = await fetchWithAuthRetry(`${base}/movements`, {
     method: 'GET',
-    headers: await authHeaders(),
+    headers: {},
   });
   if (!res.ok) {
     const text = await res.text();
