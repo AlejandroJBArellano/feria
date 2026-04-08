@@ -1,11 +1,11 @@
 describe('Initial flow', () => {
-  it('redirects / to onboarding when onboarding is not complete', () => {
+  it('redirects / to login when onboarding is not complete and user is not signed in', () => {
     cy.visit('/', {
       onBeforeLoad(win) {
         win.localStorage.removeItem('feria_onboarding_complete');
       },
     });
-    cy.url({ timeout: 10000 }).should('include', '/onboarding');
+    cy.url({ timeout: 10000 }).should('include', '/login');
     cy.contains('FerIA');
   });
 

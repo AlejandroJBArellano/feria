@@ -20,17 +20,17 @@ const Onboarding: React.FC = () => {
     );
   }
 
+  if (!isAuthenticated) {
+    return <Redirect to="/login" />;
+  }
+
   if (isOnboardingComplete()) {
-    return <Redirect to={isAuthenticated ? '/home' : '/login'} />;
+    return <Redirect to="/home" />;
   }
 
   const handleContinue = () => {
     markOnboardingComplete();
-    if (isAuthenticated) {
-      history.replace('/home');
-    } else {
-      history.replace('/login');
-    }
+    history.replace('/home');
   };
 
   return (

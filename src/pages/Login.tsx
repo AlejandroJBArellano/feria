@@ -1,6 +1,6 @@
 import { IonContent, IonPage, IonSpinner } from '@ionic/react';
 import { useEffect, useLayoutEffect, useState } from 'react';
-import { Redirect, useHistory, useLocation } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { isCognitoConfigured } from '../auth/configureAmplify';
 import { FeriaAppShell } from '../components/FeriaAppShell';
@@ -36,7 +36,8 @@ const Login: React.FC = () => {
     if (history.location.pathname !== '/login') {
       return;
     }
-    history.replace('/home');
+
+    history.replace(isOnboardingComplete() ? '/home' : '/onboarding');
   }, [isLoading, isAuthenticated, history]);
 
   if (isLoading || oauthReturnPending) {
@@ -57,10 +58,6 @@ const Login: React.FC = () => {
         </IonContent>
       </IonPage>
     );
-  }
-
-  if (!isOnboardingComplete()) {
-    return <Redirect to="/onboarding" />;
   }
 
   return (

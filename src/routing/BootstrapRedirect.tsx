@@ -4,7 +4,7 @@ import { useAuth } from '../auth/AuthContext';
 import { isOnboardingComplete } from '../onboarding/onboardingStorage';
 
 /**
- * Resolves `/` to onboarding (first launch), login, or home based on local state and auth.
+ * Resolves `/` to login first, then onboarding, then home.
  */
 const BootstrapRedirect: React.FC = () => {
   const { isLoading, isAuthenticated } = useAuth();
@@ -19,12 +19,12 @@ const BootstrapRedirect: React.FC = () => {
     );
   }
 
-  if (!isOnboardingComplete()) {
-    return <Redirect to="/onboarding" />;
-  }
-
   if (!isAuthenticated) {
     return <Redirect to="/login" />;
+  }
+
+  if (!isOnboardingComplete()) {
+    return <Redirect to="/onboarding" />;
   }
 
   return <Redirect to="/home" />;
