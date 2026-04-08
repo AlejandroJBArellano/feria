@@ -213,6 +213,44 @@ export async function listChatMessages(
   return res.json() as Promise<{ messages: ChatMessageRow[]; nextCursor: string | null }>;
 }
 
+export type SendChatMessageResponse = {
+  conversationId: string;
+  reply: string;
+};
+
+/**
+ * POST /chat/messages — one Bedrock turn (non-streaming). Requires Cognito Bearer token.
+ */
+export async function sendChatMessage(
+  message: string,
+  options?: { conversationId?: string | null; maxTokens?: number; temperature?: number }
+): Promise<SendChatMessageResponse> {
+  const base = apiBase();
+  if (!base) throw new Error('VITE_FERIA_API_URL is not set');
+  const body: Record<string, unknown> = { message };
+  if (options?.conversationId) {
+    body.conversationId = options.conversationId;
+  }
+  if (options?.maxTokens != null) {
+    body.maxTokens = options.maxTokens;
+  }
+  if (options?.temperature != null) {
+    body.temperature = options.temperature;
+  }
+  const res = await authorizedFetch(`${base}/chat/messages`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || `sendChatMessage failed: ${res.status}`);
+  }
+  return res.json() as Promise<SendChatMessageResponse>;
+}
+
 export async function createManualMovement(input: ManualMovementInput): Promise<{ movementId: string }> {
   const base = apiBase();
   if (!base) throw new Error('VITE_FERIA_API_URL is not set');
