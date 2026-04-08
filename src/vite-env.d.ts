@@ -7,6 +7,7 @@ interface ImportMetaEnv {
 	readonly VITE_COGNITO_DOMAIN?: string;
 	readonly VITE_COGNITO_REDIRECT_SIGN_IN?: string;
 	readonly VITE_COGNITO_REDIRECT_SIGN_OUT?: string;
+	readonly VITE_CHAT_WS_URL?: string;
 }
 
 interface ImportMeta {
