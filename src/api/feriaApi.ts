@@ -151,6 +151,30 @@ export async function listMovements(): Promise<ApiMovement[]> {
   return data.movements ?? [];
 }
 
+export type ManualMovementInput = {
+  kind: 'ingreso' | 'gasto';
+  amount: number;
+  concept: string;
+  movementDate?: string | null;
+};
+
+export async function createManualMovement(input: ManualMovementInput): Promise<{ movementId: string }> {
+  const base = apiBase();
+  if (!base) throw new Error('VITE_FERIA_API_URL is not set');
+  const res = await authorizedFetch(`${base}/ingest`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(input),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || `createManualMovement failed: ${res.status}`);
+  }
+  return res.json() as Promise<{ movementId: string }>;
+}
+
 export async function uploadAudioToPresignedUrl(
   uploadUrl: string,
   blob: Blob,

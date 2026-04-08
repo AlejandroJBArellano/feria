@@ -20,6 +20,7 @@ import { logOutOutline } from 'ionicons/icons';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
+    createManualMovement,
     createVoiceJob,
     isFeriaApiConfigured,
     uploadAudioToPresignedUrl,
@@ -62,6 +63,7 @@ const Home: React.FC = () => {
   const [kind, setKind] = useState<MovementKind>('gasto');
   const [amount, setAmount] = useState('');
   const [note, setNote] = useState('');
+  const [savingKeyboard, setSavingKeyboard] = useState(false);
 
   const [voicePhase, setVoicePhase] = useState<VoicePhase>('idle');
   const [voiceError, setVoiceError] = useState<string | null>(null);
@@ -190,9 +192,62 @@ const Home: React.FC = () => {
     setKind('gasto');
   };
 
-  const handleSaveKeyboard = () => {
-    setKeyboardOpen(false);
-    resetForm();
+  const handleSaveKeyboard = async () => {
+    const normalizedAmount = Number(amount.trim().replace(',', '.'));
+    const normalizedConcept = note.trim();
+
+    if (!apiReady) {
+      void presentToast({
+        message: 'Configura VITE_FERIA_API_URL para guardar movimientos.',
+        duration: 2500,
+        color: 'warning',
+      });
+      return;
+    }
+
+    if (!Number.isFinite(normalizedAmount) || normalizedAmount <= 0) {
+      void presentToast({
+        message: 'Ingresa un monto valido mayor a 0.',
+        duration: 2500,
+        color: 'warning',
+      });
+      return;
+    }
+
+    if (!normalizedConcept) {
+      void presentToast({
+        message: 'Escribe un concepto para guardar el movimiento.',
+        duration: 2500,
+        color: 'warning',
+      });
+      return;
+    }
+
+    setSavingKeyboard(true);
+    try {
+      await createManualMovement({
+        kind,
+        amount: normalizedAmount,
+        concept: normalizedConcept,
+      });
+      setKeyboardOpen(false);
+      resetForm();
+      void presentToast({
+        message: 'Movimiento guardado.',
+        duration: 2000,
+        color: 'success',
+      });
+      history.push('/movimientos');
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'No se pudo guardar el movimiento';
+      void presentToast({
+        message: msg,
+        duration: 3500,
+        color: 'danger',
+      });
+    } finally {
+      setSavingKeyboard(false);
+    }
   };
 
   const appendConceptChip = (label: string) => {
@@ -386,8 +441,15 @@ const Home: React.FC = () => {
             </div>
           )}
 
-          <IonButton expand="block" className="feria-modal-primary" onClick={handleSaveKeyboard}>
-            Guardar
+          <IonButton
+            expand="block"
+            className="feria-modal-primary"
+            onClick={() => {
+              void handleSaveKeyboard();
+            }}
+            disabled={savingKeyboard}
+          >
+            {savingKeyboard ? <IonSpinner name="crescent" /> : 'Guardar'}
           </IonButton>
         </IonContent>
       </IonModal>
