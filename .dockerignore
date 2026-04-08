@@ -1,0 +1,16 @@
+node_modules
+dist
+.git
+.github
+.gitignore
+*.md
+.env
+.env.*
+!.env.example
+coverage
+cypress/videos
+cypress/screenshots
+.nx
+.vscode
+*.log
+npm-debug.log*
