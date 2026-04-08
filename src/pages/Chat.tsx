@@ -31,6 +31,16 @@ function asString(value: unknown): string | null {
 const chatWebSocketUrl = import.meta.env.VITE_CHAT_WS_URL;
 const CONVERSATION_STORAGE_KEY = 'feria_active_chat_conversation_id';
 
+/** Shown when there is no thread yet; tapping sends the question. */
+const TUTOR_STARTER_PROMPTS: readonly string[] = [
+  '¿Cómo puedo mejorar mis ahorros?',
+  '¿Cómo puedo reducir mis gastos?',
+  '¿Cómo armo un presupuesto mensual simple?',
+  '¿Qué conviene revisar antes de fin de mes?',
+  'Ideas para separar gastos fijos y variables',
+  '¿Cómo interpretar mejor mis movimientos en la app?',
+];
+
 const Chat: React.FC = () => {
   const history = useHistory();
   const { signOutUser, user } = useAuth();
@@ -267,8 +277,8 @@ const Chat: React.FC = () => {
     }
   };
 
-  const sendPrompt = useCallback(async () => {
-    const prompt = draft.trim();
+  const sendMessage = useCallback(async (promptRaw: string) => {
+    const prompt = promptRaw.trim();
     if (!prompt || isStreaming) {
       return;
     }
@@ -320,7 +330,11 @@ const Chat: React.FC = () => {
     );
 
     setDraft('');
-  }, [draft, isStreaming]);
+  }, [isStreaming]);
+
+  const sendPrompt = useCallback(() => {
+    void sendMessage(draft);
+  }, [draft, sendMessage]);
 
   return (
     <IonPage className="chat-page">
@@ -370,12 +384,28 @@ const Chat: React.FC = () => {
               </div>
 
               <div className="chat-feed" role="log" aria-live="polite">
-                {messages.length === 0 && !historyLoading ? (
-                  <div className="chat-empty">
-                    <p>
-                      Pregunta lo que quieras sobre tus finanzas. El tutor usa tus movimientos en la app
-                      (datos en la base; la conexión solo necesita nombres de tabla en el servidor).
+                {messages.length === 0 && !historyLoading && !isStreaming ? (
+                  <div className="tutor-empty-state">
+                    <h2 className="tutor-empty-title">¿En qué te ayudo?</h2>
+                    <p className="tutor-empty-sub">
+                      El tutor usa tus movimientos registrados en Feria. Elige una sugerencia o escribe abajo.
                     </p>
+                    <div className="tutor-starter-chips" role="group" aria-label="Preguntas sugeridas">
+                      {TUTOR_STARTER_PROMPTS.map((label, index) => (
+                        <button
+                          key={label}
+                          type="button"
+                          className="tutor-starter-chip"
+                          style={{ animationDelay: `${index * 0.14}s` }}
+                          disabled={!isConnected || historyLoading}
+                          onClick={() => {
+                            void sendMessage(label);
+                          }}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 ) : (
                   messages.map((message) => (
