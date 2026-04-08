@@ -242,7 +242,7 @@ const Home: React.FC = () => {
       >
         <div className="home-layout">
           <p className="feria-text-label-caps">Hola, {displayName}</p>
-          <p className="feria-text-muted home-intro">Registra un ingreso o un gasto</p>
+          <h1 className="home-hero-line">Registra un ingreso o un gasto</h1>
 
           <div
             className={`siri-orb-wrap ${listening ? 'siri-orb-wrap--active' : ''}`}
