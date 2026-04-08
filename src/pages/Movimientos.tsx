@@ -1,7 +1,9 @@
 import type { ReactElement } from 'react';
-import { IonIcon, IonPage } from '@ionic/react';
+import { IonIcon, IonPage, IonRefresher, IonRefresherContent, IonSpinner, IonText } from '@ionic/react';
 import { sparklesOutline } from 'ionicons/icons';
-import { useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { listMovements, isFeriaApiConfigured } from '../api/feriaApi';
+import type { ApiMovement } from '../api/feriaApi';
 import {
   DUMMY_MOVEMENTS,
   type DummyMovement,
@@ -16,6 +18,18 @@ const currencyFmt = new Intl.NumberFormat('es-MX', {
   currency: 'MXN',
   maximumFractionDigits: 0,
 });
+
+function apiToDummy(m: ApiMovement): DummyMovement {
+  const dateStr = m.movementDate ?? m.createdAt.slice(0, 10);
+  return {
+    id: m.id,
+    kind: m.kind,
+    amount: m.amount,
+    concept: m.concept,
+    category: m.category,
+    date: dateStr,
+  };
+}
 
 function formatDayHeading(isoDate: string): string {
   const d = new Date(`${isoDate}T12:00:00`);
@@ -61,24 +75,89 @@ function MovementCard({ row }: { row: DummyMovement }): ReactElement {
 }
 
 const Movimientos: React.FC = () => {
-  const summary = useMemo(() => summarizeMovements(DUMMY_MOVEMENTS), []);
-  const grouped = useMemo(() => groupByDate(DUMMY_MOVEMENTS), []);
+  const [rows, setRows] = useState<DummyMovement[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [demoMode, setDemoMode] = useState(!isFeriaApiConfigured());
+
+  const load = useCallback(async () => {
+    if (!isFeriaApiConfigured()) {
+      setRows(DUMMY_MOVEMENTS);
+      setDemoMode(true);
+      setError(null);
+      setLoading(false);
+      return;
+    }
+    setDemoMode(false);
+    setError(null);
+    try {
+      const apiRows = await listMovements();
+      setRows(apiRows.map(apiToDummy));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'No se pudieron cargar los movimientos');
+      setRows([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  const summary = useMemo(() => summarizeMovements(rows), [rows]);
+  const grouped = useMemo(() => groupByDate(rows), [rows]);
 
   return (
     <IonPage className="movimientos-page">
       <FeriaAppShell contentClassName="movimientos-content">
+        <IonRefresher
+          slot="fixed"
+          onIonRefresh={async (ev) => {
+            await load();
+            ev.detail.complete();
+          }}
+        >
+          <IonRefresherContent />
+        </IonRefresher>
         <div className="movimientos-body ion-padding">
           <div className="movimientos-ai-strip">
             <IonIcon icon={sparklesOutline} aria-hidden />
-            <span>Resumen asistido · datos de demostración</span>
+            <span>
+              {demoMode
+                ? 'Resumen asistido · datos de demostración'
+                : 'Resumen asistido · tus movimientos'}
+            </span>
           </div>
 
-          <div className="movimientos-insight">
-            <p className="movimientos-insight__text">
-              Esta semana tus gastos en <strong>transporte</strong> están un{' '}
-              <strong>12% por debajo</strong> de tu media habitual (demo).
-            </p>
-          </div>
+          {loading && (
+            <div className="movimientos-loading">
+              <IonSpinner name="crescent" />
+            </div>
+          )}
+
+          {error && (
+            <IonText color="danger">
+              <p>{error}</p>
+            </IonText>
+          )}
+
+          {!loading && !demoMode && (
+            <div className="movimientos-insight">
+              <p className="movimientos-insight__text">
+                Lista actualizada desde la API. Tira hacia abajo para refrescar.
+              </p>
+            </div>
+          )}
+
+          {demoMode && !loading && (
+            <div className="movimientos-insight">
+              <p className="movimientos-insight__text">
+                Esta semana tus gastos en <strong>transporte</strong> están un{' '}
+                <strong>12% por debajo</strong> de tu media habitual (demo).
+              </p>
+            </div>
+          )}
 
           <div className="movimientos-stats">
             <div className="movimientos-stat">
@@ -97,16 +176,23 @@ const Movimientos: React.FC = () => {
 
           <h2 className="movimientos-section-title">Actividad reciente</h2>
 
-          {Array.from(grouped.entries()).map(([date, rows]) => (
-            <section key={date}>
-              <h3 className="movimientos-date-heading">{formatDayHeading(date)}</h3>
-              <ul className="movimientos-list">
-                {rows.map((row) => (
-                  <MovementCard key={row.id} row={row} />
-                ))}
-              </ul>
-            </section>
-          ))}
+          {!loading &&
+            Array.from(grouped.entries()).map(([date, dayRows]) => (
+              <section key={date}>
+                <h3 className="movimientos-date-heading">{formatDayHeading(date)}</h3>
+                <ul className="movimientos-list">
+                  {dayRows.map((row) => (
+                    <MovementCard key={row.id} row={row} />
+                  ))}
+                </ul>
+              </section>
+            ))}
+
+          {!loading && rows.length === 0 && !demoMode && !error && (
+            <IonText color="medium">
+              <p>No hay movimientos aún. Graba una nota en Inicio.</p>
+            </IonText>
+          )}
         </div>
       </FeriaAppShell>
     </IonPage>

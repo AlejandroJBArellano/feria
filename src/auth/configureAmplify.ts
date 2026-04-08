@@ -14,9 +14,11 @@ function parseOAuthScopes(): string[] {
     return raw
       .split(',')
       .map((s) => s.trim())
-      .filter(Boolean);
+      .filter(Boolean)
+      .filter((s) => s !== 'name');
   }
-  return ['openid', 'email'];
+  // `name` is a JWT claim, not an OAuth scope — including it causes invalid_scope.
+  return ['openid', 'email', 'profile'];
 }
 
 export const isCognitoConfigured = Boolean(

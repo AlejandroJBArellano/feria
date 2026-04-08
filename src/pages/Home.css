@@ -31,7 +31,7 @@
   text-wrap: balance;
 }
 
-/* Siri-style orb: layered glow + rotating spectrum ring */
+/* Voice orb — calm “AI mic”: soft aura + narrow green ring, flat core (no heavy glass) */
 .siri-orb-wrap {
   position: relative;
   width: var(--home-orb-size);
@@ -50,88 +50,104 @@
 
 .siri-orb-glow {
   position: absolute;
-  inset: -18%;
+  inset: -14%;
   border-radius: 50%;
   background: radial-gradient(
-    circle,
-    var(--feria-orb-glow-mid) 0%,
-    var(--feria-orb-glow-edge) 45%,
-    transparent 70%
+    circle at 50% 45%,
+    color-mix(in srgb, var(--ion-color-primary) 28%, transparent) 0%,
+    color-mix(in srgb, var(--feria-color-accent-dark) 12%, transparent) 42%,
+    transparent 68%
   );
-  filter: blur(16px);
-  opacity: 0.65;
-  transition: opacity 0.35s ease, transform 0.35s ease;
+  filter: blur(14px);
+  opacity: 0.5;
+  transition:
+    opacity var(--feria-duration-normal) var(--feria-ease-standard),
+    transform var(--feria-duration-normal) var(--feria-ease-standard);
   pointer-events: none;
 }
 
 .siri-orb-wrap--active .siri-orb-glow {
-  opacity: 1;
-  transform: scale(1.08);
-  animation: home-glow-pulse 1.2s ease-in-out infinite;
+  opacity: 0.85;
+  transform: scale(1.04);
+  animation: home-glow-breathe 1.8s ease-in-out infinite;
 }
 
+/* Narrow tonal ring — fewer stops than before, slower spin = less “toy” */
 .siri-orb-ring {
   position: absolute;
   inset: 0;
   z-index: 0;
   border-radius: 50%;
   background: conic-gradient(
-    from 0deg,
-    var(--feria-orb-ring-a),
-    var(--feria-orb-ring-b),
-    var(--feria-orb-ring-c),
-    var(--feria-orb-ring-d),
-    var(--feria-orb-ring-e),
-    var(--feria-orb-ring-f),
-    var(--feria-orb-ring-a)
+    from 220deg,
+    color-mix(in srgb, var(--ion-color-primary) 55%, var(--feria-color-page)) 0deg,
+    var(--feria-color-accent-dark) 120deg,
+    color-mix(in srgb, var(--ion-color-primary-tint, var(--ion-color-primary)) 70%, var(--feria-color-page)) 240deg,
+    color-mix(in srgb, var(--ion-color-primary) 55%, var(--feria-color-page)) 360deg
   );
-  animation: home-ring-rotate 8s linear infinite;
+  animation: home-ring-rotate 22s linear infinite;
   pointer-events: none;
+  opacity: 0.92;
 }
 
 .siri-orb-wrap--active .siri-orb-ring {
-  animation-duration: 2.5s;
-  filter: brightness(1.15);
+  animation-duration: 7s;
+  opacity: 1;
 }
 
 .siri-orb-core {
   position: absolute;
-  /* Slightly wider colored ring + thicker inner disk edge */
-  inset: 8px;
+  /* Ring thickness = inset: larger inset = thicker green band around the core */
+  inset: 17px;
   z-index: 1;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--ion-background-color, #fff);
-  border: 2.5px solid color-mix(in srgb, var(--ion-color-primary) 32%, rgba(146, 148, 156, 0.38));
-  box-shadow: var(--feria-disk-shadow-inner), var(--feria-disk-shadow-elev);
+  background: var(--ion-background-color);
+  border: 1px solid color-mix(in srgb, var(--feria-color-border) 70%, var(--ion-color-primary) 18%);
+  box-shadow: 0 6px 28px rgba(0, 0, 0, 0.07);
   box-sizing: border-box;
 }
 
 .ion-palette-dark .siri-orb-core {
-  border-color: color-mix(in srgb, var(--ion-color-primary) 38%, rgba(255, 255, 255, 0.22));
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 36px rgba(0, 0, 0, 0.45);
 }
 
-.siri-orb-core .feria-text-hint {
-  padding: 0 0.75rem;
+.home-orb-hint {
+  display: block;
+  padding: 0 0.85rem;
+  max-width: 11rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  line-height: 1.25;
+  text-align: center;
+  color: var(--feria-color-text-secondary);
+  transition: color var(--feria-duration-normal) var(--feria-ease-standard);
+}
+
+.home-orb-hint--active {
+  color: var(--ion-color-primary);
+  font-weight: 700;
 }
 
 @keyframes home-ring-rotate {
   to {
-    transform: rotate(360deg);
+    transform: rotate(-360deg);
   }
 }
 
-@keyframes home-glow-pulse {
+@keyframes home-glow-breathe {
   0%,
   100% {
-    transform: scale(1.05);
-    opacity: 0.85;
+    transform: scale(1.02);
+    opacity: 0.75;
   }
   50% {
-    transform: scale(1.12);
-    opacity: 1;
+    transform: scale(1.07);
+    opacity: 0.95;
   }
 }
 
