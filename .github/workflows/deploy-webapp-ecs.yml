@@ -5,7 +5,6 @@ on:
     branches:
       - develop
       - master
-      - chore/ci-cd
     paths:
       - 'src/**'
       - 'public/**'
