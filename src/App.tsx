@@ -5,6 +5,7 @@ import RequireAuth from './auth/RequireAuth';
 import Chat from './pages/Chat';
 import Cuenta from './pages/Cuenta';
 import Home from './pages/Home';
+import Logros from './pages/Logros';
 import Movimientos from './pages/Movimientos';
 import Login from './pages/Login';
 import Onboarding from './pages/Onboarding';
@@ -64,6 +65,11 @@ const App: React.FC = () => (
         <Route exact path="/home">
           <RequireAuth>
             <Home />
+          </RequireAuth>
+        </Route>
+        <Route exact path="/logros">
+          <RequireAuth>
+            <Logros />
           </RequireAuth>
         </Route>
         <Route exact path="/movimientos">

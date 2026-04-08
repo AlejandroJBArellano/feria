@@ -1,0 +1,162 @@
+import {
+  IonContent,
+  IonIcon,
+  IonPage,
+  IonPopover,
+  IonSpinner,
+  IonText,
+  useIonViewWillEnter,
+} from '@ionic/react';
+import { lockClosedOutline, trophyOutline } from 'ionicons/icons';
+import { useCallback, useState } from 'react';
+import {
+  getEngagementSummary,
+  isFeriaApiConfigured,
+  type EngagementSummary,
+} from '../api/feriaApi';
+import { FeriaAppShell } from '../components/FeriaAppShell';
+import './Logros.css';
+
+const Logros: React.FC = () => {
+  const [data, setData] = useState<EngagementSummary | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const apiReady = isFeriaApiConfigured();
+
+  const load = useCallback(async () => {
+    if (!apiReady) {
+      setData(null);
+      setError(null);
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      const summary = await getEngagementSummary();
+      setData(summary);
+    } catch (e) {
+      setData(null);
+      setError(e instanceof Error ? e.message : 'No se pudo cargar logros.');
+    } finally {
+      setLoading(false);
+    }
+  }, [apiReady]);
+
+  useIonViewWillEnter(() => {
+    void load();
+  });
+
+  const unlockedCount = data?.achievements.filter((a) => a.unlocked).length ?? 0;
+  const total = data?.achievements.length ?? 0;
+
+  return (
+    <IonPage className="logros-page">
+      <FeriaAppShell contentClassName="logros-content">
+        <div className="logros-layout" style={{ padding: '12px 12px 24px' }}>
+          <IonText>
+            <h1 className="logros-title">Logros y claridad</h1>
+            <p className="feria-text-label-caps" style={{ marginBottom: 16 }}>
+              Basados en lo que realmente registras en Feria.
+            </p>
+          </IonText>
+
+          {!apiReady && (
+            <IonText color="medium">
+              <p>Configura VITE_FERIA_API_URL para ver tus logros.</p>
+            </IonText>
+          )}
+
+          {apiReady && loading && !data && (
+            <div style={{ display: 'flex', justifyContent: 'center', padding: 24 }}>
+              <IonSpinner name="crescent" />
+            </div>
+          )}
+
+          {error && (
+            <IonText color="danger">
+              <p>{error}</p>
+            </IonText>
+          )}
+
+          {data && (
+            <>
+              <IonText>
+                <p style={{ marginBottom: 12, fontSize: '0.9rem' }}>
+                  <IonIcon icon={trophyOutline} style={{ verticalAlign: 'text-bottom', marginRight: 6 }} />
+                  {unlockedCount} de {total} desbloqueados
+                </p>
+              </IonText>
+
+              <div className="logros-axes">
+                <div className="logros-axis">
+                  <span className="logros-axis__label">Claridad</span>
+                  <div className="logros-axis__track">
+                    <div
+                      className="logros-axis__fill"
+                      style={{ width: `${data.axes.clarityScore}%` }}
+                    />
+                  </div>
+                </div>
+                <div className="logros-axis">
+                  <span className="logros-axis__label">Control del mes</span>
+                  <div className="logros-axis__track">
+                    <div
+                      className="logros-axis__fill"
+                      style={{ width: `${data.axes.controlScore}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="logros-grid" role="list">
+                {data.achievements.map((a) => {
+                  const medalMod = a.unlocked
+                    ? 'logros-hex-medal--unlocked'
+                    : a.eligible
+                      ? 'logros-hex-medal--eligible'
+                      : 'logros-hex-medal--locked';
+                  const triggerId = `logros-trigger-${a.id}`;
+                  return (
+                    <div key={a.id} className="logros-tile" role="listitem">
+                      <button
+                        type="button"
+                        className="logros-tile__hit"
+                        id={triggerId}
+                        aria-label={`${a.title}. Toca para ver la descripción.`}
+                      >
+                        <div className={`logros-hex-medal ${medalMod}`} aria-hidden>
+                          <IonIcon
+                            icon={a.unlocked ? trophyOutline : lockClosedOutline}
+                            className="logros-hex-medal__icon"
+                          />
+                        </div>
+                        <span className="logros-tile__title">{a.title}</span>
+                      </button>
+                      <IonPopover
+                        trigger={triggerId}
+                        triggerAction="click"
+                        side="top"
+                        alignment="center"
+                        className="logros-desc-popover"
+                      >
+                        <IonContent className="logros-popover-content">
+                          <p className="logros-popover__text">{a.description}</p>
+                          <p className="logros-popover__meta">
+                            Eje:{' '}
+                            {a.axis === 'clarity' ? 'Claridad' : 'Control del mes'}
+                          </p>
+                        </IonContent>
+                      </IonPopover>
+                    </div>
+                  );
+                })}
+              </div>
+            </>
+          )}
+        </div>
+      </FeriaAppShell>
+    </IonPage>
+  );
+};
+
+export default Logros;

@@ -18,6 +18,32 @@
   box-sizing: border-box;
 }
 
+.home-engagement-reminder {
+  width: min(22rem, 94vw);
+  margin-bottom: 1.25rem;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--feria-color-border);
+  background: var(--ion-background-color, #fff);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+.home-engagement-reminder p {
+  margin: 0 0 10px;
+  font-size: 0.88rem;
+  line-height: 1.4;
+  color: var(--feria-color-text);
+  text-align: center;
+}
+
+.home-engagement-reminder__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+}
+
 /* Main instruction — oversized type, still single focal block */
 .home-hero-line {
   margin: 0 0 var(--feria-space-stack-lg);
