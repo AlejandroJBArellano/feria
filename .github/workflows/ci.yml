@@ -25,7 +25,7 @@ jobs:
 
       # --- SEGURIDAD ---
       - name: Vulnerabilidades en dependencias
-        run: npm audit --audit-level=moderate
+        run: npm audit --audit-level=high
 
       - name: Detectar secrets expuestos
         uses: trufflesecurity/trufflehog@main
@@ -53,3 +53,31 @@ jobs:
       # --- BUILD ---
       - name: Build limpio
         run: npm run build
+
+      # --- DOCKER + AWS (activar cuando estés listo para producción) ---
+      # - name: Configurar credenciales AWS
+      #   uses: aws-actions/configure-aws-credentials@v2
+      #   with:
+      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     aws-region: us-east-1
+
+      # - name: Login a Amazon ECR
+      #   id: login-ecr
+      #   uses: aws-actions/amazon-ecr-login@v1
+
+      # - name: Build y push imagen Docker
+      #   env:
+      #     ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+      #     ECR_REPOSITORY: feria-app
+      #     IMAGE_TAG: ${{ github.sha }}
+      #   run: |
+      #     docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+      #     docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+      # - name: Deploy en AWS ECS
+      #   run: |
+      #     aws ecs update-service \
+      #       --cluster feria-cluster \
+      #       --service feria-service \
+      #       --force-new-deployment
