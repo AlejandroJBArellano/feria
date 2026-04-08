@@ -138,7 +138,7 @@ jobs:
                 --bucket "$bucket_name" \
                 --create-bucket-configuration "LocationConstraint=$AWS_REGION" >/dev/null
             fi
-          }
+          ; }
 
           aws s3api put-bucket-versioning \
             --bucket "$bucket_name" \
