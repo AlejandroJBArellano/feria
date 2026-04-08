@@ -1,9 +1,10 @@
 # ---------- build ----------
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS builder
 WORKDIR /app
 
 COPY package.json package-lock.json ./
-RUN npm ci
+# npm install alinea el lock con package.json si el repo aún tiene un lock antiguo (ideal: commit de lock actualizado desde Node 22).
+RUN npm install
 
 COPY . .
 
