@@ -1,0 +1,11 @@
+node_modules
+dist
+coverage
+cypress/screenshots
+cypress/videos
+.git
+.github
+.vscode
+.cursor
+npm-debug.log
+Dockerfile

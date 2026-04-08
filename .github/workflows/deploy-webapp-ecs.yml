@@ -1,0 +1,451 @@
+name: Deploy webapp to ECS
+
+on:
+  push:
+    branches:
+      - develop
+      - master
+    paths:
+      - 'src/**'
+      - 'public/**'
+      - 'index.html'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'tsconfig*.json'
+      - 'vite.config.ts'
+      - 'Dockerfile'
+      - '.dockerignore'
+      - 'nginx/**'
+      - '.github/workflows/deploy-webapp-ecs.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  AWS_REGION: mx-central-1
+  AWS_ROLE_TO_ASSUME: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+  ECS_CLUSTER: feria-v2
+  ECS_SERVICE: feria-webapp
+  ECS_CONTAINER_NAME: feria-webapp-container
+  ECR_REPOSITORY: feria-webapp
+  ECS_CPU: '256'
+  ECS_MEMORY: '512'
+  ECS_DESIRED_COUNT: '1'
+  CONTAINER_PORT: '80'
+  ALB_SCHEME: internet-facing
+  ECS_EXECUTION_ROLE_NAME: GitHubActionsEcsTaskExecutionRole
+  ECS_TASK_ROLE_NAME: GitHubActionsEcsTaskRole
+  VITE_COGNITO_REGION: ${{ vars.VITE_COGNITO_REGION }}
+  VITE_COGNITO_USER_POOL_ID: ${{ vars.VITE_COGNITO_USER_POOL_ID }}
+  VITE_COGNITO_USER_POOL_CLIENT_ID: ${{ vars.VITE_COGNITO_USER_POOL_CLIENT_ID }}
+  VITE_COGNITO_DOMAIN: ${{ vars.VITE_COGNITO_DOMAIN }}
+  VITE_COGNITO_REDIRECT_SIGN_IN: ${{ vars.VITE_COGNITO_REDIRECT_SIGN_IN }}
+  VITE_COGNITO_REDIRECT_SIGN_OUT: ${{ vars.VITE_COGNITO_REDIRECT_SIGN_OUT }}
+  VITE_COGNITO_OAUTH_SCOPES: ${{ vars.VITE_COGNITO_OAUTH_SCOPES }}
+  VITE_AUTH_DEBUG: ${{ vars.VITE_AUTH_DEBUG }}
+  VITE_FERIA_API_URL: ${{ vars.VITE_FERIA_API_URL }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate required configuration
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          required_values=(
+            AWS_REGION
+            ECS_CLUSTER
+            ECS_SERVICE
+            ECS_CONTAINER_NAME
+            VITE_COGNITO_REGION
+            VITE_COGNITO_USER_POOL_ID
+            VITE_COGNITO_USER_POOL_CLIENT_ID
+            VITE_COGNITO_DOMAIN
+            VITE_COGNITO_REDIRECT_SIGN_IN
+            VITE_COGNITO_REDIRECT_SIGN_OUT
+            VITE_COGNITO_OAUTH_SCOPES
+            VITE_FERIA_API_URL
+          )
+
+          for name in "${required_values[@]}"; do
+            if [[ -z "${!name:-}" ]]; then
+              echo "::error::$name is required as a GitHub repository variable or secret."
+              exit 1
+            fi
+          done
+
+          has_oidc_role="false"
+          if [[ -n "${AWS_ROLE_TO_ASSUME:-}" ]]; then
+            has_oidc_role="true"
+          fi
+
+          has_access_keys="false"
+          if [[ -n "${AWS_ACCESS_KEY_ID:-}" && -n "${AWS_SECRET_ACCESS_KEY:-}" ]]; then
+            has_access_keys="true"
+          fi
+
+          if [[ "$has_oidc_role" != "true" && "$has_access_keys" != "true" ]]; then
+            echo "::error::Configure AWS auth using either AWS_ROLE_TO_ASSUME (OIDC) or AWS_ACCESS_KEY_ID/AWS_SECRET_ACCESS_KEY (Secrets)."
+            exit 1
+          fi
+
+      - name: Configure AWS credentials (OIDC)
+        if: env.AWS_ROLE_TO_ASSUME != ''
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Configure AWS credentials (Access Keys)
+        if: env.AWS_ROLE_TO_ASSUME == ''
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ env.AWS_SESSION_TOKEN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Resolve deployment values
+        id: ecs
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          account_id=$(aws sts get-caller-identity --query 'Account' --output text)
+          registry_host="$account_id.dkr.ecr.$AWS_REGION.amazonaws.com"
+          repository_name="${ECR_REPOSITORY:-$ECS_SERVICE}"
+          image_tag="web-${GITHUB_SHA::7}"
+          image_uri="$registry_host/$repository_name:$image_tag"
+          latest_uri="$registry_host/$repository_name:latest"
+
+          container_port="${CONTAINER_PORT:-80}"
+          ecs_cpu="${ECS_CPU:-256}"
+          ecs_memory="${ECS_MEMORY:-512}"
+          desired_count="${ECS_DESIRED_COUNT:-1}"
+          alb_scheme="${ALB_SCHEME:-internet-facing}"
+          execution_role_name="${ECS_EXECUTION_ROLE_NAME:-GitHubActionsEcsTaskExecutionRole}"
+          task_role_name="${ECS_TASK_ROLE_NAME:-GitHubActionsEcsTaskRole}"
+
+          svc_slug=$(echo "$ECS_SERVICE" | tr -cd '[:alnum:]-' | tr '[:upper:]' '[:lower:]')
+          alb_name=$(echo "${svc_slug}-alb" | cut -c1-32)
+          tg_name=$(echo "${svc_slug}-tg" | cut -c1-32)
+          alb_sg_name=$(echo "${svc_slug}-alb-sg" | cut -c1-255)
+          svc_sg_name=$(echo "${svc_slug}-svc-sg" | cut -c1-255)
+
+          if [[ -z "$repository_name" ]]; then
+            echo "::error::ECR_REPOSITORY no puede ser vacio."
+            exit 1
+          fi
+
+          aws ecr describe-repositories --repository-names "$repository_name" >/dev/null 2>&1 || \
+            aws ecr create-repository --repository-name "$repository_name" >/dev/null
+
+          {
+            echo "registry_host=$registry_host"
+            echo "repository_name=$repository_name"
+            echo "image_uri=$image_uri"
+            echo "latest_uri=$latest_uri"
+            echo "container_port=$container_port"
+            echo "ecs_cpu=$ecs_cpu"
+            echo "ecs_memory=$ecs_memory"
+            echo "desired_count=$desired_count"
+            echo "alb_scheme=$alb_scheme"
+            echo "execution_role_name=$execution_role_name"
+            echo "task_role_name=$task_role_name"
+            echo "alb_name=$alb_name"
+            echo "tg_name=$tg_name"
+            echo "alb_sg_name=$alb_sg_name"
+            echo "svc_sg_name=$svc_sg_name"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push image
+        shell: bash
+        env:
+          IMAGE_URI: ${{ steps.ecs.outputs.image_uri }}
+          LATEST_URI: ${{ steps.ecs.outputs.latest_uri }}
+        run: |
+          set -euo pipefail
+
+          docker build \
+            --build-arg VITE_COGNITO_REGION="$VITE_COGNITO_REGION" \
+            --build-arg VITE_COGNITO_USER_POOL_ID="$VITE_COGNITO_USER_POOL_ID" \
+            --build-arg VITE_COGNITO_USER_POOL_CLIENT_ID="$VITE_COGNITO_USER_POOL_CLIENT_ID" \
+            --build-arg VITE_COGNITO_DOMAIN="$VITE_COGNITO_DOMAIN" \
+            --build-arg VITE_COGNITO_REDIRECT_SIGN_IN="$VITE_COGNITO_REDIRECT_SIGN_IN" \
+            --build-arg VITE_COGNITO_REDIRECT_SIGN_OUT="$VITE_COGNITO_REDIRECT_SIGN_OUT" \
+            --build-arg VITE_COGNITO_OAUTH_SCOPES="$VITE_COGNITO_OAUTH_SCOPES" \
+            --build-arg VITE_AUTH_DEBUG="${VITE_AUTH_DEBUG:-false}" \
+            --build-arg VITE_FERIA_API_URL="$VITE_FERIA_API_URL" \
+            -t "$IMAGE_URI" \
+            -t "$LATEST_URI" \
+            .
+
+          docker push "$IMAGE_URI"
+          docker push "$LATEST_URI"
+
+      - name: Create/Update ECS infra and deploy
+        id: deploy
+        shell: bash
+        env:
+          IMAGE_URI: ${{ steps.ecs.outputs.image_uri }}
+          CONTAINER_PORT: ${{ steps.ecs.outputs.container_port }}
+          ECS_CPU: ${{ steps.ecs.outputs.ecs_cpu }}
+          ECS_MEMORY: ${{ steps.ecs.outputs.ecs_memory }}
+          ECS_DESIRED_COUNT: ${{ steps.ecs.outputs.desired_count }}
+          ALB_SCHEME: ${{ steps.ecs.outputs.alb_scheme }}
+          ALB_NAME: ${{ steps.ecs.outputs.alb_name }}
+          TG_NAME: ${{ steps.ecs.outputs.tg_name }}
+          ALB_SG_NAME: ${{ steps.ecs.outputs.alb_sg_name }}
+          SVC_SG_NAME: ${{ steps.ecs.outputs.svc_sg_name }}
+          EXECUTION_ROLE_NAME: ${{ steps.ecs.outputs.execution_role_name }}
+          TASK_ROLE_NAME: ${{ steps.ecs.outputs.task_role_name }}
+        run: |
+          set -euo pipefail
+
+          cluster_status=$(aws ecs describe-clusters \
+            --clusters "$ECS_CLUSTER" \
+            --query 'clusters[0].status' \
+            --output text 2>/dev/null || true)
+
+          if [[ -z "$cluster_status" || "$cluster_status" == "None" || "$cluster_status" == "INACTIVE" ]]; then
+            aws ecs create-cluster --cluster-name "$ECS_CLUSTER" >/dev/null
+          fi
+
+          vpc_id=$(aws ec2 describe-vpcs \
+            --filters Name=isDefault,Values=true \
+            --query 'Vpcs[0].VpcId' \
+            --output text)
+
+          if [[ -z "$vpc_id" || "$vpc_id" == "None" ]]; then
+            echo "::error::No existe VPC default. Crea una VPC y define el network manualmente."
+            exit 1
+          fi
+
+          subnet_ids_csv=$(aws ec2 describe-subnets \
+            --filters Name=vpc-id,Values="$vpc_id" Name=default-for-az,Values=true \
+            --query 'Subnets[].SubnetId' \
+            --output text | tr '\t' ',')
+
+          if [[ -z "$subnet_ids_csv" ]]; then
+            echo "::error::No encontré subnets default en la VPC $vpc_id."
+            exit 1
+          fi
+
+          iam_assume_policy='{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"Service":"ecs-tasks.amazonaws.com"},"Action":"sts:AssumeRole"}]}'
+
+          execution_role_arn=$(aws iam get-role --role-name "$EXECUTION_ROLE_NAME" --query 'Role.Arn' --output text 2>/dev/null || true)
+          if [[ -z "$execution_role_arn" || "$execution_role_arn" == "None" ]]; then
+            execution_role_arn=$(aws iam create-role \
+              --role-name "$EXECUTION_ROLE_NAME" \
+              --assume-role-policy-document "$iam_assume_policy" \
+              --query 'Role.Arn' --output text)
+            aws iam attach-role-policy \
+              --role-name "$EXECUTION_ROLE_NAME" \
+              --policy-arn arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy >/dev/null
+          fi
+
+          task_role_arn=$(aws iam get-role --role-name "$TASK_ROLE_NAME" --query 'Role.Arn' --output text 2>/dev/null || true)
+          if [[ -z "$task_role_arn" || "$task_role_arn" == "None" ]]; then
+            task_role_arn=$(aws iam create-role \
+              --role-name "$TASK_ROLE_NAME" \
+              --assume-role-policy-document "$iam_assume_policy" \
+              --query 'Role.Arn' --output text)
+          fi
+
+          aws logs create-log-group --log-group-name "/ecs/$ECS_SERVICE" >/dev/null 2>&1 || true
+
+          alb_sg_id=$(aws ec2 describe-security-groups \
+            --filters Name=vpc-id,Values="$vpc_id" Name=group-name,Values="$ALB_SG_NAME" \
+            --query 'SecurityGroups[0].GroupId' \
+            --output text 2>/dev/null || true)
+
+          if [[ -z "$alb_sg_id" || "$alb_sg_id" == "None" ]]; then
+            alb_sg_id=$(aws ec2 create-security-group \
+              --group-name "$ALB_SG_NAME" \
+              --description "ALB security group for $ECS_SERVICE" \
+              --vpc-id "$vpc_id" \
+              --query 'GroupId' \
+              --output text)
+          fi
+
+          aws ec2 authorize-security-group-ingress \
+            --group-id "$alb_sg_id" \
+            --ip-permissions '[{"IpProtocol":"tcp","FromPort":80,"ToPort":80,"IpRanges":[{"CidrIp":"0.0.0.0/0"}]}]' >/dev/null 2>&1 || true
+
+          svc_sg_id=$(aws ec2 describe-security-groups \
+            --filters Name=vpc-id,Values="$vpc_id" Name=group-name,Values="$SVC_SG_NAME" \
+            --query 'SecurityGroups[0].GroupId' \
+            --output text 2>/dev/null || true)
+
+          if [[ -z "$svc_sg_id" || "$svc_sg_id" == "None" ]]; then
+            svc_sg_id=$(aws ec2 create-security-group \
+              --group-name "$SVC_SG_NAME" \
+              --description "ECS service security group for $ECS_SERVICE" \
+              --vpc-id "$vpc_id" \
+              --query 'GroupId' \
+              --output text)
+          fi
+
+          aws ec2 authorize-security-group-ingress \
+            --group-id "$svc_sg_id" \
+            --ip-permissions "[{\"IpProtocol\":\"tcp\",\"FromPort\":$CONTAINER_PORT,\"ToPort\":$CONTAINER_PORT,\"UserIdGroupPairs\":[{\"GroupId\":\"$alb_sg_id\"}]}]" >/dev/null 2>&1 || true
+
+          alb_arn=$(aws elbv2 describe-load-balancers \
+            --names "$ALB_NAME" \
+            --query 'LoadBalancers[0].LoadBalancerArn' \
+            --output text 2>/dev/null || true)
+
+          if [[ -z "$alb_arn" || "$alb_arn" == "None" ]]; then
+            alb_arn=$(aws elbv2 create-load-balancer \
+              --name "$ALB_NAME" \
+              --type application \
+              --scheme "$ALB_SCHEME" \
+              --security-groups "$alb_sg_id" \
+              --subnets "${subnet_ids_csv//,/ }" \
+              --query 'LoadBalancers[0].LoadBalancerArn' \
+              --output text)
+            aws elbv2 wait load-balancer-available --load-balancer-arns "$alb_arn"
+          fi
+
+          target_group_arn=$(aws elbv2 describe-target-groups \
+            --names "$TG_NAME" \
+            --query 'TargetGroups[0].TargetGroupArn' \
+            --output text 2>/dev/null || true)
+
+          if [[ -z "$target_group_arn" || "$target_group_arn" == "None" ]]; then
+            target_group_arn=$(aws elbv2 create-target-group \
+              --name "$TG_NAME" \
+              --protocol HTTP \
+              --port "$CONTAINER_PORT" \
+              --vpc-id "$vpc_id" \
+              --target-type ip \
+              --health-check-path /healthz \
+              --query 'TargetGroups[0].TargetGroupArn' \
+              --output text)
+          fi
+
+          listener_arn=$(aws elbv2 describe-listeners \
+            --load-balancer-arn "$alb_arn" \
+            --query 'Listeners[?Port==`80`].ListenerArn | [0]' \
+            --output text)
+
+          if [[ -z "$listener_arn" || "$listener_arn" == "None" ]]; then
+            aws elbv2 create-listener \
+              --load-balancer-arn "$alb_arn" \
+              --protocol HTTP \
+              --port 80 \
+              --default-actions "Type=forward,TargetGroupArn=$target_group_arn" >/dev/null
+          fi
+
+          cat > task-definition-input.json <<EOF
+          {
+            "family": "$ECS_SERVICE",
+            "networkMode": "awsvpc",
+            "requiresCompatibilities": ["FARGATE"],
+            "cpu": "$ECS_CPU",
+            "memory": "$ECS_MEMORY",
+            "executionRoleArn": "$execution_role_arn",
+            "taskRoleArn": "$task_role_arn",
+            "containerDefinitions": [
+              {
+                "name": "$ECS_CONTAINER_NAME",
+                "image": "$IMAGE_URI",
+                "essential": true,
+                "portMappings": [
+                  {
+                    "containerPort": $CONTAINER_PORT,
+                    "hostPort": $CONTAINER_PORT,
+                    "protocol": "tcp"
+                  }
+                ],
+                "logConfiguration": {
+                  "logDriver": "awslogs",
+                  "options": {
+                    "awslogs-group": "/ecs/$ECS_SERVICE",
+                    "awslogs-region": "$AWS_REGION",
+                    "awslogs-stream-prefix": "ecs"
+                  }
+                }
+              }
+            ]
+          }
+          EOF
+
+          task_definition_arn=$(aws ecs register-task-definition \
+            --cli-input-json file://task-definition-input.json \
+            --query 'taskDefinition.taskDefinitionArn' \
+            --output text)
+
+          service_arn=$(aws ecs describe-services \
+            --cluster "$ECS_CLUSTER" \
+            --services "$ECS_SERVICE" \
+            --query 'services[0].serviceArn' \
+            --output text 2>/dev/null || true)
+
+          network_configuration="awsvpcConfiguration={subnets=[$subnet_ids_csv],securityGroups=[$svc_sg_id],assignPublicIp=ENABLED}"
+
+          if [[ -z "$service_arn" || "$service_arn" == "None" ]]; then
+            aws ecs create-service \
+              --cluster "$ECS_CLUSTER" \
+              --service-name "$ECS_SERVICE" \
+              --task-definition "$task_definition_arn" \
+              --desired-count "$ECS_DESIRED_COUNT" \
+              --launch-type FARGATE \
+              --platform-version LATEST \
+              --network-configuration "$network_configuration" \
+              --load-balancers "targetGroupArn=$target_group_arn,containerName=$ECS_CONTAINER_NAME,containerPort=$CONTAINER_PORT" >/dev/null
+          else
+            aws ecs update-service \
+              --cluster "$ECS_CLUSTER" \
+              --service "$ECS_SERVICE" \
+              --task-definition "$task_definition_arn" \
+              --desired-count "$ECS_DESIRED_COUNT" \
+              --force-new-deployment >/dev/null
+          fi
+
+          aws ecs wait services-stable \
+            --cluster "$ECS_CLUSTER" \
+            --services "$ECS_SERVICE"
+
+          dns_name=$(aws elbv2 describe-load-balancers \
+            --load-balancer-arns "$alb_arn" \
+            --query 'LoadBalancers[0].DNSName' \
+            --output text)
+
+          public_url="http://$dns_name"
+          echo "public_url=$public_url" >> "$GITHUB_OUTPUT"
+
+      - name: Get public URL
+        id: url
+        shell: bash
+        run: |
+          set -euo pipefail
+          public_url="${{ steps.deploy.outputs.public_url }}"
+          echo "public_url=$public_url" >> "$GITHUB_OUTPUT"
+
+      - name: Publish deployment summary
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          {
+            echo "## Webapp desplegada"
+            echo
+            echo "URL pública: ${{ steps.url.outputs.public_url }}"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          echo "Webapp URL: ${{ steps.url.outputs.public_url }}"
