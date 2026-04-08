@@ -1,23 +1,26 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
 import {
-  IonButton,
-  IonContent,
-  IonHeader,
-  IonIcon,
-  IonInput,
-  IonItem,
-  IonLabel,
-  IonModal,
-  IonPage,
-  IonSegment,
-  IonSegmentButton,
-  IonText,
-  IonTitle,
-  IonToolbar,
+    IonButton,
+    IonContent,
+    IonHeader,
+    IonIcon,
+    IonInput,
+    IonItem,
+    IonLabel,
+    IonModal,
+    IonPage,
+    IonSegment,
+    IonSegmentButton,
+    IonSpinner,
+    IonText,
+    IonTitle,
+    IonToolbar,
 } from '@ionic/react';
 import { logOutOutline } from 'ionicons/icons';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import KeyboardClassicIcon from '../components/icons/KeyboardClassicIcon';
+import ThemeToggle from '../components/ThemeToggle';
 import './Home.css';
 
 type MovementKind = 'ingreso' | 'gasto';
@@ -70,8 +73,14 @@ function createSpeechRecognition(): SpeechRecognitionInstance | null {
   return r;
 }
 
+/** Quick labels for expense concept (modal chips). */
+const GASTO_CONCEPT_CHIPS = ['Comida', 'Transporte', 'Servicios', 'Ocio', 'Otros'] as const;
+
 const Home: React.FC = () => {
-  const { signOutUser } = useAuth();
+  const history = useHistory();
+  const { user, signOutUser } = useAuth();
+  const [signingOut, setSigningOut] = useState(false);
+  const displayName = user?.name ?? user?.email ?? user?.username ?? 'Usuario autenticado';
   const [listening, setListening] = useState(false);
   const [voiceSupported, setVoiceSupported] = useState(true);
   const [voiceTranscript, setVoiceTranscript] = useState('');
@@ -186,10 +195,36 @@ const Home: React.FC = () => {
     resetForm();
   };
 
+  const appendConceptChip = (label: string) => {
+    setNote((prev) => {
+      const t = prev.trim();
+      if (!t) {
+        return label;
+      }
+      if (t.toLowerCase().includes(label.toLowerCase())) {
+        return t;
+      }
+      return `${t}, ${label}`;
+    });
+  };
+
+  const handleSignOut = async () => {
+    if (signingOut) return;
+    setSigningOut(true);
+    try {
+      await signOutUser();
+      // Hosted UI global sign-out may navigate away entirely; when staying in SPA, sync URL with auth.
+      history.replace('/login');
+    } catch {
+      setSigningOut(false);
+    }
+  };
+
   return (
     <IonPage className="home-page">
       <IonContent fullscreen className="home-content">
         <div className="home-layout">
+          <p className="feria-text-label-caps">Hola, {displayName}</p>
           <p className="feria-text-muted home-intro">Registra un ingreso o un gasto</p>
 
           <div
@@ -242,17 +277,22 @@ const Home: React.FC = () => {
         </div>
       </IonContent>
 
+      <div className="feria-fixed-corner-tr">
+        <ThemeToggle />
+      </div>
+
       <div className="feria-fixed-corner-tl">
         <IonButton
           className="feria-icon-btn-quiet"
           fill="solid"
           shape="round"
           aria-label="Cerrar sesión"
+          disabled={signingOut}
           onClick={() => {
-            void signOutUser();
+            void handleSignOut();
           }}
         >
-          <IonIcon icon={logOutOutline} aria-hidden />
+          {signingOut ? <IonSpinner name="crescent" /> : <IonIcon icon={logOutOutline} aria-hidden />}
         </IonButton>
       </div>
 
@@ -324,6 +364,21 @@ const Home: React.FC = () => {
               onIonInput={(e) => setNote(String(e.detail.value ?? ''))}
             />
           </IonItem>
+
+          {kind === 'gasto' && (
+            <div className="home-modal-chips" role="group" aria-label="Conceptos rápidos">
+              {GASTO_CONCEPT_CHIPS.map((label) => (
+                <button
+                  key={label}
+                  type="button"
+                  className="home-modal-chip"
+                  onClick={() => appendConceptChip(label)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          )}
 
           <IonButton expand="block" className="feria-modal-primary" onClick={handleSaveKeyboard}>
             Guardar

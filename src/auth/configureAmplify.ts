@@ -7,6 +7,18 @@ const domain = import.meta.env.VITE_COGNITO_DOMAIN;
 const redirectSignIn = import.meta.env.VITE_COGNITO_REDIRECT_SIGN_IN;
 const redirectSignOut = import.meta.env.VITE_COGNITO_REDIRECT_SIGN_OUT;
 
+/** Comma-separated; must match "Allowed OAuth scopes" on the Cognito app client. Default: openid,email */
+function parseOAuthScopes(): string[] {
+  const raw = import.meta.env.VITE_COGNITO_OAUTH_SCOPES as string | undefined;
+  if (raw && raw.trim().length > 0) {
+    return raw
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
+  }
+  return ['openid', 'email'];
+}
+
 export const isCognitoConfigured = Boolean(
   cognitoRegion && userPoolId && userPoolClientId && domain && redirectSignIn && redirectSignOut
 );
@@ -31,7 +43,7 @@ export function configureAmplify(): void {
         loginWith: {
           oauth: {
             domain: safeDomain,
-            scopes: ['openid', 'email', 'profile'],
+            scopes: parseOAuthScopes(),
             redirectSignIn: [safeRedirectSignIn],
             redirectSignOut: [safeRedirectSignOut],
             responseType: 'code'
