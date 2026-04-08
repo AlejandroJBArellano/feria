@@ -7,6 +7,7 @@
 name: CI and deploy
 
 on:
+  workflow_dispatch:
   push:
     branches: [main, master, workflow]
   pull_request:
@@ -68,6 +69,13 @@ jobs:
           path: ./
           extra_args: --only-verified
 
+      - name: Secret scan (TruffleHog) — ejecución manual
+        if: github.event_name == 'workflow_dispatch'
+        uses: trufflesecurity/trufflehog@v3.88.27
+        with:
+          path: ./
+          extra_args: --only-verified
+
       - name: Semgrep
         run: |
           python3 -m pip install --user semgrep
@@ -80,6 +88,9 @@ jobs:
       - name: Typecheck
         run: npx tsc --noEmit
 
+      - name: Unit tests (Vitest)
+        run: npm run test.unit
+
       - name: Build (Vite)
         run: npm run build
 
@@ -89,6 +100,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: quality
     if: |
+      github.event_name == 'workflow_dispatch' ||
       github.event_name == 'pull_request' ||
       (github.event_name == 'push' &&
         github.ref != 'refs/heads/main' &&
