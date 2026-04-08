@@ -154,11 +154,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }): React
         preferred_username?: string;
       };
       let attributes: AttrSlice = {};
-      try {
-        attributes = (await fetchUserAttributes()) as AttrSlice;
-      } catch (attrErr) {
-        authLog('fetchUserAttributes failed; using ID token claims only', {
-          error: attrErr instanceof Error ? attrErr.message : String(attrErr)
+      const accessScopeRaw = session.tokens?.accessToken?.payload?.scope;
+      const accessScopes = typeof accessScopeRaw === 'string'
+        ? accessScopeRaw.split(' ').map((scope) => scope.trim()).filter(Boolean)
+        : [];
+      const canCallGetUser = accessScopes.includes('aws.cognito.signin.user.admin');
+
+      if (canCallGetUser) {
+        try {
+          attributes = (await fetchUserAttributes()) as AttrSlice;
+        } catch (attrErr) {
+          authLog('fetchUserAttributes failed; using ID token claims only', {
+            error: attrErr instanceof Error ? attrErr.message : String(attrErr)
+          });
+        }
+      } else {
+        authLog('skip fetchUserAttributes; missing admin scope', {
+          scopes: accessScopes
         });
       }
 

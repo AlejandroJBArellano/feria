@@ -10,6 +10,8 @@ interface ImportMetaEnv {
 	readonly VITE_CHAT_WS_URL?: string;
 	readonly VITE_COGNITO_OAUTH_SCOPES?: string;
 	readonly VITE_AUTH_DEBUG?: string;
+	/** Base URL of Feria REST API (CDK output ApiUrl), e.g. https://xxx.execute-api.region.amazonaws.com/prod/ */
+	readonly VITE_FERIA_API_URL?: string;
 }
 
 interface ImportMeta {

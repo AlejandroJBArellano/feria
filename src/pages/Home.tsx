@@ -14,64 +14,40 @@ import {
     IonText,
     IonTitle,
     IonToolbar,
+    useIonToast,
 } from '@ionic/react';
 import { logOutOutline } from 'ionicons/icons';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
+import {
+    createManualMovement,
+    createVoiceJob,
+    isFeriaApiConfigured,
+    uploadAudioToPresignedUrl,
+} from '../api/feriaApi';
 import { useAuth } from '../auth/AuthContext';
 import { getUserDisplayLabel } from '../auth/userDisplay';
 import { FeriaAppShell } from '../components/FeriaAppShell';
 import KeyboardClassicIcon from '../components/icons/KeyboardClassicIcon';
+import { setPendingVoiceJobId } from '../voice/voiceJobStorage';
 import './Home.css';
 
 type MovementKind = 'ingreso' | 'gasto';
 
-interface SpeechRecognitionInstance {
-  continuous: boolean;
-  interimResults: boolean;
-  lang: string;
-  start(): void;
-  stop(): void;
-  abort(): void;
-  onresult: ((event: AppSpeechRecognitionResultEvent) => void) | null;
-  onerror: ((event: Event) => void) | null;
-  onend: (() => void) | null;
-}
+type VoicePhase = 'idle' | 'recording' | 'uploading' | 'error';
 
-interface AppSpeechRecognitionResultEvent extends Event {
-  readonly results: SpeechRecognitionResultList;
-}
-
-interface SpeechRecognitionResultList {
-  readonly length: number;
-  item(index: number): SpeechRecognitionResult;
-  [index: number]: SpeechRecognitionResult;
-}
-
-interface SpeechRecognitionResult {
-  readonly length: number;
-  readonly isFinal: boolean;
-  item(index: number): SpeechRecognitionAlternative;
-  [index: number]: SpeechRecognitionAlternative;
-}
-
-interface SpeechRecognitionAlternative {
-  readonly transcript: string;
-}
-
-function createSpeechRecognition(): SpeechRecognitionInstance | null {
-  const w = window as Window &
-    typeof globalThis & {
-      SpeechRecognition?: new () => SpeechRecognitionInstance;
-      webkitSpeechRecognition?: new () => SpeechRecognitionInstance;
-    };
-  const Ctor = w.SpeechRecognition ?? w.webkitSpeechRecognition;
-  if (!Ctor) return null;
-  const r = new Ctor();
-  r.continuous = false;
-  r.interimResults = true;
-  r.lang = 'es-MX';
-  return r;
+function pickRecorderMime(): { mime: string; label: string } {
+  const candidates = [
+    'audio/webm;codecs=opus',
+    'audio/webm',
+    'audio/mp4',
+  ];
+  for (const m of candidates) {
+    if (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported(m)) {
+      return { mime: m, label: m };
+    }
+  }
+  return { mime: '', label: 'default' };
 }
 
 /** Quick labels for expense concept (modal chips). */
@@ -80,108 +56,134 @@ const GASTO_CONCEPT_CHIPS = ['Comida', 'Transporte', 'Servicios', 'Ocio', 'Otros
 const Home: React.FC = () => {
   const history = useHistory();
   const { user, signOutUser } = useAuth();
+  const [presentToast] = useIonToast();
   const [signingOut, setSigningOut] = useState(false);
   const displayName = getUserDisplayLabel(user);
-  const [listening, setListening] = useState(false);
-  const [voiceSupported, setVoiceSupported] = useState(true);
-  const [voiceTranscript, setVoiceTranscript] = useState('');
-  const [voiceInterim, setVoiceInterim] = useState('');
   const [keyboardOpen, setKeyboardOpen] = useState(false);
   const [kind, setKind] = useState<MovementKind>('gasto');
   const [amount, setAmount] = useState('');
   const [note, setNote] = useState('');
+  const [savingKeyboard, setSavingKeyboard] = useState(false);
 
-  const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
-  const listeningRef = useRef(false);
+  const [voicePhase, setVoicePhase] = useState<VoicePhase>('idle');
+  const [voiceError, setVoiceError] = useState<string | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const chunksRef = useRef<BlobPart[]>([]);
+  const recordingRef = useRef(false);
+
+  const apiReady = isFeriaApiConfigured();
+
+  const cleanupStream = useCallback(() => {
+    streamRef.current?.getTracks().forEach((t) => t.stop());
+    streamRef.current = null;
+  }, []);
 
   useEffect(() => {
-    const r = createSpeechRecognition();
-    recognitionRef.current = r;
-    setVoiceSupported(!!r);
-    if (!r) return;
-
-    r.onresult = (event: AppSpeechRecognitionResultEvent) => {
-      let interim = '';
-      let finalText = '';
-      for (let i = 0; i < event.results.length; i++) {
-        const res = event.results[i];
-        const piece = res[0]?.transcript ?? '';
-        if (res.isFinal) finalText += piece;
-        else interim += piece;
-      }
-      if (interim) setVoiceInterim(interim);
-      if (finalText) {
-        setVoiceTranscript((prev) => (prev ? `${prev.trim()} ${finalText.trim()}` : finalText.trim()));
-        setVoiceInterim('');
-      }
-    };
-
-    r.onerror = () => {
-      setListening(false);
-      listeningRef.current = false;
-    };
-
-    r.onend = () => {
-      if (listeningRef.current) {
-        try {
-          r.start();
-        } catch {
-          setListening(false);
-          listeningRef.current = false;
-        }
-      } else {
-        setListening(false);
-      }
-    };
-
     return () => {
-      listeningRef.current = false;
-      try {
-        r.abort();
-      } catch {
-        /* ignore */
-      }
+      cleanupStream();
     };
-  }, []);
+  }, [cleanupStream]);
 
-  const stopListening = useCallback(() => {
-    listeningRef.current = false;
-    const r = recognitionRef.current;
-    if (r) {
-      try {
-        r.stop();
-      } catch {
-        /* ignore */
-      }
-    }
-    setListening(false);
-  }, []);
-
-  const startListening = useCallback(() => {
-    const r = recognitionRef.current;
-    if (!r) return;
-    setVoiceInterim('');
-    listeningRef.current = true;
-    setListening(true);
+  const startRecording = useCallback(async () => {
+    if (!apiReady) return;
+    setVoiceError(null);
     try {
-      r.start();
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream;
+      chunksRef.current = [];
+      const { mime } = pickRecorderMime();
+      const rec = mime
+        ? new MediaRecorder(stream, { mimeType: mime })
+        : new MediaRecorder(stream);
+      mediaRecorderRef.current = rec;
+      rec.ondataavailable = (e) => {
+        if (e.data.size > 0) chunksRef.current.push(e.data);
+      };
+      rec.start(200);
+      recordingRef.current = true;
+      setVoicePhase('recording');
     } catch {
-      listeningRef.current = false;
-      setListening(false);
+      setVoiceError('No se pudo acceder al micrófono.');
+      setVoicePhase('error');
+      cleanupStream();
     }
-  }, []);
+  }, [apiReady, cleanupStream]);
+
+  const stopRecordingAndUpload = useCallback(async () => {
+    const rec = mediaRecorderRef.current;
+    if (!rec || rec.state === 'inactive') {
+      recordingRef.current = false;
+      setVoicePhase('idle');
+      cleanupStream();
+      return;
+    }
+
+    recordingRef.current = false;
+
+    await new Promise<void>((resolve, reject) => {
+      rec.onstop = () => resolve();
+      rec.onerror = () => reject(new Error('Recorder error'));
+      try {
+        rec.stop();
+      } catch {
+        resolve();
+      }
+    });
+
+    cleanupStream();
+    mediaRecorderRef.current = null;
+
+    const recordedContentType = rec.mimeType || pickRecorderMime().mime || 'audio/webm';
+    const blob = new Blob(chunksRef.current, {
+      type: recordedContentType,
+    });
+    chunksRef.current = [];
+
+    if (blob.size < 100) {
+      setVoicePhase('idle');
+      void presentToast({
+        message: 'Grabación demasiado corta.',
+        duration: 2000,
+        color: 'medium',
+      });
+      return;
+    }
+
+    try {
+      setVoicePhase('uploading');
+      const job = await createVoiceJob(recordedContentType);
+      const ct = job.contentType || recordedContentType;
+      await uploadAudioToPresignedUrl(job.uploadUrl, blob, ct);
+      setPendingVoiceJobId(job.jobId);
+      void presentToast({
+        message: 'Audio recibido. Procesando en segundo plano.',
+        duration: 2000,
+        color: 'success',
+      });
+      setVoicePhase('idle');
+      history.push('/movimientos');
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Error al procesar la nota';
+      setVoiceError(msg);
+      void presentToast({
+        message: msg,
+        duration: 4000,
+        color: 'danger',
+      });
+      setVoicePhase('idle');
+    }
+  }, [cleanupStream, history, presentToast]);
 
   const handleOrbPointerDown = () => {
-    if (!voiceSupported) return;
-    startListening();
+    if (!apiReady) return;
+    void startRecording();
   };
 
   const handleOrbPointerUp = () => {
-    stopListening();
-  };
-
-  const handleOrbPointerLeave = () => {
-    if (listeningRef.current) stopListening();
+    if (recordingRef.current) {
+      void stopRecordingAndUpload();
+    }
   };
 
   const resetForm = () => {
@@ -190,10 +192,62 @@ const Home: React.FC = () => {
     setKind('gasto');
   };
 
-  const handleSaveKeyboard = () => {
-    // Wire to persistence / router when backend exists
-    setKeyboardOpen(false);
-    resetForm();
+  const handleSaveKeyboard = async () => {
+    const normalizedAmount = Number(amount.trim().replace(',', '.'));
+    const normalizedConcept = note.trim();
+
+    if (!apiReady) {
+      void presentToast({
+        message: 'Configura VITE_FERIA_API_URL para guardar movimientos.',
+        duration: 2500,
+        color: 'warning',
+      });
+      return;
+    }
+
+    if (!Number.isFinite(normalizedAmount) || normalizedAmount <= 0) {
+      void presentToast({
+        message: 'Ingresa un monto valido mayor a 0.',
+        duration: 2500,
+        color: 'warning',
+      });
+      return;
+    }
+
+    if (!normalizedConcept) {
+      void presentToast({
+        message: 'Escribe un concepto para guardar el movimiento.',
+        duration: 2500,
+        color: 'warning',
+      });
+      return;
+    }
+
+    setSavingKeyboard(true);
+    try {
+      await createManualMovement({
+        kind,
+        amount: normalizedAmount,
+        concept: normalizedConcept,
+      });
+      setKeyboardOpen(false);
+      resetForm();
+      void presentToast({
+        message: 'Movimiento guardado.',
+        duration: 2000,
+        color: 'success',
+      });
+      history.push('/movimientos');
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'No se pudo guardar el movimiento';
+      void presentToast({
+        message: msg,
+        duration: 3500,
+        color: 'danger',
+      });
+    } finally {
+      setSavingKeyboard(false);
+    }
   };
 
   const appendConceptChip = (label: string) => {
@@ -214,12 +268,14 @@ const Home: React.FC = () => {
     setSigningOut(true);
     try {
       await signOutUser();
-      // Hosted UI global sign-out may navigate away entirely; when staying in SPA, sync URL with auth.
       history.replace('/login');
     } catch {
       setSigningOut(false);
     }
   };
+
+  const listening = voicePhase === 'recording';
+  const busy = voicePhase === 'uploading';
 
   return (
     <IonPage className="home-page">
@@ -249,47 +305,54 @@ const Home: React.FC = () => {
             onPointerDown={handleOrbPointerDown}
             onPointerUp={handleOrbPointerUp}
             onPointerCancel={handleOrbPointerUp}
-            onPointerLeave={handleOrbPointerLeave}
+            onPointerLeave={(e) => {
+              if (e.buttons === 0 && recordingRef.current) handleOrbPointerUp();
+            }}
             role="button"
             tabIndex={0}
             aria-label={
-              voiceSupported
-                ? 'Mantén pulsado para dictar con la voz'
-                : 'Dictado por voz no disponible en este dispositivo'
+              apiReady
+                ? busy
+                  ? 'Subiendo audio…'
+                  : 'Mantén pulsado para grabar una nota de voz'
+                : 'Configura VITE_FERIA_API_URL para grabar notas'
             }
+            style={{ opacity: busy ? 0.7 : 1, pointerEvents: busy || !apiReady ? 'none' : 'auto' }}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                if (!listening) startListening();
+                if (!listening && apiReady && !busy) void startRecording();
               }
             }}
             onKeyUp={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') stopListening();
+              if (e.key === 'Enter' || e.key === ' ') handleOrbPointerUp();
             }}
           >
             <div className="siri-orb-glow" aria-hidden />
             <div className="siri-orb-ring" aria-hidden />
             <div className="siri-orb-core">
-              <span className={`feria-text-hint ${listening ? 'feria-text-hint--active' : ''}`}>
-                {listening ? 'Escuchando…' : 'Mantén pulsado'}
+              <span className={`home-orb-hint ${listening ? 'home-orb-hint--active' : ''}`}>
+                {busy
+                  ? 'Subiendo…'
+                  : listening
+                    ? 'Grabando…'
+                    : 'Mantén pulsado'}
               </span>
             </div>
           </div>
 
-          {!voiceSupported && (
+          {!apiReady && (
             <IonText color="medium">
-              <p className="home-voice-unsupported">El dictado por voz no está disponible aquí.</p>
+              <p className="home-voice-unsupported">
+                Añade <code>VITE_FERIA_API_URL</code> en <code>.env</code> para grabar y procesar notas de voz.
+              </p>
             </IonText>
           )}
 
-          {(voiceTranscript || voiceInterim) && (
-            <div className="home-transcript">
-              <p className="feria-text-label-caps">Reconocido</p>
-              <p className="home-transcript-text">
-                {voiceTranscript}
-                {voiceInterim ? <span className="home-transcript-interim">{voiceInterim}</span> : null}
-              </p>
-            </div>
+          {voiceError && voicePhase === 'error' && (
+            <IonText color="danger">
+              <p className="home-voice-unsupported">{voiceError}</p>
+            </IonText>
           )}
         </div>
       </FeriaAppShell>
@@ -378,8 +441,15 @@ const Home: React.FC = () => {
             </div>
           )}
 
-          <IonButton expand="block" className="feria-modal-primary" onClick={handleSaveKeyboard}>
-            Guardar
+          <IonButton
+            expand="block"
+            className="feria-modal-primary"
+            onClick={() => {
+              void handleSaveKeyboard();
+            }}
+            disabled={savingKeyboard}
+          >
+            {savingKeyboard ? <IonSpinner name="crescent" /> : 'Guardar'}
           </IonButton>
         </IonContent>
       </IonModal>

@@ -1,14 +1,17 @@
-import type { ReactElement } from 'react';
-import { IonIcon, IonPage } from '@ionic/react';
+import { IonIcon, IonPage, IonRefresher, IonRefresherContent, IonSpinner, IonText } from '@ionic/react';
 import { sparklesOutline } from 'ionicons/icons';
-import { useMemo } from 'react';
-import {
-  DUMMY_MOVEMENTS,
-  type DummyMovement,
-  groupByDate,
-  summarizeMovements,
-} from '../data/dummyMovements';
+import type { ReactElement } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import type { ApiMovement } from '../api/feriaApi';
+import { getVoiceJob, isFeriaApiConfigured, listMovements } from '../api/feriaApi';
 import { FeriaAppShell } from '../components/FeriaAppShell';
+import {
+    DUMMY_MOVEMENTS,
+    type DummyMovement,
+    groupByDate,
+    summarizeMovements,
+} from '../data/dummyMovements';
+import { clearPendingVoiceJobId, getPendingVoiceJobId } from '../voice/voiceJobStorage';
 import './Movimientos.css';
 
 const currencyFmt = new Intl.NumberFormat('es-MX', {
@@ -16,6 +19,18 @@ const currencyFmt = new Intl.NumberFormat('es-MX', {
   currency: 'MXN',
   maximumFractionDigits: 0,
 });
+
+function apiToDummy(m: ApiMovement): DummyMovement {
+  const dateStr = m.movementDate ?? m.createdAt.slice(0, 10);
+  return {
+    id: m.id,
+    kind: m.kind,
+    amount: m.amount,
+    concept: m.concept,
+    category: m.category,
+    date: dateStr,
+  };
+}
 
 function formatDayHeading(isoDate: string): string {
   const d = new Date(`${isoDate}T12:00:00`);
@@ -61,24 +76,171 @@ function MovementCard({ row }: { row: DummyMovement }): ReactElement {
 }
 
 const Movimientos: React.FC = () => {
-  const summary = useMemo(() => summarizeMovements(DUMMY_MOVEMENTS), []);
-  const grouped = useMemo(() => groupByDate(DUMMY_MOVEMENTS), []);
+  const [rows, setRows] = useState<DummyMovement[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [demoMode, setDemoMode] = useState(!isFeriaApiConfigured());
+  const [pendingVoiceJobId, setPendingVoiceJobId] = useState<string | null>(() => getPendingVoiceJobId());
+
+  const load = useCallback(async () => {
+    if (!isFeriaApiConfigured()) {
+      setRows(DUMMY_MOVEMENTS);
+      setDemoMode(true);
+      setError(null);
+      setLoading(false);
+      return;
+    }
+    setDemoMode(false);
+    setError(null);
+    try {
+      const apiRows = await listMovements();
+      setRows(apiRows.map(apiToDummy));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'No se pudieron cargar los movimientos');
+      setRows([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  useEffect(() => {
+    if (!isFeriaApiConfigured() && pendingVoiceJobId) {
+      clearPendingVoiceJobId();
+      setPendingVoiceJobId(null);
+    }
+  }, [pendingVoiceJobId]);
+
+  useEffect(() => {
+    if (!pendingVoiceJobId || !isFeriaApiConfigured()) {
+      return;
+    }
+
+    let cancelled = false;
+    const delay = (ms: number) => new Promise<void>((resolve) => {
+      window.setTimeout(resolve, ms);
+    });
+
+    const pollVoiceJob = async () => {
+      try {
+        let attempts = 0;
+        while (!cancelled && attempts < 180) {
+          attempts += 1;
+          try {
+            const job = await getVoiceJob(pendingVoiceJobId);
+            setError(null);
+            if (job.status === 'completed') {
+              for (let attempt = 0; attempt < 4 && !cancelled; attempt += 1) {
+                await load();
+                if (attempt < 3) {
+                  await delay(1500);
+                }
+              }
+              clearPendingVoiceJobId();
+              setPendingVoiceJobId(null);
+              return;
+            }
+            if (job.status === 'failed') {
+              clearPendingVoiceJobId();
+              setPendingVoiceJobId(null);
+              setError(job.error || 'No se pudo procesar el audio');
+              return;
+            }
+          } catch (e) {
+            if (!cancelled) {
+              setError(e instanceof Error ? e.message : 'No se pudo consultar el estado del audio');
+            }
+          }
+          await delay(2000);
+        }
+
+        if (!cancelled) {
+          clearPendingVoiceJobId();
+          setPendingVoiceJobId(null);
+          setError('El procesamiento tardó demasiado. Intenta grabar de nuevo.');
+        }
+      } catch (e) {
+        if (!cancelled) {
+          setError(e instanceof Error ? e.message : 'No se pudo consultar el estado del audio');
+        }
+      }
+    };
+
+    void pollVoiceJob();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [load, pendingVoiceJobId]);
+
+  const summary = useMemo(() => summarizeMovements(rows), [rows]);
+  const grouped = useMemo(() => groupByDate(rows), [rows]);
+  const isProcessingVoice = Boolean(pendingVoiceJobId);
 
   return (
     <IonPage className="movimientos-page">
       <FeriaAppShell contentClassName="movimientos-content">
+        <IonRefresher
+          slot="fixed"
+          onIonRefresh={async (ev) => {
+            await load();
+            ev.detail.complete();
+          }}
+        >
+          <IonRefresherContent />
+        </IonRefresher>
         <div className="movimientos-body ion-padding">
           <div className="movimientos-ai-strip">
             <IonIcon icon={sparklesOutline} aria-hidden />
-            <span>Resumen asistido · datos de demostración</span>
+            <span>
+              {isProcessingVoice
+                ? 'Resumen asistido · procesando audio reciente'
+                : demoMode
+                ? 'Resumen asistido · datos de demostración'
+                : 'Resumen asistido · tus movimientos'}
+            </span>
           </div>
 
-          <div className="movimientos-insight">
-            <p className="movimientos-insight__text">
-              Esta semana tus gastos en <strong>transporte</strong> están un{' '}
-              <strong>12% por debajo</strong> de tu media habitual (demo).
-            </p>
-          </div>
+          {isProcessingVoice && (
+            <div className="movimientos-insight movimientos-processing">
+              <IonSpinner name="crescent" />
+              <p className="movimientos-insight__text">
+                Estamos procesando tu audio en segundo plano. Los movimientos aparecerán aquí cuando termine.
+              </p>
+            </div>
+          )}
+
+          {loading && (
+            <div className="movimientos-loading">
+              <IonSpinner name="crescent" />
+            </div>
+          )}
+
+          {error && (
+            <IonText color="danger">
+              <p>{error}</p>
+            </IonText>
+          )}
+
+          {!loading && !demoMode && !isProcessingVoice && (
+            <div className="movimientos-insight">
+              <p className="movimientos-insight__text">
+                Lista actualizada desde la API. Tira hacia abajo para refrescar.
+              </p>
+            </div>
+          )}
+
+          {demoMode && !loading && !isProcessingVoice && (
+            <div className="movimientos-insight">
+              <p className="movimientos-insight__text">
+                Esta semana tus gastos en <strong>transporte</strong> están un{' '}
+                <strong>12% por debajo</strong> de tu media habitual (demo).
+              </p>
+            </div>
+          )}
 
           <div className="movimientos-stats">
             <div className="movimientos-stat">
@@ -97,16 +259,23 @@ const Movimientos: React.FC = () => {
 
           <h2 className="movimientos-section-title">Actividad reciente</h2>
 
-          {Array.from(grouped.entries()).map(([date, rows]) => (
-            <section key={date}>
-              <h3 className="movimientos-date-heading">{formatDayHeading(date)}</h3>
-              <ul className="movimientos-list">
-                {rows.map((row) => (
-                  <MovementCard key={row.id} row={row} />
-                ))}
-              </ul>
-            </section>
-          ))}
+          {!loading &&
+            Array.from(grouped.entries()).map(([date, dayRows]) => (
+              <section key={date}>
+                <h3 className="movimientos-date-heading">{formatDayHeading(date)}</h3>
+                <ul className="movimientos-list">
+                  {dayRows.map((row) => (
+                    <MovementCard key={row.id} row={row} />
+                  ))}
+                </ul>
+              </section>
+            ))}
+
+          {!loading && rows.length === 0 && !demoMode && !error && !isProcessingVoice && (
+            <IonText color="medium">
+              <p>No hay movimientos aún. Graba una nota en Inicio.</p>
+            </IonText>
+          )}
         </div>
       </FeriaAppShell>
     </IonPage>

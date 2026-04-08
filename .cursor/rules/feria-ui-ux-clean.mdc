@@ -1,0 +1,30 @@
+---
+description: FerIA UI/UX — prefer maximum cleanliness and calm interfaces
+alwaysApply: true
+---
+
+# FerIA — UI & UX: clean first
+
+The product goal is a **clean, calm, minimal** interface. The current UI is **not** the benchmark; **improve toward clarity** on every touch.
+
+## Principles
+
+- **Hierarchy**: one primary action per view; secondary actions visually quieter (outline, ghost, icon-only where appropriate).
+- **Density**: prefer breathing room over cramming; avoid stacked heavy cards, duplicate chrome, or competing focal points.
+- **Chrome**: headers/footers stay light; avoid oversized controls (e.g. huge toggles or segments in the global shell). Theme and account-level settings belong in **Cuenta**, not crowding global navigation.
+- **Consistency**: reuse Feria tokens (`feria-palette`, `feria-tokens`, `feria-components`, `feria-app-shell`, `feria-overlays`) before adding ad-hoc colors, radii, or shadows.
+- **Color**: brand green as accent; neutrals for structure; no decorative rainbow or “assistant” gradients unless explicitly requested.
+
+## When changing UI
+
+- **Remove** before **add**: drop redundant labels, borders, or duplicate logos when a single pattern suffices.
+- **Simplify** states: loading, empty, and error should be short and unobtrusive.
+- **Mobile**: respect safe areas; touch targets ≥ 44px without inflating entire rows.
+
+## Anti-patterns to avoid
+
+- Loud segment controls or primary-colored blocks in the global header for non-primary tasks.
+- Mixing many font families or weights on one screen without a clear system.
+- One-off modal/sheet styling that diverges from `feria-modal` patterns.
+
+When in doubt, choose the **quieter** option and align with existing Feria classes and CSS variables.
