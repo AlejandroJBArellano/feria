@@ -57,26 +57,46 @@ ion-content.feria-shell-content {
   display: flex;
   width: 100%;
   align-items: stretch;
-  justify-content: space-around;
-  gap: 4px;
+  justify-content: space-between;
+  gap: 2px;
 }
 
 .feria-app-footer__link {
   flex: 1;
+  min-width: 0;
   text-align: center;
-  font-size: 0.7rem;
+  font-size: 0.62rem;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   text-decoration: none;
   color: var(--feria-color-text-muted);
-  padding: 10px 6px 8px;
+  padding: 8px 4px 6px;
   border-radius: 10px;
-  max-width: 120px;
   margin-inline: auto;
   transition:
     color 0.2s ease,
     background 0.2s ease;
+}
+
+.feria-app-footer__link-inner {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  max-width: 100%;
+}
+
+.feria-app-footer__icon {
+  font-size: 1.05rem;
+  flex-shrink: 0;
+}
+
+.feria-app-footer__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .feria-app-footer__link:hover {

@@ -1,5 +1,11 @@
+import { IonContent, IonFooter, IonHeader, IonIcon, IonToolbar } from '@ionic/react';
+import {
+  chatbubbleEllipsesOutline,
+  homeOutline,
+  personOutline,
+  walletOutline,
+} from 'ionicons/icons';
 import type { ReactElement, ReactNode } from 'react';
-import { IonContent, IonFooter, IonHeader, IonToolbar } from '@ionic/react';
 import { NavLink } from 'react-router-dom';
 
 export type FeriaAppShellProps = {
@@ -17,19 +23,43 @@ function FeriaAppFooterNav(): ReactElement {
   return (
     <nav className="feria-app-footer__nav" aria-label="Secciones de la app">
       <NavLink to="/home" className="feria-app-footer__link" activeClassName="is-active" exact>
-        Inicio
+        <span className="feria-app-footer__link-inner">
+          <IonIcon icon={homeOutline} className="feria-app-footer__icon" aria-hidden />
+          <span className="feria-app-footer__label">Inicio</span>
+        </span>
       </NavLink>
-      <NavLink to="/movimientos" className="feria-app-footer__link" activeClassName="is-active" exact>
-        Movimientos
+      <NavLink
+        to="/movimientos"
+        className="feria-app-footer__link"
+        activeClassName="is-active"
+        exact
+      >
+        <span className="feria-app-footer__link-inner">
+          <IonIcon icon={walletOutline} className="feria-app-footer__icon" aria-hidden />
+          <span className="feria-app-footer__label">Movimientos</span>
+        </span>
+      </NavLink>
+      <NavLink to="/tutor" className="feria-app-footer__link" activeClassName="is-active" exact>
+        <span className="feria-app-footer__link-inner">
+          <IonIcon icon={chatbubbleEllipsesOutline} className="feria-app-footer__icon" aria-hidden />
+          <span className="feria-app-footer__label">Tutor</span>
+        </span>
       </NavLink>
       <NavLink to="/cuenta" className="feria-app-footer__link" activeClassName="is-active" exact>
-        Cuenta
+        <span className="feria-app-footer__link-inner">
+          <IonIcon icon={personOutline} className="feria-app-footer__icon" aria-hidden />
+          <span className="feria-app-footer__label">Cuenta</span>
+        </span>
       </NavLink>
     </nav>
   );
 }
 
-export function FeriaAppShell({ children, headerEnd, contentClassName = '' }: FeriaAppShellProps): ReactElement {
+export function FeriaAppShell({
+  children,
+  headerEnd,
+  contentClassName = '',
+}: FeriaAppShellProps): ReactElement {
   const contentClasses = ['feria-shell-content', contentClassName].filter(Boolean).join(' ');
 
   return (

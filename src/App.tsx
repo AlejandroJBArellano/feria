@@ -1,6 +1,6 @@
 import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import { Route } from 'react-router-dom';
+import { Redirect, Route } from 'react-router-dom';
 import RequireAuth from './auth/RequireAuth';
 import Chat from './pages/Chat';
 import Cuenta from './pages/Cuenta';
@@ -54,6 +54,9 @@ const App: React.FC = () => (
         <Route exact path="/onboarding" component={Onboarding} />
         <Route exact path="/login" component={Login} />
         <Route exact path="/chat">
+          <Redirect to="/tutor" />
+        </Route>
+        <Route exact path="/tutor">
           <RequireAuth>
             <Chat />
           </RequireAuth>

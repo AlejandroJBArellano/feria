@@ -1,20 +1,18 @@
 import {
   IonButton,
-  IonContent,
-  IonFooter,
-  IonHeader,
   IonIcon,
-  IonPage,
+  IonSpinner,
   IonText,
   IonTextarea,
-  IonTitle,
-  IonToolbar,
+  IonPage,
 } from '@ionic/react';
 import { fetchAuthSession } from 'aws-amplify/auth';
 import { addOutline, logOutOutline, paperPlaneOutline } from 'ionicons/icons';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import { isFeriaApiConfigured, listChatMessages } from '../api/feriaApi';
 import { useAuth } from '../auth/AuthContext';
+import { FeriaAppShell } from '../components/FeriaAppShell';
 import './Chat.css';
 
 type ChatMessageRole = 'user' | 'assistant' | 'system';
@@ -34,6 +32,7 @@ const chatWebSocketUrl = import.meta.env.VITE_CHAT_WS_URL;
 const CONVERSATION_STORAGE_KEY = 'feria_active_chat_conversation_id';
 
 const Chat: React.FC = () => {
+  const history = useHistory();
   const { signOutUser, user } = useAuth();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [draft, setDraft] = useState('');
@@ -48,6 +47,7 @@ const Chat: React.FC = () => {
     }
   });
   const [historyLoading, setHistoryLoading] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
 
   const wsRef = useRef<WebSocket | null>(null);
   const activeRequestIdRef = useRef<string | null>(null);
@@ -256,6 +256,17 @@ const Chat: React.FC = () => {
     }
   }, []);
 
+  const handleSignOut = async () => {
+    if (signingOut) return;
+    setSigningOut(true);
+    try {
+      await signOutUser();
+      history.replace('/login');
+    } catch {
+      setSigningOut(false);
+    }
+  };
+
   const sendPrompt = useCallback(async () => {
     const prompt = draft.trim();
     if (!prompt || isStreaming) {
@@ -313,93 +324,100 @@ const Chat: React.FC = () => {
 
   return (
     <IonPage className="chat-page">
-      <IonHeader translucent>
-        <IonToolbar>
-          <IonButton
-            slot="start"
-            fill="clear"
-            aria-label="Nueva conversacion"
-            onClick={startNewConversation}
-            disabled={isStreaming}
-          >
-            <IonIcon icon={addOutline} slot="icon-only" />
-          </IonButton>
-          <IonTitle>Chat IA</IonTitle>
-          <IonButton
-            slot="end"
-            fill="clear"
-            aria-label="Cerrar sesion"
-            onClick={() => {
-              void signOutUser();
-            }}
-          >
-            <IonIcon icon={logOutOutline} />
-          </IonButton>
-        </IonToolbar>
-      </IonHeader>
-
-      <IonContent fullscreen className="chat-content">
-        <div className="chat-shell">
-          <div className="chat-meta">
-            <IonText>
-              <p className="chat-user">Sesion: {displayName}</p>
-            </IonText>
-            <IonText>
-              <p className={`chat-status ${isConnected ? 'chat-status--ok' : 'chat-status--warn'}`}>
-                {historyLoading ? 'Cargando historial...' : connectionStatus}
-              </p>
-            </IonText>
+      <FeriaAppShell
+        contentClassName="chat-content chat-content--tutor"
+        headerEnd={
+          <div className="chat-header-actions">
+            <IonButton
+              className="feria-icon-btn-quiet"
+              fill="solid"
+              shape="round"
+              aria-label="Nueva conversacion"
+              disabled={isStreaming}
+              onClick={startNewConversation}
+            >
+              <IonIcon icon={addOutline} aria-hidden />
+            </IonButton>
+            <IonButton
+              className="feria-icon-btn-quiet"
+              fill="solid"
+              shape="round"
+              aria-label="Cerrar sesion"
+              disabled={signingOut}
+              onClick={() => {
+                void handleSignOut();
+              }}
+            >
+              {signingOut ? <IonSpinner name="crescent" /> : <IonIcon icon={logOutOutline} aria-hidden />}
+            </IonButton>
           </div>
-
-          <div className="chat-feed" role="log" aria-live="polite">
-            {messages.length === 0 && !historyLoading ? (
-              <div className="chat-empty">
-                <p>
-                  Escribe una pregunta sobre tus finanzas. El asistente usa tu historial de movimientos
-                  en la app (vía Amazon Bedrock).
-                </p>
+        }
+      >
+        <div className="tutor-layout">
+          <div className="tutor-scroll">
+            <div className="chat-shell">
+              <div className="chat-meta">
+                <IonText>
+                  <p className="chat-user">Tutor · {displayName}</p>
+                </IonText>
+                <IonText>
+                  <p
+                    className={`chat-status ${isConnected ? 'chat-status--ok' : 'chat-status--warn'}`}
+                  >
+                    {historyLoading ? 'Cargando historial...' : connectionStatus}
+                  </p>
+                </IonText>
               </div>
-            ) : (
-              messages.map((message) => (
-                <article
-                  key={message.id}
-                  className={`chat-bubble chat-bubble--${message.role}`}
-                >
-                  <p>{message.content || (message.pending ? '...' : '')}</p>
-                </article>
-              ))
-            )}
 
-            {isStreaming ? (
-              <div className="chat-streaming">Recibiendo respuesta en tiempo real...</div>
-            ) : null}
-            <div ref={bottomRef} />
+              <div className="chat-feed" role="log" aria-live="polite">
+                {messages.length === 0 && !historyLoading ? (
+                  <div className="chat-empty">
+                    <p>
+                      Pregunta lo que quieras sobre tus finanzas. El tutor usa tus movimientos en la app
+                      (datos en la base; la conexión solo necesita nombres de tabla en el servidor).
+                    </p>
+                  </div>
+                ) : (
+                  messages.map((message) => (
+                    <article
+                      key={message.id}
+                      className={`chat-bubble chat-bubble--${message.role}`}
+                    >
+                      <p>{message.content || (message.pending ? '...' : '')}</p>
+                    </article>
+                  ))
+                )}
+
+                {isStreaming ? (
+                  <div className="chat-streaming">Recibiendo respuesta en tiempo real...</div>
+                ) : null}
+                <div ref={bottomRef} />
+              </div>
+            </div>
+          </div>
+
+          <div className="tutor-composer">
+            <IonTextarea
+              autoGrow
+              label="Mensaje"
+              labelPlacement="stacked"
+              value={draft}
+              placeholder="Escribe aqui..."
+              onIonInput={(event) => setDraft(String(event.detail.value ?? ''))}
+            />
+            <IonButton
+              className="chat-send-btn"
+              onClick={() => {
+                void sendPrompt();
+              }}
+              disabled={!isConnected || isStreaming || draft.trim().length === 0 || historyLoading}
+            >
+              <IonIcon icon={paperPlaneOutline} slot="start" />
+              Enviar
+            </IonButton>
           </div>
         </div>
-      </IonContent>
-
-      <IonFooter className="chat-composer-footer">
-        <div className="chat-composer">
-          <IonTextarea
-            autoGrow
-            label="Mensaje"
-            labelPlacement="stacked"
-            value={draft}
-            placeholder="Escribe aqui..."
-            onIonInput={(event) => setDraft(String(event.detail.value ?? ''))}
-          />
-          <IonButton
-            className="chat-send-btn"
-            onClick={() => {
-              void sendPrompt();
-            }}
-            disabled={!isConnected || isStreaming || draft.trim().length === 0 || historyLoading}
-          >
-            <IonIcon icon={paperPlaneOutline} slot="start" />
-            Enviar
-          </IonButton>
-        </div>
-      </IonFooter>
+      </FeriaAppShell>
     </IonPage>
   );
 };
