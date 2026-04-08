@@ -20,11 +20,18 @@ function authLog(message: string, meta?: LogMeta): void {
 
   const timestamp = new Date().toISOString();
   if (meta) {
-    console.info(`[auth][${timestamp}] ${message}`, meta);
+    console.info('[auth]', {
+      timestamp,
+      message,
+      meta
+    });
     return;
   }
 
-  console.info(`[auth][${timestamp}] ${message}`);
+  console.info('[auth]', {
+    timestamp,
+    message
+  });
 }
 
 function parseEpochClaim(value: unknown): number | undefined {
