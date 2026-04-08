@@ -14,7 +14,6 @@ on:
       - master
       - workflow
       - layout
-      # Agrega aquí nuevas ramas cuando sean necesarias:
       # - staging
       # - develop
       # - release
@@ -33,7 +32,6 @@ permissions:
   id-token: write
 
 env:
-  # @capacitor/cli 8.3+ requires Node >= 22
   NODE_VERSION: "22"
 
 jobs:
@@ -52,7 +50,6 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
 
-      # npm install reconcilia package-lock.json con package.json si están desalineados (luego haz commit del lock en local).
       - name: Install dependencies
         run: npm install
 
@@ -109,10 +106,6 @@ jobs:
       - name: Build (Vite)
         run: npm run build
 
-  # ─────────────────────────────────────────────────────────────────
-  # Valida Dockerfile + nginx sin credenciales AWS.
-  # Corre en todas las ramas EXCEPTO main/master (ahí corre deploy).
-  # ─────────────────────────────────────────────────────────────────
   docker-verify:
     name: Docker build (sin publicar)
     runs-on: ubuntu-latest
@@ -142,15 +135,30 @@ jobs:
             -t feria:ci-verify \
             .
 
-  # ─────────────────────────────────────────────────────────────────
-  # Deploy a AWS ECR + ECS.
-  # Solo corre en main/master cuando ENABLE_AWS_DEPLOY == 'true'.
+  # Para activar deploy en otras ramas, agrega dentro del if del job deploy:
+  #   || github.ref == 'refs/heads/staging'
+  #   || github.ref == 'refs/heads/develop'
+  #   || github.ref == 'refs/heads/release'
+  #   || github.ref == 'refs/heads/layout'
+  #   || github.ref == 'refs/heads/workflow'
   #
-  # Para activar deploy en otras ramas descomenta las líneas indicadas:
-  #   - staging:  descomenta el bloque "staging"
-  #   - develop:  descomenta el bloque "develop"
-  #   - release:  descomenta el bloque "release"
-  # ─────────────────────────────────────────────────────────────────
+  # Secrets requeridos en GitHub → Settings → Secrets → Actions:
+  #   AWS_ROLE_TO_ASSUME
+  #   VITE_COGNITO_REGION
+  #   VITE_COGNITO_USER_POOL_ID
+  #   VITE_COGNITO_USER_POOL_CLIENT_ID
+  #   VITE_COGNITO_DOMAIN
+  #   VITE_COGNITO_REDIRECT_SIGN_IN
+  #   VITE_COGNITO_REDIRECT_SIGN_OUT
+  #   VITE_CHAT_WS_URL
+  #
+  # Variables requeridas en GitHub → Settings → Variables → Actions:
+  #   ENABLE_AWS_DEPLOY = true
+  #   AWS_REGION        = us-east-1
+  #   ECR_REPOSITORY    = feria-app
+  #   ECS_CLUSTER       = feria-cluster
+  #   ECS_SERVICE       = feria-service
+  #   VITE_COGNITO_OAUTH_SCOPES = openid,email
   deploy:
     name: Docker, ECR and ECS
     runs-on: ubuntu-latest
@@ -161,36 +169,12 @@ jobs:
       (
         github.ref == 'refs/heads/main' ||
         github.ref == 'refs/heads/master'
-        # || github.ref == 'refs/heads/staging'   # descomenta para activar deploy en staging
-        # || github.ref == 'refs/heads/develop'   # descomenta para activar deploy en develop
-        # || github.ref == 'refs/heads/release'   # descomenta para activar deploy en release
-        # || github.ref == 'refs/heads/layout'    # descomenta para activar deploy en layout
-        # || github.ref == 'refs/heads/workflow'  # descomenta para activar deploy en workflow
       )
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # ── AWS credentials ──────────────────────────────────────────
-      # Secrets requeridos en GitHub → Settings → Secrets → Actions:
-      #   AWS_ROLE_TO_ASSUME
-      #   VITE_COGNITO_REGION
-      #   VITE_COGNITO_USER_POOL_ID
-      #   VITE_COGNITO_USER_POOL_CLIENT_ID
-      #   VITE_COGNITO_DOMAIN
-      #   VITE_COGNITO_REDIRECT_SIGN_IN
-      #   VITE_COGNITO_REDIRECT_SIGN_OUT
-      #   VITE_CHAT_WS_URL
-      #
-      # Variables requeridas en GitHub → Settings → Variables → Actions:
-      #   ENABLE_AWS_DEPLOY = true
-      #   AWS_REGION        = us-east-1
-      #   ECR_REPOSITORY    = feria-app
-      #   ECS_CLUSTER       = feria-cluster
-      #   ECS_SERVICE       = feria-service
-      #   VITE_COGNITO_OAUTH_SCOPES = openid,email
-      # ─────────────────────────────────────────────────────────────
       - name: Configure AWS (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -223,8 +207,6 @@ jobs:
           docker push "$REGISTRY/$REPOSITORY:$IMAGE_TAG"
           docker push "$REGISTRY/$REPOSITORY:latest"
 
-      # La task definition debe referenciar la misma imagen en ECR (p. ej. :latest)
-      # o registrar una nueva revisión apuntando al tag ${{ github.sha }}.
       - name: Deploy ECS service
         env:
           ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}
