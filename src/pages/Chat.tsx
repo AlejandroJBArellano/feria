@@ -340,6 +340,7 @@ const Chat: React.FC = () => {
     <IonPage className="chat-page">
       <FeriaAppShell
         contentClassName="chat-content chat-content--tutor"
+        contentFullscreen={false}
         headerEnd={
           <div className="chat-header-actions">
             <IonButton
@@ -429,10 +430,9 @@ const Chat: React.FC = () => {
           <div className="tutor-composer">
             <IonTextarea
               autoGrow
-              label="Mensaje"
-              labelPlacement="stacked"
+              aria-label="Mensaje para el tutor"
               value={draft}
-              placeholder="Escribe aqui..."
+              placeholder="Escribe tu mensaje…"
               onIonInput={(event) => setDraft(String(event.detail.value ?? ''))}
             />
             <IonButton

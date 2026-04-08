@@ -53,6 +53,11 @@ ion-content.feria-shell-content {
   padding-inline: max(8px, env(safe-area-inset-left)) max(8px, env(safe-area-inset-right));
 }
 
+.feria-app-footer {
+  /* Stay above scroll content if any theme sets overlapping stacks */
+  z-index: 10;
+}
+
 .feria-app-footer__nav {
   display: flex;
   width: 100%;

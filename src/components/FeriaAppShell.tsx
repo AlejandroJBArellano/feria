@@ -14,6 +14,11 @@ export type FeriaAppShellProps = {
   headerEnd?: React.ReactNode;
   /** Merged onto IonContent (e.g. home-content, login-content). */
   contentClassName?: string;
+  /**
+   * When true (default), content can scroll under header/footer — fine for centered pages.
+   * Set false for bottom-heavy layouts (e.g. Tutor composer) so the footer tabs do not cover inputs.
+   */
+  contentFullscreen?: boolean;
 };
 
 /**
@@ -59,6 +64,7 @@ export function FeriaAppShell({
   children,
   headerEnd,
   contentClassName = '',
+  contentFullscreen = true,
 }: FeriaAppShellProps): ReactElement {
   const contentClasses = ['feria-shell-content', contentClassName].filter(Boolean).join(' ');
 
@@ -76,7 +82,7 @@ export function FeriaAppShell({
           ) : null}
         </IonToolbar>
       </IonHeader>
-      <IonContent fullscreen className={contentClasses}>
+      <IonContent fullscreen={contentFullscreen} className={contentClasses}>
         {children}
       </IonContent>
       <IonFooter className="feria-app-footer">
