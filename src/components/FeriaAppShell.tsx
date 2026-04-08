@@ -19,9 +19,9 @@ function FeriaAppFooterNav(): ReactElement {
       <NavLink to="/home" className="feria-app-footer__link" activeClassName="is-active" exact>
         Inicio
       </NavLink>
-      <span className="feria-app-footer__link feria-app-footer__link--soon" title="Próximamente">
+      <NavLink to="/movimientos" className="feria-app-footer__link" activeClassName="is-active" exact>
         Movimientos
-      </span>
+      </NavLink>
       <NavLink to="/cuenta" className="feria-app-footer__link" activeClassName="is-active" exact>
         Cuenta
       </NavLink>

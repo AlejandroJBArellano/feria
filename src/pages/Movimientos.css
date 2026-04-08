@@ -1,0 +1,227 @@
+/* Movimientos — clean ledger + subtle “assistant” cues */
+
+.movimientos-page {
+  --background: var(--feria-color-page);
+}
+
+.movimientos-content {
+  --background: var(--ion-background-color, var(--feria-color-page));
+}
+
+.movimientos-body {
+  max-width: 26rem;
+  margin-inline: auto;
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+.movimientos-ai-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 1rem;
+  font-size: var(--feria-font-caption);
+  color: var(--feria-color-text-muted);
+  letter-spacing: 0.02em;
+}
+
+.movimientos-ai-strip ion-icon {
+  font-size: 1.1rem;
+  color: var(--feria-color-primary);
+  opacity: 0.85;
+  flex-shrink: 0;
+}
+
+.movimientos-insight {
+  margin: 0 0 1.25rem;
+  padding: 14px 16px;
+  border-radius: var(--feria-modal-radius-inner);
+  border: 1px solid var(--feria-modal-border-color);
+  background: var(--feria-modal-field-bg);
+  box-shadow: var(--feria-disk-shadow-elev);
+  position: relative;
+  overflow: hidden;
+}
+
+.movimientos-insight::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, var(--feria-color-primary), var(--feria-color-accent-dark));
+  border-radius: 2px 0 0 2px;
+  opacity: 0.9;
+}
+
+.movimientos-insight__text {
+  margin: 0;
+  padding-left: 8px;
+  font-size: var(--feria-font-body-sm);
+  line-height: 1.5;
+  color: var(--feria-color-text-secondary);
+  font-weight: 500;
+}
+
+.movimientos-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 1.35rem;
+}
+
+.movimientos-stat {
+  text-align: center;
+  padding: 12px 8px;
+  border-radius: var(--feria-modal-radius-inner);
+  border: 1px solid var(--feria-modal-border-color);
+  background: var(--feria-modal-field-bg);
+}
+
+.movimientos-stat__label {
+  display: block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--feria-color-text-muted);
+  margin-bottom: 6px;
+}
+
+.movimientos-stat__value {
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--feria-color-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.movimientos-stat--balance .movimientos-stat__value {
+  color: var(--feria-color-primary);
+}
+
+.movimientos-section-title {
+  margin: 0 0 0.65rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--feria-color-text-muted);
+}
+
+.movimientos-date-heading {
+  margin: 1.1rem 0 0.5rem;
+  font-size: var(--feria-font-caption);
+  font-weight: 600;
+  color: var(--feria-color-text-secondary);
+  letter-spacing: 0.02em;
+}
+
+.movimientos-date-heading:first-of-type {
+  margin-top: 0;
+}
+
+.movimientos-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.movimientos-card {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: var(--feria-modal-radius-inner);
+  border: 1px solid var(--feria-modal-border-color);
+  background: color-mix(in srgb, var(--feria-color-surface) 92%, transparent);
+  transition:
+    border-color var(--feria-duration-normal) var(--feria-ease-standard),
+    box-shadow var(--feria-duration-normal) var(--feria-ease-standard);
+}
+
+.ion-palette-dark .movimientos-card {
+  background: color-mix(in srgb, var(--feria-color-surface) 65%, transparent);
+}
+
+.movimientos-card:hover {
+  border-color: color-mix(in srgb, var(--feria-color-primary) 25%, var(--feria-modal-border-color));
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+.movimientos-card__left {
+  min-width: 0;
+  flex: 1;
+}
+
+.movimientos-card__concept {
+  margin: 0 0 4px;
+  font-size: var(--feria-font-body-sm);
+  font-weight: 600;
+  color: var(--feria-color-text);
+  letter-spacing: -0.01em;
+}
+
+.movimientos-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.movimientos-card__chip {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--feria-color-primary) 12%, transparent);
+  color: var(--feria-color-accent-dark);
+}
+
+.ion-palette-dark .movimientos-card__chip {
+  color: var(--ion-color-primary-tint);
+}
+
+.movimientos-card__hint {
+  margin: 6px 0 0;
+  font-size: 0.7rem;
+  line-height: 1.35;
+  color: var(--feria-color-text-hint);
+  font-style: italic;
+}
+
+.movimientos-card__amount {
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.movimientos-card__amount-value {
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.movimientos-card__amount-value--gasto {
+  color: var(--feria-color-danger);
+}
+
+.movimientos-card__amount-value--ingreso {
+  color: var(--feria-color-primary);
+}
+
+.movimientos-card__kind {
+  display: block;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--feria-color-text-hint);
+  margin-top: 2px;
+}
