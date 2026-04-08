@@ -213,7 +213,7 @@ jobs:
                 "CloudFrontDefaultCertificate": true
               }
             }
-            EOF
+          EOF
 
             distribution_id=$(aws cloudfront create-distribution \
               --distribution-config file://distribution-config.json \
