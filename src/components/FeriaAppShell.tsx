@@ -3,6 +3,7 @@ import {
   chatbubbleEllipsesOutline,
   homeOutline,
   personOutline,
+  ribbonOutline,
   walletOutline,
 } from 'ionicons/icons';
 import type { ReactElement, ReactNode } from 'react';
@@ -31,6 +32,12 @@ function FeriaAppFooterNav(): ReactElement {
         <span className="feria-app-footer__link-inner">
           <IonIcon icon={homeOutline} className="feria-app-footer__icon" aria-hidden />
           <span className="feria-app-footer__label">Inicio</span>
+        </span>
+      </NavLink>
+      <NavLink to="/logros" className="feria-app-footer__link" activeClassName="is-active" exact>
+        <span className="feria-app-footer__link-inner">
+          <IonIcon icon={ribbonOutline} className="feria-app-footer__icon" aria-hidden />
+          <span className="feria-app-footer__label">Logros</span>
         </span>
       </NavLink>
       <NavLink

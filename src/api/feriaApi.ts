@@ -251,6 +251,61 @@ export async function sendChatMessage(
   return res.json() as Promise<SendChatMessageResponse>;
 }
 
+export type EngagementAchievementRow = {
+  id: string;
+  title: string;
+  description: string;
+  axis: 'clarity' | 'control';
+  unlocked: boolean;
+  unlockedAt: string | null;
+  eligible: boolean;
+};
+
+export type EngagementActiveReminder = {
+  ruleId: string;
+  message: string;
+  ctaLabel: string;
+  ctaPath: string;
+};
+
+export type EngagementSummary = {
+  achievements: EngagementAchievementRow[];
+  axes: { clarityScore: number; controlScore: number };
+  activeReminder: EngagementActiveReminder | null;
+};
+
+/** GET /engagement/summary — achievements, scores, optional in-app reminder. */
+export async function getEngagementSummary(): Promise<EngagementSummary> {
+  const base = apiBase();
+  if (!base) throw new Error('VITE_FERIA_API_URL is not set');
+  const res = await authorizedFetch(`${base}/engagement/summary`, {
+    method: 'GET',
+    headers: {},
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || `getEngagementSummary failed: ${res.status}`);
+  }
+  return res.json() as Promise<EngagementSummary>;
+}
+
+/** POST /engagement/reminders/dismiss — 24h cooldown per ruleId; sets tutor nudge timestamp when rule is remind_try_tutor. */
+export async function dismissEngagementReminder(ruleId: string): Promise<void> {
+  const base = apiBase();
+  if (!base) throw new Error('VITE_FERIA_API_URL is not set');
+  const res = await authorizedFetch(`${base}/engagement/reminders/dismiss`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ ruleId }),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || `dismissEngagementReminder failed: ${res.status}`);
+  }
+}
+
 export async function createManualMovement(input: ManualMovementInput): Promise<{ movementId: string }> {
   const base = apiBase();
   if (!base) throw new Error('VITE_FERIA_API_URL is not set');

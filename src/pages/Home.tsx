@@ -15,6 +15,7 @@ import {
     IonTitle,
     IonToolbar,
     useIonToast,
+    useIonViewWillEnter,
 } from '@ionic/react';
 import { logOutOutline } from 'ionicons/icons';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -22,8 +23,11 @@ import { useHistory } from 'react-router-dom';
 import {
     createManualMovement,
     createVoiceJob,
+    dismissEngagementReminder,
+    getEngagementSummary,
     isFeriaApiConfigured,
     uploadAudioToPresignedUrl,
+    type EngagementActiveReminder,
 } from '../api/feriaApi';
 import { useAuth } from '../auth/AuthContext';
 import { getUserDisplayLabel } from '../auth/userDisplay';
@@ -64,6 +68,7 @@ const Home: React.FC = () => {
   const [amount, setAmount] = useState('');
   const [note, setNote] = useState('');
   const [savingKeyboard, setSavingKeyboard] = useState(false);
+  const [activeReminder, setActiveReminder] = useState<EngagementActiveReminder | null>(null);
 
   const [voicePhase, setVoicePhase] = useState<VoicePhase>('idle');
   const [voiceError, setVoiceError] = useState<string | null>(null);
@@ -73,6 +78,23 @@ const Home: React.FC = () => {
   const recordingRef = useRef(false);
 
   const apiReady = isFeriaApiConfigured();
+
+  const loadEngagement = useCallback(async () => {
+    if (!apiReady) {
+      setActiveReminder(null);
+      return;
+    }
+    try {
+      const summary = await getEngagementSummary();
+      setActiveReminder(summary.activeReminder);
+    } catch {
+      setActiveReminder(null);
+    }
+  }, [apiReady]);
+
+  useIonViewWillEnter(() => {
+    void loadEngagement();
+  });
 
   const cleanupStream = useCallback(() => {
     streamRef.current?.getTracks().forEach((t) => t.stop());
@@ -298,6 +320,36 @@ const Home: React.FC = () => {
       >
         <div className="home-layout">
           <p className="feria-text-label-caps">Hola, {displayName}</p>
+
+          {apiReady && activeReminder && (
+            <div className="home-engagement-reminder" role="status">
+              <p>{activeReminder.message}</p>
+              <div className="home-engagement-reminder__actions">
+                <IonButton
+                  size="small"
+                  onClick={() => {
+                    history.push(activeReminder.ctaPath);
+                  }}
+                >
+                  {activeReminder.ctaLabel}
+                </IonButton>
+                <IonButton
+                  size="small"
+                  fill="clear"
+                  onClick={() => {
+                    const id = activeReminder.ruleId;
+                    void dismissEngagementReminder(id).then(() => {
+                      setActiveReminder(null);
+                      void loadEngagement();
+                    });
+                  }}
+                >
+                  Cerrar
+                </IonButton>
+              </div>
+            </div>
+          )}
+
           <h1 className="home-hero-line">Registra un ingreso o un gasto</h1>
 
           <div
