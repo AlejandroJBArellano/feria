@@ -228,7 +228,7 @@ jobs:
             --query 'Distribution.DomainName' \
             --output text)
 
-          policy_document=$(cat <<EOF
+          cat > bucket-policy.json <<EOF
           {
             "Version": "2012-10-17",
             "Statement": [
@@ -249,11 +249,10 @@ jobs:
             ]
           }
           EOF
-          )
 
           aws s3api put-bucket-policy \
             --bucket "$bucket_name" \
-            --policy "$policy_document"
+            --policy file://bucket-policy.json
 
           {
             echo "bucket_name=$bucket_name"
