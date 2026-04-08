@@ -1,36 +1,53 @@
 import type { ReactElement } from 'react';
-import { IonLabel, IonSegment, IonSegmentButton } from '@ionic/react';
+import { IonItem, IonLabel, IonToggle } from '@ionic/react';
 import { useTheme } from '../theme/ThemeContext';
-import type { ThemeMode } from '../theme/ThemeContext';
+
+export type ThemeToggleVariant = 'field' | 'inline';
 
 type ThemeToggleProps = {
+  /** `field`: row for lists (Cuenta). `inline`: one line for login/onboarding footers. */
+  variant?: ThemeToggleVariant;
   className?: string;
 };
 
 /**
- * Compact light/dark switch; uses ThemeContext (class `ion-palette-dark` on documentElement).
+ * Light/dark preference via ThemeContext (`ion-palette-dark` on documentElement).
  */
-function ThemeToggle({ className }: ThemeToggleProps): ReactElement {
+function ThemeToggle({ variant = 'field', className }: ThemeToggleProps): ReactElement {
   const { mode, setMode } = useTheme();
+  const checked = mode === 'dark';
+
+  const apply = (next: boolean) => {
+    setMode(next ? 'dark' : 'light');
+  };
+
+  if (variant === 'inline') {
+    return (
+      <div className={['feria-theme-inline', className].filter(Boolean).join(' ')}>
+        <span className="feria-theme-inline__label">Modo oscuro</span>
+        <IonToggle
+          className="feria-theme-inline__toggle"
+          aria-label="Activar modo oscuro"
+          checked={checked}
+          onIonChange={(e) => apply(e.detail.checked)}
+        />
+      </div>
+    );
+  }
 
   return (
-    <IonSegment
-      className={className ? `feria-theme-toggle ${className}` : 'feria-theme-toggle'}
-      value={mode}
-      onIonChange={(e) => {
-        const v = e.detail.value as ThemeMode | undefined;
-        if (v === 'light' || v === 'dark') {
-          setMode(v);
-        }
-      }}
-    >
-      <IonSegmentButton value="light">
-        <IonLabel>Claro</IonLabel>
-      </IonSegmentButton>
-      <IonSegmentButton value="dark">
-        <IonLabel>Oscuro</IonLabel>
-      </IonSegmentButton>
-    </IonSegment>
+    <IonItem className={['feria-theme-field', className].filter(Boolean).join(' ')} lines="none">
+      <IonLabel>
+        <p className="feria-theme-field__title">Apariencia</p>
+        <p className="feria-theme-field__hint">Modo oscuro</p>
+      </IonLabel>
+      <IonToggle
+        slot="end"
+        aria-label="Activar modo oscuro"
+        checked={checked}
+        onIonChange={(e) => apply(e.detail.checked)}
+      />
+    </IonItem>
   );
 }
 

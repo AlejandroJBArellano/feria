@@ -1,6 +1,7 @@
 import { Route } from 'react-router-dom';
 import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
+import Cuenta from './pages/Cuenta';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Onboarding from './pages/Onboarding';
@@ -53,6 +54,11 @@ const App: React.FC = () => (
         <Route exact path="/home">
           <RequireAuth>
             <Home />
+          </RequireAuth>
+        </Route>
+        <Route exact path="/cuenta">
+          <RequireAuth>
+            <Cuenta />
           </RequireAuth>
         </Route>
       </IonRouterOutlet>

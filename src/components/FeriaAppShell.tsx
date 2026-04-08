@@ -4,7 +4,7 @@ import { NavLink } from 'react-router-dom';
 
 export type FeriaAppShellProps = {
   children: ReactNode;
-  /** Right side of header (e.g. theme toggle, actions). */
+  /** Right side of header (optional). Theme control is under Cuenta. */
   headerEnd?: React.ReactNode;
   /** Merged onto IonContent (e.g. home-content, login-content). */
   contentClassName?: string;
@@ -22,9 +22,9 @@ function FeriaAppFooterNav(): ReactElement {
       <span className="feria-app-footer__link feria-app-footer__link--soon" title="Próximamente">
         Movimientos
       </span>
-      <span className="feria-app-footer__link feria-app-footer__link--soon" title="Próximamente">
+      <NavLink to="/cuenta" className="feria-app-footer__link" activeClassName="is-active" exact>
         Cuenta
-      </span>
+      </NavLink>
     </nav>
   );
 }
@@ -39,9 +39,11 @@ export function FeriaAppShell({ children, headerEnd, contentClassName = '' }: Fe
           <div className="feria-app-logo" slot="start">
             Fer<span className="feria-app-logo__accent">IA</span>
           </div>
-          <div slot="end" className="feria-app-header__end">
-            {headerEnd}
-          </div>
+          {headerEnd ? (
+            <div className="feria-app-header__end" slot="end">
+              {headerEnd}
+            </div>
+          ) : null}
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen className={contentClasses}>

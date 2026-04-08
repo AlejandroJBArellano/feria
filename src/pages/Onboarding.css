@@ -214,3 +214,10 @@
   text-align: center;
   color: var(--feria-color-text-hint);
 }
+
+.onboarding-theme-footer {
+  margin-top: 1.25rem;
+  width: 100%;
+  max-width: 20rem;
+  margin-inline: auto;
+}

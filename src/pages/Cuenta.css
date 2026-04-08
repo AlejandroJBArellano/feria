@@ -1,0 +1,91 @@
+.cuenta-page {
+  --background: var(--feria-color-page);
+}
+
+.cuenta-content {
+  --background: var(--ion-background-color, var(--feria-color-page));
+}
+
+.cuenta-body {
+  padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+  max-width: 28rem;
+  margin-inline: auto;
+}
+
+.cuenta-lead {
+  margin: 0 0 1.25rem;
+  font-size: var(--feria-font-caption);
+  line-height: 1.45;
+}
+
+.cuenta-section-title {
+  margin: 1.25rem 0 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--feria-color-text-muted);
+}
+
+.cuenta-section-title:first-of-type {
+  margin-top: 0;
+}
+
+.cuenta-list {
+  background: transparent;
+  margin-bottom: 0.25rem;
+  border-radius: var(--feria-modal-radius-inner);
+  overflow: hidden;
+  border: 1px solid var(--feria-modal-border-color);
+}
+
+.cuenta-list ion-item {
+  --background: var(--feria-modal-field-bg);
+  --padding-start: 14px;
+  --padding-end: 14px;
+  --inner-padding-end: 8px;
+  --min-height: 56px;
+}
+
+.cuenta-list--prefs ion-item.feria-theme-field {
+  --background: var(--feria-modal-field-bg);
+}
+
+.cuenta-item__label {
+  margin: 0 0 2px;
+  font-size: var(--feria-font-caption);
+  color: var(--feria-color-text-muted);
+}
+
+.cuenta-item__value {
+  margin: 0;
+  font-size: var(--feria-font-body-sm);
+  color: var(--feria-color-text);
+  font-weight: 500;
+}
+
+.cuenta-item__value--mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.8rem;
+  font-weight: 400;
+  word-break: break-all;
+}
+
+.cuenta-signout {
+  margin-top: 1.5rem;
+  --border-radius: var(--feria-modal-radius-inner);
+  font-weight: 600;
+}
+
+ion-item.feria-theme-field ion-label .feria-theme-field__title {
+  margin: 0 0 2px;
+  font-size: var(--feria-font-body-sm);
+  font-weight: 600;
+  color: var(--feria-color-text);
+}
+
+ion-item.feria-theme-field ion-label .feria-theme-field__hint {
+  margin: 0;
+  font-size: var(--feria-font-caption);
+  color: var(--feria-color-text-muted);
+}

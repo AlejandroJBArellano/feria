@@ -21,7 +21,6 @@ import { useHistory } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { FeriaAppShell } from '../components/FeriaAppShell';
 import KeyboardClassicIcon from '../components/icons/KeyboardClassicIcon';
-import ThemeToggle from '../components/ThemeToggle';
 import './Home.css';
 
 type MovementKind = 'ingreso' | 'gasto';
@@ -226,21 +225,18 @@ const Home: React.FC = () => {
       <FeriaAppShell
         contentClassName="home-content"
         headerEnd={
-          <>
-            <ThemeToggle />
-            <IonButton
-              className="feria-icon-btn-quiet"
-              fill="solid"
-              shape="round"
-              aria-label="Cerrar sesión"
-              disabled={signingOut}
-              onClick={() => {
-                void handleSignOut();
-              }}
-            >
-              {signingOut ? <IonSpinner name="crescent" /> : <IonIcon icon={logOutOutline} aria-hidden />}
-            </IonButton>
-          </>
+          <IonButton
+            className="feria-icon-btn-quiet"
+            fill="solid"
+            shape="round"
+            aria-label="Cerrar sesión"
+            disabled={signingOut}
+            onClick={() => {
+              void handleSignOut();
+            }}
+          >
+            {signingOut ? <IonSpinner name="crescent" /> : <IonIcon icon={logOutOutline} aria-hidden />}
+          </IonButton>
         }
       >
         <div className="home-layout">

@@ -36,7 +36,7 @@ const Onboarding: React.FC = () => {
   return (
     <IonPage className="onboarding-page">
       <div className="onboarding-ai-bg" aria-hidden />
-      <FeriaAppShell headerEnd={<ThemeToggle />} contentClassName="onboarding-content">
+      <FeriaAppShell contentClassName="onboarding-content">
         <div className="onboarding-ai-layout">
           <div className="onboarding-ai-hero">
             <div className="onboarding-ai-orb" aria-hidden>
@@ -71,7 +71,13 @@ const Onboarding: React.FC = () => {
             <IonButton expand="block" className="onboarding-ai-cta" onClick={handleContinue}>
               Empezar
             </IonButton>
-            <p className="onboarding-ai-footnote">Puedes cambiar el tema en la barra superior cuando quieras.</p>
+            <p className="onboarding-ai-footnote">
+              Tras iniciar sesión podrás afinar tema y datos en <strong>Cuenta</strong>.
+            </p>
+          </div>
+
+          <div className="onboarding-theme-footer">
+            <ThemeToggle variant="inline" />
           </div>
         </div>
       </FeriaAppShell>

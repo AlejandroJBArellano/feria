@@ -66,37 +66,38 @@
   pointer-events: auto;
 }
 
-/* Theme switch — pill track aligned with modal segments */
-ion-segment.feria-theme-toggle {
-  --background: var(--feria-color-surface-muted);
+/* Compact theme row (login / onboarding) — not in header */
+.feria-theme-inline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 0.5rem;
+  padding: 8px 14px;
   border-radius: 12px;
-  padding: 3px;
-  max-width: 220px;
-  min-height: 38px;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--feria-color-border);
+  background: color-mix(in srgb, var(--feria-color-surface) 75%, transparent);
+  max-width: 280px;
+  margin-inline: auto;
+  box-sizing: border-box;
 }
 
-.ion-palette-dark ion-segment.feria-theme-toggle {
-  --background: rgba(255, 255, 255, 0.08);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+.feria-theme-inline__label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--feria-color-text-secondary);
+  flex: 1;
+  min-width: 0;
 }
 
-ion-segment.feria-theme-toggle ion-segment-button {
-  --indicator-color: var(--ion-color-primary);
-  --color: var(--ion-color-medium-shade);
-  min-height: 32px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  text-transform: none;
+.feria-theme-inline__toggle {
+  flex-shrink: 0;
+  transform: scale(0.9);
 }
 
-ion-segment.feria-theme-toggle ion-segment-button.segment-button-checked {
-  --color: var(--ion-color-primary-contrast);
-}
-
-ion-segment.feria-theme-toggle ion-segment-button::part(native) {
-  padding-inline: 10px;
+.ion-palette-dark .feria-theme-inline {
+  background: color-mix(in srgb, var(--feria-color-surface) 55%, transparent);
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
 /*

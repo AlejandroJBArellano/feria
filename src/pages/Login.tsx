@@ -65,7 +65,7 @@ const Login: React.FC = () => {
 
   return (
     <IonPage className="login-page">
-      <FeriaAppShell headerEnd={<ThemeToggle />} contentClassName="login-content">
+      <FeriaAppShell contentClassName="login-content">
         <main className="login-layout">
           <section className="login-brand">
             <h1 className="login-brand__title">
@@ -187,6 +187,10 @@ const Login: React.FC = () => {
               <a href="#ayuda" id="link-ayuda">AYUDA</a>
             </nav>
           </section>
+
+          <div className="login-theme-footer">
+            <ThemeToggle variant="inline" />
+          </div>
         </main>
       </FeriaAppShell>
     </IonPage>

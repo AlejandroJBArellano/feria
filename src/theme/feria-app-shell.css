@@ -37,10 +37,6 @@
   margin-inline-end: 4px;
 }
 
-.feria-app-header__end ion-segment.feria-theme-toggle {
-  max-width: 200px;
-}
-
 /* Main scroll area sits between header and footer */
 ion-content.feria-shell-content {
   --background: var(--ion-background-color, var(--feria-color-page));
