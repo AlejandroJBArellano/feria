@@ -2,9 +2,9 @@ name: CI - Seguridad y Calidad FerIA
 
 on:
   push:
-    branches: [ main, layout ]
+    branches: [ workflow ]
   pull_request:
-    branches: [ main ]
+    branches: [ workflow ]
 
 jobs:
   seguridad-y-calidad:
