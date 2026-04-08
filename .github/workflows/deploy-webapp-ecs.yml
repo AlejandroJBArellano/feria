@@ -122,8 +122,12 @@ jobs:
         run: |
           set -euo pipefail
 
-          account_id=$(aws sts get-caller-identity --query 'Account' --output text)
-          bucket_name="${S3_BUCKET_NAME:-feria-webapp-${account_id}-${AWS_REGION}}"
+          account_id="$(aws sts get-caller-identity --query 'Account' --output text)"
+          if [[ -n "${S3_BUCKET_NAME:-}" ]]; then
+            bucket_name="$S3_BUCKET_NAME"
+          else
+            bucket_name="feria-webapp-${account_id}-${AWS_REGION}"
+          fi
           cf_comment="${CLOUDFRONT_COMMENT:-feria-webapp}"
 
           aws s3api head-bucket --bucket "$bucket_name" >/dev/null 2>&1 || {
