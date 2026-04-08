@@ -158,6 +158,61 @@ export type ManualMovementInput = {
   movementDate?: string | null;
 };
 
+export type ChatConversationSummary = {
+  conversationId: string;
+  title: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export async function listChatConversations(): Promise<ChatConversationSummary[]> {
+  const base = apiBase();
+  if (!base) throw new Error('VITE_FERIA_API_URL is not set');
+  const res = await authorizedFetch(`${base}/chat/conversations`, {
+    method: 'GET',
+    headers: {},
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || `listChatConversations failed: ${res.status}`);
+  }
+  const data = (await res.json()) as { conversations?: ChatConversationSummary[] };
+  return data.conversations ?? [];
+}
+
+export type ChatMessageRow = {
+  messageId: string;
+  role: string;
+  content: string;
+  createdAt: string;
+};
+
+export async function listChatMessages(
+  conversationId: string,
+  options?: { limit?: number; cursor?: string | null }
+): Promise<{ messages: ChatMessageRow[]; nextCursor: string | null }> {
+  const base = apiBase();
+  if (!base) throw new Error('VITE_FERIA_API_URL is not set');
+  const params = new URLSearchParams();
+  if (options?.limit != null) {
+    params.set('limit', String(options.limit));
+  }
+  if (options?.cursor) {
+    params.set('cursor', options.cursor);
+  }
+  const q = params.toString();
+  const path = `${base}/chat/conversations/${encodeURIComponent(conversationId)}/messages`;
+  const res = await authorizedFetch(q ? `${path}?${q}` : path, {
+    method: 'GET',
+    headers: {},
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || `listChatMessages failed: ${res.status}`);
+  }
+  return res.json() as Promise<{ messages: ChatMessageRow[]; nextCursor: string | null }>;
+}
+
 export async function createManualMovement(input: ManualMovementInput): Promise<{ movementId: string }> {
   const base = apiBase();
   if (!base) throw new Error('VITE_FERIA_API_URL is not set');

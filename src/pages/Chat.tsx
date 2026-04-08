@@ -1,18 +1,19 @@
 import {
-    IonButton,
-    IonContent,
-    IonFooter,
-    IonHeader,
-    IonIcon,
-    IonPage,
-    IonText,
-    IonTextarea,
-    IonTitle,
-    IonToolbar,
+  IonButton,
+  IonContent,
+  IonFooter,
+  IonHeader,
+  IonIcon,
+  IonPage,
+  IonText,
+  IonTextarea,
+  IonTitle,
+  IonToolbar,
 } from '@ionic/react';
 import { fetchAuthSession } from 'aws-amplify/auth';
-import { logOutOutline, paperPlaneOutline } from 'ionicons/icons';
+import { addOutline, logOutOutline, paperPlaneOutline } from 'ionicons/icons';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { isFeriaApiConfigured, listChatMessages } from '../api/feriaApi';
 import { useAuth } from '../auth/AuthContext';
 import './Chat.css';
 
@@ -30,6 +31,7 @@ function asString(value: unknown): string | null {
 }
 
 const chatWebSocketUrl = import.meta.env.VITE_CHAT_WS_URL;
+const CONVERSATION_STORAGE_KEY = 'feria_active_chat_conversation_id';
 
 const Chat: React.FC = () => {
   const { signOutUser, user } = useAuth();
@@ -38,10 +40,21 @@ const Chat: React.FC = () => {
   const [isStreaming, setIsStreaming] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState('Conectando...');
+  const [conversationId, setConversationId] = useState<string | null>(() => {
+    try {
+      return localStorage.getItem(CONVERSATION_STORAGE_KEY);
+    } catch {
+      return null;
+    }
+  });
+  const [historyLoading, setHistoryLoading] = useState(false);
 
   const wsRef = useRef<WebSocket | null>(null);
   const activeRequestIdRef = useRef<string | null>(null);
   const bottomRef = useRef<HTMLDivElement | null>(null);
+  const conversationIdRef = useRef<string | null>(conversationId);
+
+  conversationIdRef.current = conversationId;
 
   const displayName = useMemo(() => {
     return user?.email ?? user?.username ?? 'usuario';
@@ -50,6 +63,55 @@ const Chat: React.FC = () => {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
   }, [messages, isStreaming]);
+
+  useEffect(() => {
+    if (!isFeriaApiConfigured() || !conversationId) {
+      return;
+    }
+
+    let cancelled = false;
+    setHistoryLoading(true);
+
+    void listChatMessages(conversationId, { limit: 100 })
+      .then(({ messages: rows }) => {
+        if (cancelled) {
+          return;
+        }
+        const ui: ChatMessage[] = [];
+        for (const row of rows) {
+          if (row.role !== 'user' && row.role !== 'assistant') {
+            continue;
+          }
+          ui.push({
+            id: row.messageId,
+            role: row.role as 'user' | 'assistant',
+            content: row.content,
+          });
+        }
+        setMessages(ui);
+      })
+      .catch(() => {
+        if (cancelled) {
+          return;
+        }
+        setMessages([]);
+        setConversationId(null);
+        try {
+          localStorage.removeItem(CONVERSATION_STORAGE_KEY);
+        } catch {
+          /* ignore */
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setHistoryLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [conversationId]);
 
   const connectWebSocket = useCallback(() => {
     if (!chatWebSocketUrl) {
@@ -123,6 +185,15 @@ const Chat: React.FC = () => {
 
       if (type === 'chat.done') {
         const outputText = asString(parsed.outputText);
+        const cid = asString(parsed.conversationId);
+        if (cid) {
+          setConversationId(cid);
+          try {
+            localStorage.setItem(CONVERSATION_STORAGE_KEY, cid);
+          } catch {
+            /* ignore */
+          }
+        }
 
         setMessages((prev) =>
           prev.map((m) => {
@@ -175,6 +246,16 @@ const Chat: React.FC = () => {
     };
   }, [connectWebSocket]);
 
+  const startNewConversation = useCallback(() => {
+    setConversationId(null);
+    setMessages([]);
+    try {
+      localStorage.removeItem(CONVERSATION_STORAGE_KEY);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
   const sendPrompt = useCallback(async () => {
     const prompt = draft.trim();
     if (!prompt || isStreaming) {
@@ -216,12 +297,14 @@ const Chat: React.FC = () => {
       { id: requestId, role: 'assistant', content: '', pending: true },
     ]);
 
+    const cid = conversationIdRef.current;
     ws.send(
       JSON.stringify({
         action: 'chat.start',
         requestId,
         prompt,
         idToken,
+        ...(cid ? { conversationId: cid } : {}),
       }),
     );
 
@@ -232,6 +315,15 @@ const Chat: React.FC = () => {
     <IonPage className="chat-page">
       <IonHeader translucent>
         <IonToolbar>
+          <IonButton
+            slot="start"
+            fill="clear"
+            aria-label="Nueva conversacion"
+            onClick={startNewConversation}
+            disabled={isStreaming}
+          >
+            <IonIcon icon={addOutline} slot="icon-only" />
+          </IonButton>
           <IonTitle>Chat IA</IonTitle>
           <IonButton
             slot="end"
@@ -254,15 +346,18 @@ const Chat: React.FC = () => {
             </IonText>
             <IonText>
               <p className={`chat-status ${isConnected ? 'chat-status--ok' : 'chat-status--warn'}`}>
-                {connectionStatus}
+                {historyLoading ? 'Cargando historial...' : connectionStatus}
               </p>
             </IonText>
           </div>
 
           <div className="chat-feed" role="log" aria-live="polite">
-            {messages.length === 0 ? (
+            {messages.length === 0 && !historyLoading ? (
               <div className="chat-empty">
-                <p>Escribe una pregunta para iniciar el stream desde Amazon Bedrock.</p>
+                <p>
+                  Escribe una pregunta sobre tus finanzas. El asistente usa tu historial de movimientos
+                  en la app (vía Amazon Bedrock).
+                </p>
               </div>
             ) : (
               messages.map((message) => (
@@ -298,7 +393,7 @@ const Chat: React.FC = () => {
             onClick={() => {
               void sendPrompt();
             }}
-            disabled={!isConnected || isStreaming || draft.trim().length === 0}
+            disabled={!isConnected || isStreaming || draft.trim().length === 0 || historyLoading}
           >
             <IonIcon icon={paperPlaneOutline} slot="start" />
             Enviar
