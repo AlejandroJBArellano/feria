@@ -1,36 +1,36 @@
 import {
-    IonButton,
-    IonContent,
-    IonHeader,
-    IonIcon,
-    IonInput,
-    IonItem,
-    IonLabel,
-    IonModal,
-    IonPage,
-    IonSegment,
-    IonSegmentButton,
-    IonSpinner,
-    IonText,
-    IonTitle,
-    IonToolbar,
-    useIonToast,
-    useIonViewWillEnter,
+  IonButton,
+  IonContent,
+  IonHeader,
+  IonInput,
+  IonItem,
+  IonLabel,
+  IonModal,
+  IonPage,
+  IonSegment,
+  IonSegmentButton,
+  IonSpinner,
+  IonText,
+  IonTitle,
+  IonToolbar,
+  useIonToast,
+  useIonViewWillEnter
 } from '@ionic/react';
-import { logOutOutline } from 'ionicons/icons';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
     createManualMovement,
     createVoiceJob,
     dismissEngagementReminder,
+    ensureUserProfileSynced,
     getEngagementSummary,
+    getUserProfile,
     isFeriaApiConfigured,
     uploadAudioToPresignedUrl,
     type EngagementActiveReminder,
 } from '../api/feriaApi';
 import { useAuth } from '../auth/AuthContext';
-import { getUserDisplayLabel } from '../auth/userDisplay';
+import { resolveDisplayNameForUi } from '../auth/userDisplay';
 import { FeriaAppShell } from '../components/FeriaAppShell';
 import KeyboardClassicIcon from '../components/icons/KeyboardClassicIcon';
 import { setPendingVoiceJobId } from '../voice/voiceJobStorage';
@@ -62,7 +62,8 @@ const Home: React.FC = () => {
   const { user, signOutUser } = useAuth();
   const [presentToast] = useIonToast();
   const [signingOut, setSigningOut] = useState(false);
-  const displayName = getUserDisplayLabel(user);
+  const [serverProfileName, setServerProfileName] = useState<string | null>(null);
+  const displayName = resolveDisplayNameForUi(user, serverProfileName);
   const [keyboardOpen, setKeyboardOpen] = useState(false);
   const [kind, setKind] = useState<MovementKind>('gasto');
   const [amount, setAmount] = useState('');
@@ -94,6 +95,16 @@ const Home: React.FC = () => {
 
   useIonViewWillEnter(() => {
     void loadEngagement();
+    if (apiReady && user?.userId) {
+      void ensureUserProfileSynced()
+        .then(() => getUserProfile())
+        .then((p) => setServerProfileName(p.name))
+        .catch(() => {
+          /* sync or profile optional */
+        });
+    } else {
+      setServerProfileName(null);
+    }
   });
 
   const cleanupStream = useCallback(() => {
@@ -314,12 +325,24 @@ const Home: React.FC = () => {
               void handleSignOut();
             }}
           >
-            {signingOut ? <IonSpinner name="crescent" /> : <IonIcon icon={logOutOutline} aria-hidden />}
+            {signingOut ? <IonSpinner name="crescent" /> : <span className="material-symbols-rounded" aria-hidden>logout</span>}
           </IonButton>
         }
       >
         <div className="home-layout">
-          <p className="feria-text-label-caps">Hola, {displayName}</p>
+          <p className="feria-text-label-caps">¡Qué onda, {displayName}!</p>
+
+          {/* Gamified Stat Row */}
+          <div className="home-gamified-stats" aria-label="Tus rachas y medallas">
+            <div className="stat-pill stat-pill--streak">
+              <span className="stat-pill__emoji material-symbols-rounded">local_fire_department</span>
+              <span className="stat-pill__value">Racha de 3 días</span>
+            </div>
+            <div className="stat-pill stat-pill--coins">
+              <span className="stat-pill__emoji material-symbols-rounded">monetization_on</span>
+              <span className="stat-pill__value">12 registros</span>
+            </div>
+          </div>
 
           {apiReady && activeReminder && (
             <div className="home-engagement-reminder" role="status">
@@ -327,6 +350,7 @@ const Home: React.FC = () => {
               <div className="home-engagement-reminder__actions">
                 <IonButton
                   size="small"
+                  className="feria-btn-playful"
                   onClick={() => {
                     history.push(activeReminder.ctaPath);
                   }}
@@ -344,13 +368,13 @@ const Home: React.FC = () => {
                     });
                   }}
                 >
-                  Cerrar
+                  Luego
                 </IonButton>
               </div>
             </div>
           )}
 
-          <h1 className="home-hero-line">Registra un ingreso o un gasto</h1>
+          <h1 className="home-hero-line">¿Qué movimiento traemos hoy?</h1>
 
           <div
             className={`siri-orb-wrap ${listening ? 'siri-orb-wrap--active' : ''}`}

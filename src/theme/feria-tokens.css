@@ -1,15 +1,20 @@
 /*
  * Feria design tokens
  * -------------------
- * Shared primitives for spacing, motion, typography scale, and “disk” surfaces
- * (voice orb core, quiet icon buttons). Prefer these over ad-hoc values in pages.
- * Extend this file as the product language evolves.
+ * Shared primitives for spacing, motion, typography scale, and "disk" surfaces.
+ * Prefer these over ad-hoc values in pages. Extend as the product evolves.
  */
 
 :root {
+  /* Font family — Nunito: rounded, warm, highly readable */
+  --feria-font-family: 'Nunito', system-ui, -apple-system, sans-serif;
+
   /* Motion */
-  --feria-duration-normal: 0.35s;
+  --feria-duration-fast: 0.18s;
+  --feria-duration-normal: 0.32s;
+  --feria-duration-slow: 0.5s;
   --feria-ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --feria-ease-decel: cubic-bezier(0, 0, 0.2, 1);
 
   /* Layout */
   --feria-space-page: 1.25rem;
@@ -17,7 +22,13 @@
   --feria-space-stack-sm: 0.75rem;
   --feria-fab-offset: 0.75rem;
 
-  /* Typography (hierarchy on top of Ionic defaults) */
+  /* Radius scale */
+  --feria-radius-lg: 20px;
+  --feria-radius-md: 14px;
+  --feria-radius-sm: 10px;
+  --feria-radius-pill: 999px;
+
+  /* Typography */
   --feria-font-caption: 0.8125rem;
   --feria-font-body-sm: 0.9375rem;
   --feria-font-label: 0.75rem;
@@ -28,32 +39,30 @@
   /* Touch targets */
   --feria-control-min: 44px;
 
-  /* “Disk” surfaces: same family as the voice orb inner core */
-  --feria-disk-shadow-inner: inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  --feria-disk-shadow-elev: 0 8px 32px rgba(0, 0, 0, 0.06);
-  --feria-disk-border: 1px solid rgba(146, 148, 156, 0.22);
+  /* "Disk" surfaces: same family as the voice orb inner core */
+  --feria-disk-shadow-inner: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  --feria-disk-shadow-elev: 0 6px 24px rgba(44, 36, 24, 0.06);
+  --feria-disk-border: 1px solid rgba(154, 139, 121, 0.18);
 
-  /* Voice orb size cap (pages may still use vw for responsiveness) */
+  /* Voice orb size cap */
   --feria-orb-size-max: 220px;
 
-  /*
-   * Modals / sheets (shadcn-like: generous radius, hairline border, soft shadow)
-   */
-  --feria-modal-radius: 16px;
-  --feria-modal-radius-inner: 10px;
-  --feria-modal-border-color: rgba(15, 23, 42, 0.08);
-  --feria-modal-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.18);
-  --feria-modal-backdrop-opacity: 0.45;
-  --feria-modal-field-bg: rgba(15, 23, 42, 0.04);
+  /* Modals / sheets */
+  --feria-modal-radius: 20px;
+  --feria-modal-radius-inner: 12px;
+  --feria-modal-border-color: rgba(44, 36, 24, 0.08);
+  --feria-modal-shadow: 0 25px 50px -12px rgba(44, 36, 24, 0.16);
+  --feria-modal-backdrop-opacity: 0.4;
+  --feria-modal-field-bg: rgba(44, 36, 24, 0.04);
 }
 
 .ion-palette-dark {
-  --feria-disk-shadow-inner: inset 0 1px 0 rgba(255, 255, 255, 0.04);
-  --feria-disk-shadow-elev: 0 8px 32px rgba(0, 0, 0, 0.35);
-  --feria-disk-border: 1px solid rgba(255, 255, 255, 0.12);
+  --feria-disk-shadow-inner: inset 0 1px 0 rgba(255, 240, 220, 0.04);
+  --feria-disk-shadow-elev: 0 8px 28px rgba(0, 0, 0, 0.35);
+  --feria-disk-border: 1px solid rgba(255, 230, 190, 0.10);
 
-  --feria-modal-border-color: rgba(255, 255, 255, 0.1);
+  --feria-modal-border-color: rgba(255, 230, 190, 0.08);
   --feria-modal-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.55);
-  --feria-modal-backdrop-opacity: 0.6;
-  --feria-modal-field-bg: rgba(255, 255, 255, 0.06);
+  --feria-modal-backdrop-opacity: 0.55;
+  --feria-modal-field-bg: rgba(255, 240, 220, 0.05);
 }

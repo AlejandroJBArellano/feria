@@ -1,11 +1,18 @@
 import { IonContent, IonPage, IonSpinner } from '@ionic/react';
-import { useEffect, useLayoutEffect, useState } from 'react';
-import { Redirect, useHistory, useLocation } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useHistory, useLocation } from 'react-router-dom';
+import {
+  getUserProfile,
+  isFeriaApiConfigured,
+  syncUserProfile,
+} from '../api/feriaApi';
 import { useAuth } from '../auth/AuthContext';
 import { isCognitoConfigured } from '../auth/configureAmplify';
 import { FeriaAppShell } from '../components/FeriaAppShell';
-import ThemeToggle from '../components/ThemeToggle';
-import { isOnboardingComplete } from '../onboarding/onboardingStorage';
+import {
+  isOnboardingComplete,
+  syncOnboardingFlagFromServer,
+} from '../onboarding/onboardingStorage';
 import './Login.css';
 
 const Login: React.FC = () => {
@@ -29,15 +36,34 @@ const Login: React.FC = () => {
     }
   }, [oauthReturnPending, isLoading, isAuthenticated]);
 
-  useLayoutEffect(() => {
-    if (isLoading || !isAuthenticated) {
+  useEffect(() => {
+    if (isLoading || !isAuthenticated || history.location.pathname !== '/login') {
       return;
     }
-    if (history.location.pathname !== '/login') {
+    if (!isFeriaApiConfigured()) {
+      history.replace(isOnboardingComplete() ? '/home' : '/onboarding');
       return;
     }
-    history.replace('/home');
-  }, [isLoading, isAuthenticated, history]);
+    let cancelled = false;
+    void (async () => {
+      try {
+        await syncUserProfile();
+        const p = await getUserProfile();
+        if (cancelled) {
+          return;
+        }
+        syncOnboardingFlagFromServer(p.isOnboardingComplete);
+        history.replace(p.isOnboardingComplete ? '/home' : '/onboarding');
+      } catch {
+        if (!cancelled) {
+          history.replace(isOnboardingComplete() ? '/home' : '/onboarding');
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [isLoading, isAuthenticated, history, history.location.pathname]);
 
   if (isLoading || oauthReturnPending) {
     return (
@@ -59,15 +85,27 @@ const Login: React.FC = () => {
     );
   }
 
-  if (!isOnboardingComplete()) {
-    return <Redirect to="/onboarding" />;
-  }
-
   return (
     <IonPage className="login-page">
       <FeriaAppShell contentClassName="login-content">
         <main className="login-layout">
           <section className="login-brand">
+            <figure className="login-brand__art" aria-hidden="true">
+              <div className="login-brand__art-frame login-brand__art-frame--main">
+                <img
+                  src="/festivo.png"
+                  alt=""
+                  className="login-brand__art-image login-brand__art-image--main"
+                />
+              </div>
+              <div className="login-brand__art-frame login-brand__art-frame--left">
+                <img
+                  src="/pensativo.png"
+                  alt=""
+                  className="login-brand__art-image login-brand__art-image--secondary"
+                />
+              </div>
+            </figure>
             <h1 className="login-brand__title">
               Bienvenido a <span className="login-brand__accent">FerIA</span>
             </h1>
@@ -75,6 +113,15 @@ const Login: React.FC = () => {
           </section>
 
           <section className="login-card">
+            <div className="login-card__image-hint" aria-hidden="true">
+              <span className="login-card__image-hint-shape login-card__image-hint-shape--left">
+                <span className="material-symbols-rounded">auto_awesome</span>
+              </span>
+              <span className="login-card__image-hint-shape login-card__image-hint-shape--right">
+                <span className="material-symbols-rounded">trending_up</span>
+              </span>
+            </div>
+
             <button
               type="button"
               id="btn-google-login"
@@ -86,8 +133,8 @@ const Login: React.FC = () => {
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 48 48"
-                  width="20"
-                  height="20"
+                  width="22"
+                  height="22"
                   aria-hidden="true"
                 >
                   <path
@@ -109,56 +156,18 @@ const Login: React.FC = () => {
                   <path fill="none" d="M0 0h48v48H0z" />
                 </svg>
               </span>
-              <span className="google-btn__label">Continuar con Google</span>
+              <span className="google-btn__label">Entrar con Google</span>
             </button>
 
             <div className="feature-grid">
               <article className="feature-item">
-                <span className="feature-item__icon" aria-hidden="true">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none">
-                    <path
-                      d="M12 2L3 6v6c0 5.25 3.75 10.15 9 11.25C17.25 22.15 21 17.25 21 12V6l-9-4z"
-                      fill="currentColor"
-                      opacity="0.18"
-                    />
-                    <path
-                      d="M12 2L3 6v6c0 5.25 3.75 10.15 9 11.25C17.25 22.15 21 17.25 21 12V6l-9-4z"
-                      stroke="currentColor"
-                      strokeWidth="1.6"
-                      fill="none"
-                    />
-                    <path
-                      d="M9 12l2 2 4-4"
-                      stroke="currentColor"
-                      strokeWidth="1.6"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </span>
-                <p className="feature-item__label">BOVEDA CIFRADA</p>
+                <span className="feature-item__emoji material-symbols-rounded" aria-hidden="true">lock</span>
+                <p className="feature-item__label">Privado</p>
               </article>
 
               <article className="feature-item">
-                <span className="feature-item__icon" aria-hidden="true">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none">
-                    <polyline
-                      points="23 6 13.5 15.5 8.5 10.5 1 18"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <polyline
-                      points="17 6 23 6 23 12"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </span>
-                <p className="feature-item__label">CRECIMIENTO SOCIAL</p>
+                <span className="feature-item__emoji material-symbols-rounded" aria-hidden="true">eco</span>
+                <p className="feature-item__label">Crece tu lanita</p>
               </article>
             </div>
 
@@ -169,16 +178,6 @@ const Login: React.FC = () => {
 
           <section className="login-footer">
             <p className="login-footer__signup">
-              ¿No tienes cuenta?{' '}
-              <button
-                type="button"
-                id="link-registro"
-                className="login-footer__register-link"
-                disabled={!isCognitoConfigured}
-                onClick={() => void signIn('Google')}
-              >
-                Continuar con Google
-              </button>
               <span className="login-footer__signup-hint"> La primera vez se crea tu cuenta al completar el acceso.</span>
             </p>
             <nav aria-label="Legal" className="legal-links">
@@ -187,10 +186,6 @@ const Login: React.FC = () => {
               <a href="#ayuda" id="link-ayuda">AYUDA</a>
             </nav>
           </section>
-
-          <div className="login-theme-footer">
-            <ThemeToggle variant="inline" />
-          </div>
         </main>
       </FeriaAppShell>
     </IonPage>

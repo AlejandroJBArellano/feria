@@ -21,3 +21,18 @@ export function markOnboardingComplete(): void {
     /* ignore quota / private mode */
   }
 }
+
+/**
+ * Align local stub with server `isOnboardingComplete` (Users table) so routing matches DynamoDB.
+ */
+export function syncOnboardingFlagFromServer(serverComplete: boolean): void {
+  try {
+    if (serverComplete) {
+      localStorage.setItem(STORAGE_KEY, '1');
+    } else {
+      localStorage.removeItem(STORAGE_KEY);
+    }
+  } catch {
+    /* ignore */
+  }
+}

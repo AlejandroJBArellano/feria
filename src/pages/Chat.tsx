@@ -1,10 +1,10 @@
 import {
   IonButton,
   IonIcon,
+  IonPage,
   IonSpinner,
   IonText,
   IonTextarea,
-  IonPage,
 } from '@ionic/react';
 import { addOutline, logOutOutline, paperPlaneOutline } from 'ionicons/icons';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -41,7 +41,7 @@ const TUTOR_STARTER_PROMPTS: readonly string[] = [
 
 const Chat: React.FC = () => {
   const history = useHistory();
-  const { signOutUser, user } = useAuth();
+  const { signOutUser } = useAuth();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [draft, setDraft] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
@@ -71,10 +71,6 @@ const Chat: React.FC = () => {
     }
     return 'Listo';
   }, [apiReady, historyLoading]);
-
-  const displayName = useMemo(() => {
-    return user?.email ?? user?.username ?? 'usuario';
-  }, [user?.email, user?.username]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
@@ -253,9 +249,6 @@ const Chat: React.FC = () => {
             <div className="chat-shell">
               <div className="chat-meta">
                 <IonText>
-                  <p className="chat-user">Tutor · {displayName}</p>
-                </IonText>
-                <IonText>
                   <p
                     className={`chat-status ${apiReady ? 'chat-status--ok' : 'chat-status--warn'}`}
                   >
@@ -263,6 +256,14 @@ const Chat: React.FC = () => {
                   </p>
                 </IonText>
               </div>
+
+              <section className="chat-brand-banner" aria-label="Bienvenida de FerIA">
+                <img src="/principal.png" className="chat-brand-banner__image" alt="" aria-hidden="true" />
+                <div className="chat-brand-banner__copy">
+                  <p className="chat-brand-banner__eyebrow">Tu tutor FerIA</p>
+                  <p className="chat-brand-banner__text">Pregunta sobre tus movimientos y el sistema te responde con contexto.</p>
+                </div>
+              </section>
 
               <div className="chat-feed" role="log" aria-live="polite">
                 {messages.length === 0 && !historyLoading && !isStreaming ? (
@@ -289,14 +290,91 @@ const Chat: React.FC = () => {
                     </div>
                   </div>
                 ) : (
-                  messages.map((message) => (
-                    <article
-                      key={message.id}
-                      className={`chat-bubble chat-bubble--${message.role}`}
-                    >
-                      <p>{message.content || (message.pending ? '...' : '')}</p>
-                    </article>
-                  ))
+                  messages.map((message) => {
+                    const renderMarkdown = (text: string) => {
+                      if (!text) return null;
+
+                      const lines = text.split('\n');
+                      const elements = [];
+                      let inTable = false;
+                      let tableRows = [];
+
+                      const processText = (str: string) => {
+                        // Very basic bold and italic replacement
+                        let parsed = str.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                        parsed = parsed.replace(/\*(.*?)\*/g, '<em>$1</em>');
+                        // Render emojis wrapped in some simple tags if needed, but strings are fine
+                        return <span dangerouslySetInnerHTML={{ __html: parsed }} />;
+                      };
+
+                      for (let i = 0; i < lines.length; i++) {
+                        const line = lines[i];
+
+                        if (line.startsWith('|')) {
+                          inTable = true;
+                          if (!line.includes('---')) {
+                            tableRows.push(line);
+                          }
+                          continue;
+                        } else if (inTable) {
+                          // End of table
+                          elements.push(
+                            <table className="chat-table" key={`table-${i}`}>
+                              <tbody>
+                                {tableRows.map((row, rIdx) => (
+                                  <tr key={`tr-${rIdx}`}>
+                                    {row.split('|').filter(c => c.trim()).map((cell, cIdx) => (
+                                      rIdx === 0 ? <th key={`th-${cIdx}`}>{processText(cell.trim())}</th> : <td key={`td-${cIdx}`}>{processText(cell.trim())}</td>
+                                    ))}
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          );
+                          inTable = false;
+                          tableRows = [];
+                        }
+
+                        if (line.startsWith('## ')) {
+                          elements.push(<h3 key={`h3-${i}`} className="chat-h3">{processText(line.replace('## ', ''))}</h3>);
+                        } else if (line.startsWith('# ')) {
+                          elements.push(<h2 key={`h2-${i}`} className="chat-h2">{processText(line.replace('# ', ''))}</h2>);
+                        } else if (line.startsWith('- ')) {
+                          elements.push(<li key={`li-${i}`} className="chat-li">{processText(line.replace('- ', ''))}</li>);
+                        } else if (line.trim().length > 0) {
+                          elements.push(<p key={`p-${i}`}>{processText(line)}</p>);
+                        }
+                      }
+
+                      // Catch trailing table
+                      if (inTable && tableRows.length > 0) {
+                        elements.push(
+                          <table className="chat-table" key={`table-end`}>
+                            <tbody>
+                              {tableRows.map((row, rIdx) => (
+                                <tr key={`tr-${rIdx}`}>
+                                  {row.split('|').filter(c => c.trim()).map((cell, cIdx) => (
+                                    rIdx === 0 ? <th key={`th-${cIdx}`}>{processText(cell.trim())}</th> : <td key={`td-${cIdx}`}>{processText(cell.trim())}</td>
+                                  ))}
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        );
+                      }
+
+                      return elements;
+                    };
+
+                    return (
+                      <article
+                        key={message.id}
+                        className={`chat-bubble chat-bubble--${message.role}`}
+                      >
+                        {message.pending ? <p>Generando...</p> : renderMarkdown(message.content)}
+                      </article>
+                    );
+                  })
                 )}
 
                 {isStreaming ? (
@@ -308,23 +386,27 @@ const Chat: React.FC = () => {
           </div>
 
           <div className="tutor-composer">
-            <IonTextarea
-              autoGrow
-              aria-label="Mensaje para el tutor"
-              value={draft}
-              placeholder="Escribe tu mensaje…"
-              onIonInput={(event) => setDraft(String(event.detail.value ?? ''))}
-            />
-            <IonButton
-              className="chat-send-btn"
-              onClick={() => {
-                void sendPrompt();
-              }}
-              disabled={!apiReady || isStreaming || draft.trim().length === 0 || historyLoading}
-            >
-              <IonIcon icon={paperPlaneOutline} slot="start" />
-              Enviar
-            </IonButton>
+            <div className="tutor-composer-inner">
+              <IonTextarea
+                className="tutor-textarea-playful"
+                autoGrow
+                aria-label="Mensaje para el tutor"
+                value={draft}
+                placeholder="Escribe tu mensaje…"
+                onIonInput={(event) => setDraft(String(event.detail.value ?? ''))}
+              />
+              <IonButton
+                className="chat-send-btn feria-btn-playful"
+                shape="round"
+                onClick={() => {
+                  void sendPrompt();
+                }}
+                disabled={!apiReady || isStreaming || draft.trim().length === 0 || historyLoading}
+              >
+                <IonIcon icon={paperPlaneOutline} slot="start" />
+                Enviar
+              </IonButton>
+            </div>
           </div>
         </div>
       </FeriaAppShell>
