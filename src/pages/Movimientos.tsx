@@ -193,89 +193,93 @@ const Movimientos: React.FC = () => {
           <IonRefresherContent />
         </IonRefresher>
         <div className="movimientos-body ion-padding">
-          <div className="movimientos-ai-strip">
-            <span aria-hidden="true" style={{ fontSize: '1.2rem'}}>✨</span>
-            <span>
-              {isProcessingVoice
-                ? 'FerIA está procesando tu audio en chinga...'
-                : demoMode
-                ? 'Modo prueba: Así se verá tu lana'
-                : 'Todo chido, esta es tu lana registrada'}
-            </span>
+          <div className="movimientos-grid-col-summary">
+            <div className="movimientos-ai-strip">
+              <span aria-hidden="true" style={{ fontSize: '1.2rem'}}>✨</span>
+              <span>
+                {isProcessingVoice
+                  ? 'FerIA está procesando tu audio en chinga...'
+                  : demoMode
+                  ? 'Modo prueba: Así se verá tu lana'
+                  : 'Todo chido, esta es tu lana registrada'}
+              </span>
+            </div>
+
+            {isProcessingVoice && (
+              <div className="movimientos-insight movimientos-processing">
+                <IonSpinner name="crescent" />
+                <p className="movimientos-insight__text">
+                  Estamos procesando tu audio en segundo plano. Los movimientos aparecerán aquí cuando termine.
+                </p>
+              </div>
+            )}
+
+            {loading && (
+              <div className="movimientos-loading">
+                <IonSpinner name="crescent" />
+              </div>
+            )}
+
+            {error && (
+              <IonText color="danger">
+                <p>{error}</p>
+              </IonText>
+            )}
+
+            {!loading && !demoMode && !isProcessingVoice && (
+              <div className="movimientos-insight">
+                <p className="movimientos-insight__text">
+                  Lista actualizada al cien. Tira hacia abajo para refrescar tu lana.
+                </p>
+              </div>
+            )}
+
+            {demoMode && !loading && !isProcessingVoice && (
+              <div className="movimientos-insight">
+                <p className="movimientos-insight__text">
+                  Esta semana tus gastos en <strong>transporte</strong> están un{' '}
+                  <strong>12% por debajo</strong> de tu media habitual (demo).
+                </p>
+              </div>
+            )}
+
+            <div className="movimientos-stats">
+              <div className="movimientos-stat">
+                <span className="movimientos-stat__label">Entró</span>
+                <span className="movimientos-stat__value">{currencyFmt.format(summary.totalIngresos)}</span>
+              </div>
+              <div className="movimientos-stat">
+                <span className="movimientos-stat__label">Salió</span>
+                <span className="movimientos-stat__value">{currencyFmt.format(summary.totalGastos)}</span>
+              </div>
+              <div className="movimientos-stat movimientos-stat--balance">
+                <span className="movimientos-stat__label">Te Queda</span>
+                <span className="movimientos-stat__value">{currencyFmt.format(summary.balance)}</span>
+              </div>
+            </div>
           </div>
 
-          {isProcessingVoice && (
-            <div className="movimientos-insight movimientos-processing">
-              <IonSpinner name="crescent" />
-              <p className="movimientos-insight__text">
-                Estamos procesando tu audio en segundo plano. Los movimientos aparecerán aquí cuando termine.
-              </p>
-            </div>
-          )}
+          <div className="movimientos-grid-col-list">
+            <h2 className="movimientos-section-title">Tus Movimientos</h2>
 
-          {loading && (
-            <div className="movimientos-loading">
-              <IonSpinner name="crescent" />
-            </div>
-          )}
+            {!loading &&
+              Array.from(grouped.entries()).map(([date, dayRows]) => (
+                <section key={date}>
+                  <h3 className="movimientos-date-heading">{formatDayHeading(date)}</h3>
+                  <ul className="movimientos-list">
+                    {dayRows.map((row) => (
+                      <MovementCard key={row.id} row={row} />
+                    ))}
+                  </ul>
+                </section>
+              ))}
 
-          {error && (
-            <IonText color="danger">
-              <p>{error}</p>
-            </IonText>
-          )}
-
-          {!loading && !demoMode && !isProcessingVoice && (
-            <div className="movimientos-insight">
-              <p className="movimientos-insight__text">
-                Lista actualizada al cien. Tira hacia abajo para refrescar tu lana.
-              </p>
-            </div>
-          )}
-
-          {demoMode && !loading && !isProcessingVoice && (
-            <div className="movimientos-insight">
-              <p className="movimientos-insight__text">
-                Esta semana tus gastos en <strong>transporte</strong> están un{' '}
-                <strong>12% por debajo</strong> de tu media habitual (demo).
-              </p>
-            </div>
-          )}
-
-          <div className="movimientos-stats">
-            <div className="movimientos-stat">
-              <span className="movimientos-stat__label">Entró</span>
-              <span className="movimientos-stat__value">{currencyFmt.format(summary.totalIngresos)}</span>
-            </div>
-            <div className="movimientos-stat">
-              <span className="movimientos-stat__label">Salió</span>
-              <span className="movimientos-stat__value">{currencyFmt.format(summary.totalGastos)}</span>
-            </div>
-            <div className="movimientos-stat movimientos-stat--balance">
-              <span className="movimientos-stat__label">Te Queda</span>
-              <span className="movimientos-stat__value">{currencyFmt.format(summary.balance)}</span>
-            </div>
+            {!loading && rows.length === 0 && !demoMode && !error && !isProcessingVoice && (
+              <IonText color="medium">
+                <p>No hay lana registrada aún. ¡Pícale al botón de Inicio y háblale a FerIA!</p>
+              </IonText>
+            )}
           </div>
-
-          <h2 className="movimientos-section-title">Tus Movimientos</h2>
-
-          {!loading &&
-            Array.from(grouped.entries()).map(([date, dayRows]) => (
-              <section key={date}>
-                <h3 className="movimientos-date-heading">{formatDayHeading(date)}</h3>
-                <ul className="movimientos-list">
-                  {dayRows.map((row) => (
-                    <MovementCard key={row.id} row={row} />
-                  ))}
-                </ul>
-              </section>
-            ))}
-
-          {!loading && rows.length === 0 && !demoMode && !error && !isProcessingVoice && (
-            <IonText color="medium">
-              <p>No hay lana registrada aún. ¡Pícale al botón de Inicio y háblale a FerIA!</p>
-            </IonText>
-          )}
         </div>
       </FeriaAppShell>
     </IonPage>
