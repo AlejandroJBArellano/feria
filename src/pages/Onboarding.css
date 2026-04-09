@@ -210,3 +210,126 @@
   max-width: 20rem;
   margin-inline: auto;
 }
+
+/* Voice onboarding (aligned with Home orb) */
+.onboarding-voice-flow .onboarding-voice-layout {
+  justify-content: flex-start;
+  padding-top: max(2rem, env(safe-area-inset-top));
+}
+
+.onboarding-voice-progress {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 0.5rem;
+}
+
+.onboarding-voice-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--feria-color-border);
+  transition:
+    background 0.25s ease,
+    transform 0.25s ease;
+}
+
+.onboarding-voice-dot.is-active {
+  background: var(--feria-color-primary);
+  transform: scale(1.25);
+}
+
+.onboarding-voice-dot.is-done {
+  background: color-mix(in srgb, var(--feria-color-primary) 55%, var(--feria-color-border));
+}
+
+.onboarding-voice-card {
+  text-align: center;
+  animation: onboarding-step-in 0.35s ease;
+}
+
+@keyframes onboarding-step-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.onboarding-voice-title {
+  margin: 0.35rem 0 0.75rem;
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--feria-color-text);
+}
+
+.onboarding-voice-prompt {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: var(--feria-color-text-secondary);
+}
+
+.onboarding-voice-hint {
+  text-align: center;
+  font-size: 0.85rem;
+}
+
+.onboarding-voice-orb-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+button.onboarding-voice-orb.siri-orb-wrap {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.onboarding-voice-orb.siri-orb-wrap {
+  width: 200px;
+  height: 200px;
+  position: relative;
+}
+
+.onboarding-voice-busy {
+  margin-top: 1rem;
+}
+
+.onboarding-voice-review {
+  width: 100%;
+  max-width: 24rem;
+  margin-inline: auto;
+  padding: 1rem 1rem 1.25rem;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--feria-color-surface) 92%, var(--feria-color-primary) 8%);
+  border: 1px solid var(--feria-color-border);
+  animation: onboarding-step-in 0.35s ease;
+}
+
+.onboarding-voice-review-label {
+  margin: 0 0 0.5rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--feria-color-text-muted);
+}
+
+.onboarding-voice-review-text {
+  margin: 0 0 1rem;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: var(--feria-color-text);
+  text-align: left;
+}
