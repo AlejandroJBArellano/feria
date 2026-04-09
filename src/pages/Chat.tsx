@@ -385,24 +385,26 @@ const Chat: React.FC = () => {
           </div>
 
           <div className="tutor-composer">
-            <IonTextarea
-              autoGrow
-              aria-label="Mensaje para el tutor"
-              value={draft}
-              placeholder="Escribe tu mensaje…"
-              onIonInput={(event) => setDraft(String(event.detail.value ?? ''))}
-            />
-            <IonButton
-              className="chat-send-btn feria-btn-playful"
-              shape="round"
-              onClick={() => {
-                void sendPrompt();
-              }}
-              disabled={!apiReady || isStreaming || draft.trim().length === 0 || historyLoading}
-            >
-              <IonIcon icon={paperPlaneOutline} slot="start" />
-              Enviar
-            </IonButton>
+            <div className="tutor-composer-inner">
+              <IonTextarea
+                autoGrow
+                aria-label="Mensaje para el tutor"
+                value={draft}
+                placeholder="Escribe tu mensaje…"
+                onIonInput={(event) => setDraft(String(event.detail.value ?? ''))}
+              />
+              <IonButton
+                className="chat-send-btn feria-btn-playful"
+                shape="round"
+                onClick={() => {
+                  void sendPrompt();
+                }}
+                disabled={!apiReady || isStreaming || draft.trim().length === 0 || historyLoading}
+              >
+                <IonIcon icon={paperPlaneOutline} slot="start" />
+                Enviar
+              </IonButton>
+            </div>
           </div>
         </div>
       </FeriaAppShell>

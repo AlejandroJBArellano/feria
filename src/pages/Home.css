@@ -1,5 +1,5 @@
 .home-page {
-  --home-orb-size: min(56vw, var(--feria-orb-size-max));
+  --home-orb-size: min(56vw, 360px);
   /* Lifts keyboard FAB above footer nav */
   --feria-app-footer-clear: 52px;
 }
@@ -30,15 +30,22 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
+  padding: 8px 16px;
   background: var(--feria-color-surface);
   border: 2px solid var(--feria-color-border);
   border-radius: var(--feria-radius-pill);
-  box-shadow: 0 4px 12px rgba(44, 36, 24, 0.04);
+  box-shadow: 4px 4px 0px var(--feria-color-border);
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.stat-pill:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px var(--feria-color-primary-tint);
+  border-color: var(--feria-color-primary-tint);
 }
 
 .ion-palette-dark .stat-pill {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.4);
 }
 
 .stat-pill__emoji {
@@ -87,9 +94,9 @@
 /* Main instruction — oversized type, still single focal block */
 .home-hero-line {
   margin: 0 0 var(--feria-space-stack-lg);
-  max-width: min(22rem, 92vw);
+  max-width: min(800px, 92vw);
   text-align: center;
-  font-size: clamp(2rem, 11vw, 3.35rem);
+  font-size: clamp(2.2rem, 8vw, 4.5rem);
   font-weight: 800;
   letter-spacing: -0.045em;
   line-height: 1.05;
@@ -170,10 +177,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--ion-background-color);
-  border: 1px solid color-mix(in srgb, var(--feria-color-border) 70%, var(--ion-color-primary) 18%);
-  box-shadow: 0 6px 28px rgba(0, 0, 0, 0.07);
+  background: var(--feria-color-surface);
+  border: 4px solid var(--feria-color-border);
+  box-shadow: inset 0px 8px 16px rgba(0, 0, 0, 0.08), 8px 8px 0px var(--feria-color-border);
   box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.siri-orb-wrap:active .siri-orb-core {
+  transform: translate(4px, 4px);
+  box-shadow: inset 0px 8px 16px rgba(0, 0, 0, 0.08), 2px 2px 0px var(--feria-color-border);
 }
 
 .ion-palette-dark .siri-orb-core {
@@ -184,9 +197,9 @@
 .home-orb-hint {
   display: block;
   padding: 0 0.85rem;
-  max-width: 11rem;
-  font-size: 0.9rem;
-  font-weight: 600;
+  max-width: 14rem;
+  font-size: 1.15rem;
+  font-weight: 700;
   letter-spacing: 0.03em;
   line-height: 1.25;
   text-align: center;

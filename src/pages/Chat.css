@@ -34,13 +34,21 @@
 .tutor-composer {
   flex-shrink: 0;
   display: flex;
-  gap: 0.75rem;
-  align-items: flex-end;
+  flex-direction: column;
   padding: 0.75rem var(--feria-space-page) 0.85rem;
   border-top: 1px solid var(--feria-color-border);
   background: var(--ion-background-color);
   position: relative;
   z-index: 1;
+}
+
+.tutor-composer-inner {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-end;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
 }
 
 .tutor-composer ion-textarea {
@@ -90,7 +98,9 @@
   justify-content: space-between;
   align-items: center;
   gap: 0.75rem;
-  margin: 0 0 0.85rem;
+  margin: 0 auto 0.85rem;
+  width: 100%;
+  max-width: 900px;
 }
 
 .chat-user,
@@ -124,6 +134,9 @@
   flex-direction: column;
   gap: 0.75rem;
   padding: 0.5rem 0.15rem 0.25rem;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
 }
 
 /* Empty tutor: floating starter chips */
