@@ -384,6 +384,7 @@ const Chat: React.FC = () => {
           <div className="tutor-composer">
             <div className="tutor-composer-inner">
               <IonTextarea
+                className="tutor-textarea-playful"
                 autoGrow
                 aria-label="Mensaje para el tutor"
                 value={draft}

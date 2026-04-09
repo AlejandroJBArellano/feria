@@ -7,12 +7,12 @@ import {
   IonText
 } from '@ionic/react';
 import { logOutOutline } from 'ionicons/icons';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
+import { getUserProfile, UserProfileResponse } from '../api/feriaApi';
 import { useAuth } from '../auth/AuthContext';
 import { FeriaAppShell } from '../components/FeriaAppShell';
 import ThemeToggle from '../components/ThemeToggle';
-import { getUserProfile, UserProfileResponse } from '../api/feriaApi';
 import './Cuenta.css';
 
 function displayOrDash(value: string | undefined | null): string {
@@ -53,7 +53,7 @@ const Cuenta: React.FC = () => {
       <FeriaAppShell contentClassName="cuenta-content">
         <div className="cuenta-body ion-padding">
           <IonText color="medium">
-            <p className="cuenta-lead">Acá configuras tu perfil y cómo se ve la app. (Algunos datos son de prueba rey).</p>
+            <p className="cuenta-lead">Acá configuras tu perfil y cómo se ve la app.</p>
           </IonText>
 
           <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem', gap: '1rem' }}>
