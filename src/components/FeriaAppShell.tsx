@@ -8,6 +8,7 @@ import {
 } from 'ionicons/icons';
 import type { ReactElement, ReactNode } from 'react';
 import { NavLink } from 'react-router-dom';
+import { useAuth } from '../auth/AuthContext';
 
 export type FeriaAppShellProps = {
   children: ReactNode;
@@ -73,6 +74,7 @@ export function FeriaAppShell({
   contentClassName = '',
   contentFullscreen = true,
 }: FeriaAppShellProps): ReactElement {
+  const { isAuthenticated } = useAuth();
   const contentClasses = ['feria-shell-content', contentClassName].filter(Boolean).join(' ');
 
   return (
@@ -92,11 +94,13 @@ export function FeriaAppShell({
       <IonContent fullscreen={contentFullscreen} className={contentClasses}>
         {children}
       </IonContent>
-      <IonFooter className="feria-app-footer">
-        <IonToolbar className="feria-app-footer-toolbar">
-          <FeriaAppFooterNav />
-        </IonToolbar>
-      </IonFooter>
+      {isAuthenticated && (
+        <IonFooter className="feria-app-footer">
+          <IonToolbar className="feria-app-footer-toolbar">
+            <FeriaAppFooterNav />
+          </IonToolbar>
+        </IonFooter>
+      )}
     </>
   );
 }
