@@ -118,7 +118,7 @@
 }
 
 .movimientos-stat--balance .movimientos-stat__value {
-  color: var(--feria-color-primary);
+  color: var(--feria-color-success);
 }
 
 .movimientos-section-title {
@@ -234,7 +234,7 @@
 }
 
 .movimientos-card__amount-value--ingreso {
-  color: var(--feria-color-primary);
+  color: var(--feria-color-success);
 }
 
 .movimientos-card__kind {

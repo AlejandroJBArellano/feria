@@ -1,29 +1,32 @@
 /*
  * App shell — header wordmark + footer section nav
  * -------------------------------------------------
- * Used by Home, Login, Onboarding for consistent layout.
+ * Used by Home, Login, Onboarding and all authed pages.
  */
 
+/* Apply Nunito globally to Ionic */
+ion-app {
+  font-family: var(--feria-font-family);
+}
+
+/* ─── Header ─── */
 .feria-app-header ion-toolbar.feria-app-toolbar {
   --background: var(--ion-background-color);
   --border-width: 0 0 1px 0;
   --border-style: solid;
   --border-color: var(--feria-color-border);
   --min-height: 52px;
-  padding-inline: max(4px, env(safe-area-inset-left)) max(4px, env(safe-area-inset-right));
+  padding-inline: max(8px, env(safe-area-inset-left)) max(8px, env(safe-area-inset-right));
   padding-top: max(0px, env(safe-area-inset-top));
 }
 
 .feria-app-logo {
-  font-family:
-    system-ui,
-    -apple-system,
-    sans-serif;
-  font-size: 1.25rem;
-  font-weight: 800;
+  font-family: var(--feria-font-family);
+  font-size: 1.3rem;
+  font-weight: 900;
   letter-spacing: -0.03em;
   color: var(--feria-color-text);
-  margin-inline-start: 4px;
+  margin-inline-start: 6px;
 }
 
 .feria-app-logo__accent {
@@ -37,24 +40,24 @@
   margin-inline-end: 4px;
 }
 
-/* Main scroll area sits between header and footer */
+/* ─── Main scroll area ─── */
 ion-content.feria-shell-content {
   --background: var(--ion-background-color, var(--feria-color-page));
 }
 
+/* ─── Footer tab nav (vertical icon-above-label) ─── */
 .feria-app-footer ion-toolbar.feria-app-footer-toolbar {
   --background: var(--ion-background-color);
   --border-width: 1px 0 0 0;
   --border-style: solid;
   --border-color: var(--feria-color-border);
-  --min-height: 56px;
+  --min-height: 60px;
   --padding-top: 0;
-  --padding-bottom: max(6px, env(safe-area-inset-bottom));
-  padding-inline: max(8px, env(safe-area-inset-left)) max(8px, env(safe-area-inset-right));
+  --padding-bottom: max(4px, env(safe-area-inset-bottom));
+  padding-inline: max(4px, env(safe-area-inset-left)) max(4px, env(safe-area-inset-right));
 }
 
 .feria-app-footer {
-  /* Stay above scroll content if any theme sets overlapping stacks */
   z-index: 10;
 }
 
@@ -62,39 +65,39 @@ ion-content.feria-shell-content {
   display: flex;
   width: 100%;
   align-items: stretch;
-  justify-content: space-between;
-  gap: 2px;
+  justify-content: space-around;
+  gap: 0;
 }
 
 .feria-app-footer__link {
   flex: 1;
   min-width: 0;
   text-align: center;
-  font-size: 0.55rem;
+  font-family: var(--feria-font-family);
+  font-size: 0.58rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
   text-decoration: none;
   color: var(--feria-color-text-muted);
-  padding: 8px 4px 6px;
-  border-radius: 10px;
-  margin-inline: auto;
+  padding: 6px 2px 4px;
+  border-radius: var(--feria-radius-sm);
   transition:
-    color 0.2s ease,
-    background 0.2s ease;
+    color var(--feria-duration-fast) var(--feria-ease-standard),
+    background var(--feria-duration-fast) var(--feria-ease-standard);
 }
 
 .feria-app-footer__link-inner {
   display: inline-flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 5px;
+  gap: 2px;
   max-width: 100%;
 }
 
 .feria-app-footer__icon {
-  font-size: 1.05rem;
+  font-size: 1.3rem;
   flex-shrink: 0;
 }
 
@@ -106,12 +109,12 @@ ion-content.feria-shell-content {
 
 .feria-app-footer__link:hover {
   color: var(--feria-color-text-secondary);
-  background: color-mix(in srgb, var(--feria-color-primary) 8%, transparent);
+  background: color-mix(in srgb, var(--feria-color-primary) 6%, transparent);
 }
 
 .feria-app-footer__link.is-active {
   color: var(--feria-color-primary);
-  background: color-mix(in srgb, var(--feria-color-primary) 14%, transparent);
+  background: color-mix(in srgb, var(--feria-color-primary) 10%, transparent);
 }
 
 .feria-app-footer__link--soon {
@@ -121,5 +124,5 @@ ion-content.feria-shell-content {
 }
 
 .ion-palette-dark .feria-app-footer__link.is-active {
-  background: color-mix(in srgb, var(--feria-color-primary) 18%, transparent);
+  background: color-mix(in srgb, var(--feria-color-primary) 14%, transparent);
 }
