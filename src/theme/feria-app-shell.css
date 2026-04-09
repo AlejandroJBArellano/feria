@@ -113,8 +113,8 @@ ion-content.feria-shell-content {
 }
 
 .feria-app-footer__link.is-active {
-  color: var(--feria-color-primary);
-  background: color-mix(in srgb, var(--feria-color-primary) 10%, transparent);
+  color: var(--feria-color-primary-shade);
+  background: color-mix(in srgb, var(--feria-color-primary) 12%, transparent);
 }
 
 .feria-app-footer__link--soon {

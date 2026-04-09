@@ -30,6 +30,27 @@
   color: var(--ion-color-primary);
 }
 
+/* Gamified/Playful Button Override for IonButton */
+ion-button.feria-btn-playful {
+  --background: var(--feria-color-primary);
+  --background-activated: var(--feria-color-primary-shade);
+  --background-hover: var(--feria-color-primary-shade);
+  --color: var(--feria-color-on-primary);
+  --border-radius: 99px;
+  --box-shadow: 0 4px 0 var(--feria-color-primary-shade);
+  font-family: var(--feria-font-family);
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  margin-top: 0;
+  margin-bottom: 4px; /* accounts for shadow layout */
+  transition: transform 0.1s;
+}
+
+ion-button.feria-btn-playful:active {
+  transform: translateY(4px);
+  --box-shadow: 0 0 0 var(--feria-color-primary-shade);
+}
+
 /* Small caps section label */
 .feria-text-label-caps {
   margin: 0 0 0.35rem;
