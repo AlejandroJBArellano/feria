@@ -1,13 +1,7 @@
-import { IonContent, IonFooter, IonHeader, IonIcon, IonToolbar } from '@ionic/react';
-import {
-  chatbubbleEllipsesOutline,
-  homeOutline,
-  personOutline,
-  ribbonOutline,
-  walletOutline,
-} from 'ionicons/icons';
+import { IonContent, IonFooter, IonHeader, IonToolbar } from '@ionic/react';
 import type { ReactElement, ReactNode } from 'react';
 import { NavLink } from 'react-router-dom';
+import { useAuth } from '../auth/AuthContext';
 
 export type FeriaAppShellProps = {
   children: ReactNode;
@@ -30,13 +24,13 @@ function FeriaAppFooterNav(): ReactElement {
     <nav className="feria-app-footer__nav" aria-label="Secciones de la app">
       <NavLink to="/home" className="feria-app-footer__link" activeClassName="is-active" exact>
         <span className="feria-app-footer__link-inner">
-          <IonIcon icon={homeOutline} className="feria-app-footer__icon" aria-hidden />
+          <span className="material-symbols-rounded feria-app-footer__icon" aria-hidden>home</span>
           <span className="feria-app-footer__label">Inicio</span>
         </span>
       </NavLink>
       <NavLink to="/logros" className="feria-app-footer__link" activeClassName="is-active" exact>
         <span className="feria-app-footer__link-inner">
-          <IonIcon icon={ribbonOutline} className="feria-app-footer__icon" aria-hidden />
+          <span className="material-symbols-rounded feria-app-footer__icon" aria-hidden>emoji_events</span>
           <span className="feria-app-footer__label">Logros</span>
         </span>
       </NavLink>
@@ -47,19 +41,19 @@ function FeriaAppFooterNav(): ReactElement {
         exact
       >
         <span className="feria-app-footer__link-inner">
-          <IonIcon icon={walletOutline} className="feria-app-footer__icon" aria-hidden />
+          <span className="material-symbols-rounded feria-app-footer__icon" aria-hidden>account_balance_wallet</span>
           <span className="feria-app-footer__label">Movimientos</span>
         </span>
       </NavLink>
       <NavLink to="/tutor" className="feria-app-footer__link" activeClassName="is-active" exact>
         <span className="feria-app-footer__link-inner">
-          <IonIcon icon={chatbubbleEllipsesOutline} className="feria-app-footer__icon" aria-hidden />
+          <span className="material-symbols-rounded feria-app-footer__icon" aria-hidden>forum</span>
           <span className="feria-app-footer__label">Tutor</span>
         </span>
       </NavLink>
       <NavLink to="/cuenta" className="feria-app-footer__link" activeClassName="is-active" exact>
         <span className="feria-app-footer__link-inner">
-          <IonIcon icon={personOutline} className="feria-app-footer__icon" aria-hidden />
+          <span className="material-symbols-rounded feria-app-footer__icon" aria-hidden>person</span>
           <span className="feria-app-footer__label">Cuenta</span>
         </span>
       </NavLink>
@@ -73,6 +67,7 @@ export function FeriaAppShell({
   contentClassName = '',
   contentFullscreen = true,
 }: FeriaAppShellProps): ReactElement {
+  const { isAuthenticated } = useAuth();
   const contentClasses = ['feria-shell-content', contentClassName].filter(Boolean).join(' ');
 
   return (
@@ -80,6 +75,7 @@ export function FeriaAppShell({
       <IonHeader className="feria-app-header">
         <IonToolbar className="feria-app-toolbar">
           <div className="feria-app-logo" slot="start">
+            <img src="/principal.png" className="feria-app-logo__mark" alt="" aria-hidden="true" />
             Fer<span className="feria-app-logo__accent">IA</span>
           </div>
           {headerEnd ? (
@@ -92,11 +88,13 @@ export function FeriaAppShell({
       <IonContent fullscreen={contentFullscreen} className={contentClasses}>
         {children}
       </IonContent>
-      <IonFooter className="feria-app-footer">
-        <IonToolbar className="feria-app-footer-toolbar">
-          <FeriaAppFooterNav />
-        </IonToolbar>
-      </IonFooter>
+      {isAuthenticated && (
+        <IonFooter className="feria-app-footer">
+          <IonToolbar className="feria-app-footer-toolbar">
+            <FeriaAppFooterNav />
+          </IonToolbar>
+        </IonFooter>
+      )}
     </>
   );
 }

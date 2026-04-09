@@ -1,23 +1,22 @@
 import {
+  IonAvatar,
   IonButton,
   IonIcon,
-  IonItem,
-  IonLabel,
-  IonList,
-  IonNote,
   IonPage,
   IonSpinner,
-  IonText,
+  IonText
 } from '@ionic/react';
 import { logOutOutline } from 'ionicons/icons';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
+import { getUserProfile, UserProfileResponse } from '../api/feriaApi';
 import { useAuth } from '../auth/AuthContext';
+import { resolveDisplayNameForUi } from '../auth/userDisplay';
 import { FeriaAppShell } from '../components/FeriaAppShell';
 import ThemeToggle from '../components/ThemeToggle';
 import './Cuenta.css';
 
-function displayOrDash(value: string | undefined): string {
+function displayOrDash(value: string | undefined | null): string {
   return value && value.trim().length > 0 ? value : '—';
 }
 
@@ -25,6 +24,15 @@ const Cuenta: React.FC = () => {
   const history = useHistory();
   const { user, signOutUser } = useAuth();
   const [signingOut, setSigningOut] = useState(false);
+  const [dbProfile, setDbProfile] = useState<UserProfileResponse | null>(null);
+
+  useEffect(() => {
+    if (user?.userId) {
+      getUserProfile()
+        .then((p) => setDbProfile(p))
+        .catch((e) => console.error('[Cuenta] Error fetching db profile:', e));
+    }
+  }, [user?.userId]);
 
   const handleSignOut = async () => {
     if (signingOut) return;
@@ -37,81 +45,43 @@ const Cuenta: React.FC = () => {
     }
   };
 
+  const displayName = resolveDisplayNameForUi(user, dbProfile?.name ?? null);
+  const displayEmail = dbProfile?.email || user?.email;
+  const displayPicture = dbProfile?.picture || user?.picture;
+
   return (
     <IonPage className="cuenta-page">
       <FeriaAppShell contentClassName="cuenta-content">
         <div className="cuenta-body ion-padding">
           <IonText color="medium">
-            <p className="cuenta-lead">Datos de sesión y preferencias. Parte de la información es de demostración.</p>
+            <p className="cuenta-lead">Acá configuras tu perfil y cómo se ve la app.</p>
           </IonText>
 
-          <h2 className="cuenta-section-title">Tu cuenta</h2>
-          <IonList className="cuenta-list" lines="full">
-            <IonItem>
-              <IonLabel>
-                <p className="cuenta-item__label">Nombre</p>
-                <p className="cuenta-item__value">{displayOrDash(user?.name)}</p>
-              </IonLabel>
-            </IonItem>
-            <IonItem>
-              <IonLabel>
-                <p className="cuenta-item__label">Correo</p>
-                <p className="cuenta-item__value">{displayOrDash(user?.email)}</p>
-              </IonLabel>
-            </IonItem>
-            <IonItem>
-              <IonLabel>
-                <p className="cuenta-item__label">Usuario (Cognito)</p>
-                <p className="cuenta-item__value cuenta-item__value--mono">{displayOrDash(user?.username)}</p>
-              </IonLabel>
-            </IonItem>
-            <IonItem>
-              <IonLabel>
-                <p className="cuenta-item__label">ID de usuario</p>
-                <p className="cuenta-item__value cuenta-item__value--mono">{displayOrDash(user?.userId)}</p>
-              </IonLabel>
-            </IonItem>
-            <IonItem lines="none">
-              <IonLabel>
-                <p className="cuenta-item__label">Proveedor de acceso</p>
-                <p className="cuenta-item__value">{displayOrDash(user?.provider)}</p>
-              </IonLabel>
-            </IonItem>
-          </IonList>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem', gap: '1rem' }}>
+            {displayPicture && (
+              <IonAvatar style={{ width: '4rem', height: '4rem' }}>
+                <img alt="User profile" src={displayPicture} referrerPolicy="no-referrer" />
+              </IonAvatar>
+            )}
+            <h2 className="cuenta-section-title" style={{ margin: 0 }}>Tu perfil</h2>
+          </div>
+          <div className="cuenta-grid">
+            <div className="cuenta-card">
+              <p className="cuenta-card__label">Nombre</p>
+              <p className="cuenta-card__value">{displayOrDash(displayName)}</p>
+            </div>
+            <div className="cuenta-card">
+              <p className="cuenta-card__label">Correo</p>
+              <p className="cuenta-card__value">{displayOrDash(displayEmail)}</p>
+            </div>
+          </div>
 
-          <h2 className="cuenta-section-title">Detalles adicionales (demo)</h2>
-          <IonList className="cuenta-list" lines="full">
-            <IonItem>
-              <IonLabel>
-                <p className="cuenta-item__label">Teléfono</p>
-                <p className="cuenta-item__value">+52 ••• ••• •••• (demo)</p>
-              </IonLabel>
-            </IonItem>
-            <IonItem>
-              <IonLabel>
-                <p className="cuenta-item__label">Ciudad</p>
-                <p className="cuenta-item__value">Por definir (demo)</p>
-              </IonLabel>
-            </IonItem>
-            <IonItem lines="none">
-              <IonLabel>
-                <p className="cuenta-item__label">Zona horaria</p>
-                <p className="cuenta-item__value">America/Mexico_City (demo)</p>
-              </IonLabel>
-            </IonItem>
-          </IonList>
-
-          <h2 className="cuenta-section-title">Preferencias</h2>
-          <IonList className="cuenta-list cuenta-list--prefs" lines="none">
-            <IonItem lines="none">
-              <IonLabel>
-                <p className="cuenta-item__label">Moneda</p>
-                <p className="cuenta-item__value">MXN (demo)</p>
-              </IonLabel>
-              <IonNote slot="end">Próximamente editable</IonNote>
-            </IonItem>
-            <ThemeToggle variant="field" />
-          </IonList>
+          <h2 className="cuenta-section-title">Ajustes</h2>
+          <div className="cuenta-grid">
+            <div className="cuenta-card cuenta-card--theme">
+              <ThemeToggle />
+            </div>
+          </div>
 
           <IonButton
             expand="block"
