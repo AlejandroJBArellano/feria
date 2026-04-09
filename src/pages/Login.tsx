@@ -99,9 +99,9 @@ const Login: React.FC = () => {
           <section className="login-card">
             {/* Playful Floating Elements for Gamified Feel */}
             <div className="login-floating-shapes" aria-hidden="true">
-              <div className="floating-shape shape-coin">🪙</div>
-              <div className="floating-shape shape-sparkle">✨</div>
-              <div className="floating-shape shape-graph">📈</div>
+              <span className="floating-shape shape-coin material-symbols-rounded">monetization_on</span>
+              <span className="floating-shape shape-sparkle material-symbols-rounded">auto_awesome</span>
+              <span className="floating-shape shape-graph material-symbols-rounded">trending_up</span>
             </div>
 
             <button
@@ -143,12 +143,12 @@ const Login: React.FC = () => {
 
             <div className="feature-grid">
               <article className="feature-item">
-                <span className="feature-item__emoji" aria-hidden="true">🔒</span>
+                <span className="feature-item__emoji material-symbols-rounded" aria-hidden="true">lock</span>
                 <p className="feature-item__label">Privado</p>
               </article>
 
               <article className="feature-item">
-                <span className="feature-item__emoji" aria-hidden="true">🌱</span>
+                <span className="feature-item__emoji material-symbols-rounded" aria-hidden="true">eco</span>
                 <p className="feature-item__label">Crece tu lanita</p>
               </article>
             </div>
