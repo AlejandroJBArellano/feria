@@ -189,46 +189,97 @@
   font-family: var(--feria-font-family);
 }
 
+/* ─── Floating Gamified Elements ─── */
+.login-floating-shapes {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  overflow: visible;
+}
+
+.floating-shape {
+  position: absolute;
+  font-size: 2.2rem;
+  animation: feria-float 4s ease-in-out infinite;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+}
+
+.shape-coin {
+  top: -30px;
+  left: -20px;
+  animation-delay: 0s;
+  font-size: 3rem;
+}
+
+.shape-sparkle {
+  top: 40px;
+  right: -25px;
+  animation-delay: 1.5s;
+  font-size: 2.5rem;
+}
+
+.shape-graph {
+  bottom: -20px;
+  left: 40%;
+  animation-delay: 0.7s;
+  font-size: 2.5rem;
+  opacity: 0.8;
+}
+
+@keyframes feria-float {
+  0% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-12px) rotate(8deg); }
+  100% { transform: translateY(0) rotate(0deg); }
+}
+
 /* ─── Feature Grid ─── */
 .feature-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-top: 14px;
+  gap: 12px;
+  margin-top: 20px;
+  position: relative;
+  z-index: 1;
 }
 
 .feature-item {
   background: var(--feria-color-surface-muted);
-  border: 1px solid var(--feria-color-border);
-  border-radius: var(--feria-radius-sm);
-  padding: 16px 14px 14px;
+  border: 2px solid var(--feria-color-border);
+  border-radius: var(--feria-radius-md);
+  padding: 18px 12px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  min-height: 88px;
+  align-items: center;
+  gap: 10px;
   justify-content: center;
-  transition: border-color var(--feria-duration-normal) var(--feria-ease-standard);
+  transition: all var(--feria-duration-normal) var(--feria-ease-standard);
+  cursor: default;
 }
 
 .feature-item:hover {
-  border-color: color-mix(in srgb, var(--feria-color-primary) 28%, var(--feria-color-border));
+  transform: translateY(-4px);
+  border-color: var(--feria-color-primary-tint);
+  background: color-mix(in srgb, var(--feria-color-primary-tint) 10%, var(--feria-color-surface));
 }
 
-.feature-item__icon {
-  display: flex;
-  align-items: center;
-  color: var(--feria-color-accent-dark);
+.feature-item__emoji {
+  font-size: 2rem;
+  line-height: 1;
+  display: block;
 }
 
 .feature-item__label {
   margin: 0;
   font-family: var(--feria-font-family);
-  font-size: 0.6rem;
+  font-size: 0.85rem;
   font-weight: 800;
-  letter-spacing: 0.1em;
-  color: var(--feria-color-ink-muted);
-  line-height: 1.35;
-  text-transform: uppercase;
+  color: var(--feria-color-ink);
+  line-height: 1.2;
+  text-align: center;
 }
 
 /* ─── Footer Section ─── */

@@ -39,40 +39,41 @@ const Onboarding: React.FC = () => {
       <FeriaAppShell contentClassName="onboarding-content">
         <div className="onboarding-ai-layout">
           <div className="onboarding-ai-hero">
-            <div className="onboarding-ai-orb" aria-hidden>
-              <span className="onboarding-ai-orb__core" />
-              <span className="onboarding-ai-orb__ring" />
+            <div className="onboarding-gamified-images" aria-hidden>
+              {/* Flotating emojis instead of an abstract orb */}
+              <span className="onboarding-emoji" style={{ fontSize: '4rem', transform: 'rotate(-10deg)', display: 'inline-block', margin: '0 10px' }}>🌮</span>
+              <span className="onboarding-emoji" style={{ fontSize: '4.5rem', zIndex: 2, position: 'relative' }}>💰</span>
+              <span className="onboarding-emoji" style={{ fontSize: '4rem', transform: 'rotate(15deg)', display: 'inline-block', margin: '0 10px' }}>🛵</span>
             </div>
-            <p className="onboarding-ai-eyebrow">Asistente financiero</p>
+            <p className="onboarding-ai-eyebrow">Tu compa para la lana</p>
             <h1 className="onboarding-ai-title">
-              Habla con <span className="onboarding-ai-title__brand">FerIA</span>
+              ¡Pásale a <span className="onboarding-ai-title__brand">FerIA</span>!
             </h1>
             <p className="onboarding-ai-lead">
-              Registra ingresos y gastos con voz o teclado. Un solo estilo, claro u oscuro, pensado para sentirse
-              ligero y moderno.
+              Lleva el control de tu chamba sin complicaciones. Registra lo que cae y lo que sale con notas de voz o teclado en caliente.
             </p>
           </div>
 
           <div className="onboarding-ai-glass">
-            <ul className="onboarding-ai-pills" aria-label="Capacidades">
+            <ul className="onboarding-ai-pills" aria-label="Beneficios">
               <li className="onboarding-ai-pill">
-                <span className="onboarding-ai-pill__dot" aria-hidden />
-                Dictado natural
+                <span aria-hidden>🎙️</span>
+                Háblale y ella anota
               </li>
               <li className="onboarding-ai-pill">
-                <span className="onboarding-ai-pill__dot" aria-hidden />
-                Movimientos rápidos
+                <span aria-hidden>🏅</span>
+                Gana rachas y medallas
               </li>
               <li className="onboarding-ai-pill">
-                <span className="onboarding-ai-pill__dot" aria-hidden />
-                Privacidad primero
+                <span aria-hidden>📱</span>
+                Privado y seguro
               </li>
             </ul>
             <IonButton expand="block" className="onboarding-ai-cta" onClick={handleContinue}>
-              Empezar
+              ¡A darle!
             </IonButton>
             <p className="onboarding-ai-footnote">
-              Tras iniciar sesión podrás afinar tema y datos en <strong>Cuenta</strong>.
+              Más al rato puedes ajustar tu cuenta y tema en tu perfil.
             </p>
           </div>
 

@@ -69,7 +69,7 @@ function MovementCard({ row }: { row: DummyMovement }): ReactElement {
           {sign}
           {currencyFmt.format(row.amount)}
         </span>
-        <span className="movimientos-card__kind">{isGasto ? 'Gasto' : 'Ingreso'}</span>
+        <span className="movimientos-card__kind">{isGasto ? 'Salida' : 'Entrada'}</span>
       </div>
     </li>
   );
@@ -194,13 +194,13 @@ const Movimientos: React.FC = () => {
         </IonRefresher>
         <div className="movimientos-body ion-padding">
           <div className="movimientos-ai-strip">
-            <IonIcon icon={sparklesOutline} aria-hidden />
+            <span aria-hidden="true" style={{ fontSize: '1.2rem'}}>✨</span>
             <span>
               {isProcessingVoice
-                ? 'Resumen asistido · procesando audio reciente'
+                ? 'FerIA está procesando tu audio en chinga...'
                 : demoMode
-                ? 'Resumen asistido · datos de demostración'
-                : 'Resumen asistido · tus movimientos'}
+                ? 'Modo prueba: Así se verá tu lana'
+                : 'Todo chido, esta es tu lana registrada'}
             </span>
           </div>
 
@@ -228,7 +228,7 @@ const Movimientos: React.FC = () => {
           {!loading && !demoMode && !isProcessingVoice && (
             <div className="movimientos-insight">
               <p className="movimientos-insight__text">
-                Lista actualizada desde la API. Tira hacia abajo para refrescar.
+                Lista actualizada al cien. Tira hacia abajo para refrescar tu lana.
               </p>
             </div>
           )}
@@ -244,20 +244,20 @@ const Movimientos: React.FC = () => {
 
           <div className="movimientos-stats">
             <div className="movimientos-stat">
-              <span className="movimientos-stat__label">Ingresos</span>
+              <span className="movimientos-stat__label">Entró</span>
               <span className="movimientos-stat__value">{currencyFmt.format(summary.totalIngresos)}</span>
             </div>
             <div className="movimientos-stat">
-              <span className="movimientos-stat__label">Gastos</span>
+              <span className="movimientos-stat__label">Salió</span>
               <span className="movimientos-stat__value">{currencyFmt.format(summary.totalGastos)}</span>
             </div>
             <div className="movimientos-stat movimientos-stat--balance">
-              <span className="movimientos-stat__label">Balance</span>
+              <span className="movimientos-stat__label">Te Queda</span>
               <span className="movimientos-stat__value">{currencyFmt.format(summary.balance)}</span>
             </div>
           </div>
 
-          <h2 className="movimientos-section-title">Actividad reciente</h2>
+          <h2 className="movimientos-section-title">Tus Movimientos</h2>
 
           {!loading &&
             Array.from(grouped.entries()).map(([date, dayRows]) => (
@@ -273,7 +273,7 @@ const Movimientos: React.FC = () => {
 
           {!loading && rows.length === 0 && !demoMode && !error && !isProcessingVoice && (
             <IonText color="medium">
-              <p>No hay movimientos aún. Graba una nota en Inicio.</p>
+              <p>No hay lana registrada aún. ¡Pícale al botón de Inicio y háblale a FerIA!</p>
             </IonText>
           )}
         </div>

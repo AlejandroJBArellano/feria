@@ -78,15 +78,15 @@ const Logros: React.FC = () => {
       <FeriaAppShell contentClassName="logros-content">
         <div className="logros-layout" style={{ padding: '12px 12px 24px' }}>
           <IonText>
-            <h1 className="logros-title">Logros y claridad</h1>
+            <h1 className="logros-title">¡Tus Medallas y Rachas!</h1>
             <p className="feria-text-label-caps" style={{ marginBottom: 16 }}>
-              Basados en lo que realmente registras en Feria.
+              Con cada registro que haces, Feria te da puntos. Acá ves lo que vas juntando con tu compa.
             </p>
           </IonText>
 
           {!apiReady && (
             <IonText color="medium">
-              <p>Configura VITE_FERIA_API_URL para ver tus logros.</p>
+              <p>Conecta la API (VITE_FERIA_API_URL) para desbloquear tus medallas.</p>
             </IonText>
           )}
 
@@ -105,9 +105,9 @@ const Logros: React.FC = () => {
           {data && (
             <>
               <IonText>
-                <p style={{ marginBottom: 12, fontSize: '0.9rem' }}>
-                  <IonIcon icon={trophyOutline} style={{ verticalAlign: 'text-bottom', marginRight: 6 }} />
-                  {unlockedCount} de {total} desbloqueados
+                <p style={{ marginBottom: 12, fontSize: '0.9rem', color: 'var(--feria-color-primary-shade)', fontWeight: '800' }}>
+                  <span style={{ fontSize: '1.2rem', marginRight: 6 }}>🏆</span>
+                  ¡Tienes {unlockedCount} de {total} medallas!
                 </p>
               </IonText>
 
@@ -141,7 +141,7 @@ const Logros: React.FC = () => {
                 </div>
               )}
 
-              <h2 className="logros-section-title">Medallas</h2>
+              <h2 className="logros-section-title">El Medallero</h2>
 
               <div className="logros-grid" role="list">
                 {data.achievements.map((a) => {

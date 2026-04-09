@@ -72,6 +72,13 @@ const Login: React.FC = () => {
           </section>
 
           <section className="login-card">
+            {/* Playful Floating Elements for Gamified Feel */}
+            <div className="login-floating-shapes" aria-hidden="true">
+              <div className="floating-shape shape-coin">🪙</div>
+              <div className="floating-shape shape-sparkle">✨</div>
+              <div className="floating-shape shape-graph">📈</div>
+            </div>
+
             <button
               type="button"
               id="btn-google-login"
@@ -83,8 +90,8 @@ const Login: React.FC = () => {
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 48 48"
-                  width="20"
-                  height="20"
+                  width="22"
+                  height="22"
                   aria-hidden="true"
                 >
                   <path
@@ -106,56 +113,18 @@ const Login: React.FC = () => {
                   <path fill="none" d="M0 0h48v48H0z" />
                 </svg>
               </span>
-              <span className="google-btn__label">Continuar con Google</span>
+              <span className="google-btn__label">Entrar con Google</span>
             </button>
 
             <div className="feature-grid">
               <article className="feature-item">
-                <span className="feature-item__icon" aria-hidden="true">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none">
-                    <path
-                      d="M12 2L3 6v6c0 5.25 3.75 10.15 9 11.25C17.25 22.15 21 17.25 21 12V6l-9-4z"
-                      fill="currentColor"
-                      opacity="0.18"
-                    />
-                    <path
-                      d="M12 2L3 6v6c0 5.25 3.75 10.15 9 11.25C17.25 22.15 21 17.25 21 12V6l-9-4z"
-                      stroke="currentColor"
-                      strokeWidth="1.6"
-                      fill="none"
-                    />
-                    <path
-                      d="M9 12l2 2 4-4"
-                      stroke="currentColor"
-                      strokeWidth="1.6"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </span>
-                <p className="feature-item__label">BOVEDA CIFRADA</p>
+                <span className="feature-item__emoji" aria-hidden="true">🔒</span>
+                <p className="feature-item__label">Privado</p>
               </article>
 
               <article className="feature-item">
-                <span className="feature-item__icon" aria-hidden="true">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none">
-                    <polyline
-                      points="23 6 13.5 15.5 8.5 10.5 1 18"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <polyline
-                      points="17 6 23 6 23 12"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </span>
-                <p className="feature-item__label">CRECIMIENTO SOCIAL</p>
+                <span className="feature-item__emoji" aria-hidden="true">🌱</span>
+                <p className="feature-item__label">Crece tu lanita</p>
               </article>
             </div>
 

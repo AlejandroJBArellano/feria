@@ -42,10 +42,10 @@ const Cuenta: React.FC = () => {
       <FeriaAppShell contentClassName="cuenta-content">
         <div className="cuenta-body ion-padding">
           <IonText color="medium">
-            <p className="cuenta-lead">Datos de sesión y preferencias. Parte de la información es de demostración.</p>
+            <p className="cuenta-lead">Acá configuras tu perfil y cómo se ve la app. (Algunos datos son de prueba rey).</p>
           </IonText>
 
-          <h2 className="cuenta-section-title">Tu cuenta</h2>
+          <h2 className="cuenta-section-title">Tu perfil</h2>
           <IonList className="cuenta-list" lines="full">
             <IonItem>
               <IonLabel>
@@ -79,7 +79,7 @@ const Cuenta: React.FC = () => {
             </IonItem>
           </IonList>
 
-          <h2 className="cuenta-section-title">Detalles adicionales (demo)</h2>
+          <h2 className="cuenta-section-title">Tus datos (demo)</h2>
           <IonList className="cuenta-list" lines="full">
             <IonItem>
               <IonLabel>
@@ -101,7 +101,7 @@ const Cuenta: React.FC = () => {
             </IonItem>
           </IonList>
 
-          <h2 className="cuenta-section-title">Preferencias</h2>
+          <h2 className="cuenta-section-title">Ajustes</h2>
           <IonList className="cuenta-list cuenta-list--prefs" lines="none">
             <IonItem lines="none">
               <IonLabel>
