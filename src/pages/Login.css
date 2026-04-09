@@ -213,6 +213,7 @@
   left: -1.25rem;
   animation-delay: 0s;
   font-size: 3rem;
+  color: var(--feria-color-primary);
 }
 
 .shape-sparkle {
@@ -220,6 +221,7 @@
   right: -1.5625rem;
   animation-delay: 1.5s;
   font-size: 2.5rem;
+  color: var(--feria-color-primary-tint);
 }
 
 .shape-graph {
@@ -228,6 +230,7 @@
   animation-delay: 0.7s;
   font-size: 2.5rem;
   opacity: 0.8;
+  color: var(--feria-color-success);
 }
 
 @keyframes feria-float {
@@ -270,6 +273,14 @@
   font-size: 2rem;
   line-height: 1;
   display: block;
+}
+
+.feature-item:nth-child(1) .feature-item__emoji {
+  color: var(--feria-color-primary);
+}
+
+.feature-item:nth-child(2) .feature-item__emoji {
+  color: var(--feria-color-success);
 }
 
 .feature-item__label {
