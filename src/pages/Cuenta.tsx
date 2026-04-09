@@ -7,14 +7,15 @@ import {
   IonText
 } from '@ionic/react';
 import { logOutOutline } from 'ionicons/icons';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { FeriaAppShell } from '../components/FeriaAppShell';
 import ThemeToggle from '../components/ThemeToggle';
+import { getUserProfile, UserProfileResponse } from '../api/feriaApi';
 import './Cuenta.css';
 
-function displayOrDash(value: string | undefined): string {
+function displayOrDash(value: string | undefined | null): string {
   return value && value.trim().length > 0 ? value : '—';
 }
 
@@ -22,6 +23,15 @@ const Cuenta: React.FC = () => {
   const history = useHistory();
   const { user, signOutUser } = useAuth();
   const [signingOut, setSigningOut] = useState(false);
+  const [dbProfile, setDbProfile] = useState<UserProfileResponse | null>(null);
+
+  useEffect(() => {
+    if (user?.userId) {
+      getUserProfile()
+        .then((p) => setDbProfile(p))
+        .catch((e) => console.error('[Cuenta] Error fetching db profile:', e));
+    }
+  }, [user?.userId]);
 
   const handleSignOut = async () => {
     if (signingOut) return;
@@ -34,6 +44,10 @@ const Cuenta: React.FC = () => {
     }
   };
 
+  const displayName = dbProfile?.name || user?.name;
+  const displayEmail = dbProfile?.email || user?.email;
+  const displayPicture = dbProfile?.picture || user?.picture;
+
   return (
     <IonPage className="cuenta-page">
       <FeriaAppShell contentClassName="cuenta-content">
@@ -43,9 +57,9 @@ const Cuenta: React.FC = () => {
           </IonText>
 
           <div style={{ display: 'flex', alignItems: 'center', marginBottom: '16px', gap: '16px' }}>
-            {user?.picture && (
+            {displayPicture && (
               <IonAvatar style={{ width: '64px', height: '64px' }}>
-                <img alt="User profile" src={user.picture} referrerPolicy="no-referrer" />
+                <img alt="User profile" src={displayPicture} referrerPolicy="no-referrer" />
               </IonAvatar>
             )}
             <h2 className="cuenta-section-title" style={{ margin: 0 }}>Tu perfil</h2>
@@ -53,11 +67,11 @@ const Cuenta: React.FC = () => {
           <div className="cuenta-grid">
             <div className="cuenta-card">
               <p className="cuenta-card__label">Nombre</p>
-              <p className="cuenta-card__value">{displayOrDash(user?.name)}</p>
+              <p className="cuenta-card__value">{displayOrDash(displayName)}</p>
             </div>
             <div className="cuenta-card">
               <p className="cuenta-card__label">Correo</p>
-              <p className="cuenta-card__value">{displayOrDash(user?.email)}</p>
+              <p className="cuenta-card__value">{displayOrDash(displayEmail)}</p>
             </div>
           </div>
 
