@@ -1,4 +1,4 @@
-# Privacidad y Datos (Borrador)
+# Privacidad y Datos
 
 **Estado:** Documento interno de producto (Hackathon).
 
