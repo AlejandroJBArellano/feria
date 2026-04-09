@@ -11,6 +11,7 @@ import { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { getUserProfile, UserProfileResponse } from '../api/feriaApi';
 import { useAuth } from '../auth/AuthContext';
+import { resolveDisplayNameForUi } from '../auth/userDisplay';
 import { FeriaAppShell } from '../components/FeriaAppShell';
 import ThemeToggle from '../components/ThemeToggle';
 import './Cuenta.css';
@@ -44,7 +45,7 @@ const Cuenta: React.FC = () => {
     }
   };
 
-  const displayName = dbProfile?.name || user?.name;
+  const displayName = resolveDisplayNameForUi(user, dbProfile?.name ?? null);
   const displayEmail = dbProfile?.email || user?.email;
   const displayPicture = dbProfile?.picture || user?.picture;
 

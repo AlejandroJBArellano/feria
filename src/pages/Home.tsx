@@ -19,17 +19,18 @@ import {
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
-  createManualMovement,
-  createVoiceJob,
-  dismissEngagementReminder,
-  ensureUserProfileSynced,
-  getEngagementSummary,
-  isFeriaApiConfigured,
-  uploadAudioToPresignedUrl,
-  type EngagementActiveReminder,
+    createManualMovement,
+    createVoiceJob,
+    dismissEngagementReminder,
+    ensureUserProfileSynced,
+    getEngagementSummary,
+    getUserProfile,
+    isFeriaApiConfigured,
+    uploadAudioToPresignedUrl,
+    type EngagementActiveReminder,
 } from '../api/feriaApi';
 import { useAuth } from '../auth/AuthContext';
-import { getUserDisplayLabel } from '../auth/userDisplay';
+import { resolveDisplayNameForUi } from '../auth/userDisplay';
 import { FeriaAppShell } from '../components/FeriaAppShell';
 import KeyboardClassicIcon from '../components/icons/KeyboardClassicIcon';
 import { setPendingVoiceJobId } from '../voice/voiceJobStorage';
@@ -61,7 +62,8 @@ const Home: React.FC = () => {
   const { user, signOutUser } = useAuth();
   const [presentToast] = useIonToast();
   const [signingOut, setSigningOut] = useState(false);
-  const displayName = getUserDisplayLabel(user);
+  const [serverProfileName, setServerProfileName] = useState<string | null>(null);
+  const displayName = resolveDisplayNameForUi(user, serverProfileName);
   const [keyboardOpen, setKeyboardOpen] = useState(false);
   const [kind, setKind] = useState<MovementKind>('gasto');
   const [amount, setAmount] = useState('');
@@ -94,9 +96,14 @@ const Home: React.FC = () => {
   useIonViewWillEnter(() => {
     void loadEngagement();
     if (apiReady && user?.userId) {
-      void ensureUserProfileSynced().catch(() => {
-        /* row may exist; ignore */
-      });
+      void ensureUserProfileSynced()
+        .then(() => getUserProfile())
+        .then((p) => setServerProfileName(p.name))
+        .catch(() => {
+          /* sync or profile optional */
+        });
+    } else {
+      setServerProfileName(null);
     }
   });
 

@@ -7,6 +7,7 @@ import {
 } from 'aws-amplify/auth';
 import { Hub } from 'aws-amplify/utils';
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { humanizeEmailLocalPart } from './userDisplay';
 import { isCognitoConfigured } from './configureAmplify';
 
 const authDebugEnabled = import.meta.env.VITE_AUTH_DEBUG === 'true';
@@ -195,12 +196,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }): React
       const preferredUsername =
         attributes.preferred_username ?? parseStringClaim(idPayload?.preferred_username) ?? undefined;
 
+      const derivedFromEmail = email ? humanizeEmailLocalPart(email).trim() : '';
       const name =
         attributes.name ??
         parseStringClaim(idPayload?.name) ??
         (fullNameFromParts || undefined) ??
         nickname ??
-        preferredUsername;
+        preferredUsername ??
+        (derivedFromEmail || undefined);
       const picture = attributes.picture ?? parseStringClaim(idPayload?.picture) ?? undefined;
       const provider = inferProvider(
         currentUser.username,
