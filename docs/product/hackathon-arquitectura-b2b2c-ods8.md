@@ -1,4 +1,4 @@
-# Arquitectura y Modelo (Feria)
+# Arquitectura y Modelo
 
 Feria es una plataforma de educación y acompañamiento financiero. Separamos el proyecto en dos repositorios para no pisarnos durante el desarrollo:
 - `feria`: Donde vive todo el frontend web y app móvil.
