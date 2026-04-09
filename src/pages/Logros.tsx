@@ -7,7 +7,6 @@ import {
   IonText,
   useIonViewWillEnter,
 } from '@ionic/react';
-import { lockClosedOutline, trophyOutline } from 'ionicons/icons';
 import { useCallback, useEffect, useState } from 'react';
 import {
   getEngagementSummary,
@@ -107,7 +106,7 @@ const Logros: React.FC = () => {
               <>
                 <IonText>
                   <p style={{ marginBottom: 12, fontSize: '0.9rem', color: 'var(--feria-color-primary-shade)', fontWeight: '800' }}>
-                    <span style={{ fontSize: '1.2rem', marginRight: 6 }}>🏆</span>
+                    <span style={{ fontSize: '1.2rem', marginRight: 6, verticalAlign: 'middle' }} className="material-symbols-rounded">emoji_events</span>
                     ¡Tienes {unlockedCount} de {total} medallas!
                   </p>
                 </IonText>
@@ -166,10 +165,9 @@ const Logros: React.FC = () => {
                         aria-label={`${a.title}. Toca para ver la descripción.`}
                       >
                         <div className={`logros-hex-medal ${medalMod}`} aria-hidden>
-                          <IonIcon
-                            icon={a.unlocked ? trophyOutline : lockClosedOutline}
-                            className="logros-hex-medal__icon"
-                          />
+                          <span className="material-symbols-rounded logros-hex-medal__icon">
+                            {a.unlocked ? 'emoji_events' : 'lock'}
+                          </span>
                         </div>
                         <span className="logros-tile__title">{a.title}</span>
                       </button>

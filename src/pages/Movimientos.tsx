@@ -194,7 +194,7 @@ const Movimientos: React.FC = () => {
         <div className="movimientos-body ion-padding">
           <div className="movimientos-grid-col-summary">
             <div className="movimientos-ai-strip">
-              <span aria-hidden="true" style={{ fontSize: '1.2rem' }}>✨</span>
+              <span className="material-symbols-rounded" aria-hidden="true" style={{ fontSize: '1.2rem', verticalAlign: 'middle' }}>auto_awesome</span>
               <span>
                 {isProcessingVoice
                   ? 'FerIA está procesando tu audio en corto...'

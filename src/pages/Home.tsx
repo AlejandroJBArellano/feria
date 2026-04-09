@@ -17,7 +17,6 @@ import {
     useIonToast,
     useIonViewWillEnter,
 } from '@ionic/react';
-import { logOutOutline } from 'ionicons/icons';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
@@ -320,7 +319,7 @@ const Home: React.FC = () => {
               void handleSignOut();
             }}
           >
-            {signingOut ? <IonSpinner name="crescent" /> : <IonIcon icon={logOutOutline} aria-hidden />}
+            {signingOut ? <IonSpinner name="crescent" /> : <span className="material-symbols-rounded" aria-hidden>logout</span>}
           </IonButton>
         }
       >
@@ -330,11 +329,11 @@ const Home: React.FC = () => {
           {/* Gamified Stat Row */}
           <div className="home-gamified-stats" aria-label="Tus rachas y medallas">
             <div className="stat-pill stat-pill--streak">
-              <span className="stat-pill__emoji">🔥</span>
+              <span className="stat-pill__emoji material-symbols-rounded">local_fire_department</span>
               <span className="stat-pill__value">Racha de 3 días</span>
             </div>
             <div className="stat-pill stat-pill--coins">
-              <span className="stat-pill__emoji">🪙</span>
+              <span className="stat-pill__emoji material-symbols-rounded">monetization_on</span>
               <span className="stat-pill__value">12 registros</span>
             </div>
           </div>

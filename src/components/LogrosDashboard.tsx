@@ -1,13 +1,5 @@
 import type { CSSProperties } from 'react';
-import { IonIcon } from '@ionic/react';
-import {
-  calendarOutline,
-  flameOutline,
-  schoolOutline,
-  trendingDownOutline,
-  trendingUpOutline,
-  removeOutline,
-} from 'ionicons/icons';
+
 import type { EngagementDashboard } from '../api/feriaApi';
 import type { VisitDeltas } from '../pages/logrosSnapshot';
 import { MarkdownRenderer } from './MarkdownRenderer';
@@ -69,10 +61,10 @@ const LogrosDashboard = ({
   const tier = impulseTier(dashboard.impulseIndex);
   const weekIcon =
     dashboard.registrationWeekTrend === 'up'
-      ? trendingUpOutline
+      ? 'trending_up'
       : dashboard.registrationWeekTrend === 'down'
-        ? trendingDownOutline
-        : removeOutline;
+        ? 'trending_down'
+        : 'horizontal_rule';
   const weekIconClass =
     dashboard.registrationWeekTrend === 'up'
       ? 'logros-dash__trend--up'
@@ -131,7 +123,7 @@ const LogrosDashboard = ({
 
       <div className="logros-dash__tiles">
         <div className="logros-dash__tile">
-          <IonIcon icon={calendarOutline} className="logros-dash__tile-icon" />
+          <span className="material-symbols-rounded logros-dash__tile-icon">calendar_today</span>
           <div className="logros-dash__tile-body">
             <span className="logros-dash__tile-kicker">Últimos 7 días</span>
             <span className="logros-dash__tile-value">
@@ -141,14 +133,14 @@ const LogrosDashboard = ({
               vs {dashboard.movementCountPrev7d} la semana previa
             </span>
             <div className={`logros-dash__trend ${weekIconClass}`}>
-              <IonIcon icon={weekIcon} />
+              <span className="material-symbols-rounded">{weekIcon}</span>
               <span>{weekTrendCopy(dashboard.registrationWeekTrend)}</span>
             </div>
           </div>
         </div>
 
         <div className="logros-dash__tile">
-          <IonIcon icon={flameOutline} className="logros-dash__tile-icon" />
+          <span className="material-symbols-rounded logros-dash__tile-icon">local_fire_department</span>
           <div className="logros-dash__tile-body">
             <span className="logros-dash__tile-kicker">Racha</span>
             <span className="logros-dash__tile-value">
@@ -165,7 +157,7 @@ const LogrosDashboard = ({
         </div>
 
         <div className="logros-dash__tile">
-          <IonIcon icon={schoolOutline} className="logros-dash__tile-icon" />
+          <span className="material-symbols-rounded logros-dash__tile-icon">school</span>
           <div className="logros-dash__tile-body">
             <span className="logros-dash__tile-kicker">Tutor</span>
             <span className="logros-dash__tile-value">

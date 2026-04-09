@@ -117,6 +117,10 @@ ion-content.feria-shell-content {
   background: color-mix(in srgb, var(--feria-color-primary) 12%, transparent);
 }
 
+.feria-app-footer__link.is-active .feria-app-footer__icon {
+  font-variation-settings: 'FILL' 1;
+}
+
 .feria-app-footer__link--soon {
   cursor: not-allowed;
   opacity: 0.45;
