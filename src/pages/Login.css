@@ -12,7 +12,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 28px 28px 40px;
+  padding: 1.75rem 1.75rem 2.5rem;
   box-sizing: border-box;
   overflow: hidden;
 
@@ -34,12 +34,12 @@
 .login-layout::before {
   content: '';
   position: absolute;
-  width: 320px;
-  height: 320px;
+  width: 20rem;
+  height: 20rem;
   border-radius: 50%;
   background: radial-gradient(circle, rgba(232, 160, 32, 0.07), transparent 70%);
-  top: -80px;
-  right: -80px;
+  top: -5rem;
+  right: -5rem;
   pointer-events: none;
   animation: feria-blob-drift 22s ease-in-out infinite;
 }
@@ -47,12 +47,12 @@
 .login-layout::after {
   content: '';
   position: absolute;
-  width: 250px;
-  height: 250px;
+  width: 15.625rem;
+  height: 15.625rem;
   border-radius: 50%;
   background: radial-gradient(circle, rgba(47, 174, 122, 0.05), transparent 70%);
-  bottom: -60px;
-  left: -60px;
+  bottom: -3.75rem;
+  left: -3.75rem;
   pointer-events: none;
   animation: feria-blob-drift 28s ease-in-out infinite reverse;
 }
@@ -67,14 +67,14 @@
 
 @keyframes feria-blob-drift {
   0%, 100% { transform: translate(0, 0); }
-  33% { transform: translate(12px, -8px); }
-  66% { transform: translate(-8px, 10px); }
+  33% { transform: translate(0.75rem, -0.5rem); }
+  66% { transform: translate(-0.5rem, 0.625rem); }
 }
 
 /* ─── Brand Section ─── */
 .login-brand {
   text-align: center;
-  margin-bottom: 36px;
+  margin-bottom: 2.25rem;
   position: relative;
   z-index: 1;
   animation: feria-fade-up 0.6s var(--feria-ease-decel) both;
@@ -102,7 +102,7 @@
 }
 
 .login-brand__tagline {
-  margin: 14px 0 0;
+  margin: 0.875rem 0 0;
   font-family: var(--feria-font-family);
   font-size: clamp(0.88rem, 3vw, 1rem);
   font-weight: 500;
@@ -115,27 +115,27 @@
 .login-card {
   position: relative;
   z-index: 1;
-  width: min(88vw, 340px);
+  width: min(88vw, 21.25rem);
   background: var(--feria-color-surface);
   border-radius: var(--feria-radius-lg);
   box-shadow:
-    0 1px 2px rgba(44, 36, 24, 0.04),
-    0 8px 32px rgba(44, 36, 24, 0.07);
-  padding: 22px 20px 20px;
+    0 1px 0.125rem rgba(44, 36, 24, 0.04),
+    0 0.5rem 2rem rgba(44, 36, 24, 0.07);
+  padding: 1.375rem 1.25rem 1.25rem;
   border: 1px solid var(--feria-color-border);
   animation: feria-fade-up 0.6s var(--feria-ease-decel) 0.1s both;
 }
 
 .ion-palette-dark .login-card {
   box-shadow:
-    0 2px 4px rgba(0, 0, 0, 0.2),
-    0 12px 40px rgba(0, 0, 0, 0.3);
+    0 0.125rem 0.25rem rgba(0, 0, 0, 0.2),
+    0 0.75rem 2.5rem rgba(0, 0, 0, 0.3);
 }
 
 /* ─── Google CTA Button ─── */
 .google-btn {
   width: 100%;
-  height: 54px;
+  height: 3.375rem;
   border: none;
   border-radius: var(--feria-radius-md);
   background: var(--feria-color-accent-dark);
@@ -147,9 +147,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 0.75rem;
   cursor: pointer;
-  box-shadow: 0 4px 14px color-mix(in srgb, var(--feria-color-accent-dark) 35%, transparent);
+  box-shadow: 0 0.25rem 0.875rem color-mix(in srgb, var(--feria-color-accent-dark) 35%, transparent);
   transition:
     background var(--feria-duration-fast) ease,
     transform var(--feria-duration-fast) ease,
@@ -161,22 +161,22 @@
 .google-btn:hover {
   background: color-mix(in srgb, var(--feria-color-accent-dark) 88%, #000);
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px color-mix(in srgb, var(--feria-color-accent-dark) 45%, transparent);
+  box-shadow: 0 0.375rem 1.25rem color-mix(in srgb, var(--feria-color-accent-dark) 45%, transparent);
 }
 
 .google-btn:active {
   transform: translateY(0);
-  box-shadow: 0 2px 8px color-mix(in srgb, var(--feria-color-accent-dark) 28%, transparent);
+  box-shadow: 0 0.125rem 0.5rem color-mix(in srgb, var(--feria-color-accent-dark) 28%, transparent);
 }
 
 .google-btn:focus-visible {
-  outline: 3px solid color-mix(in srgb, var(--feria-color-primary) 45%, transparent);
-  outline-offset: 2px;
+  outline: 0.1875rem solid color-mix(in srgb, var(--feria-color-primary) 45%, transparent);
+  outline-offset: 0.125rem;
 }
 
 .google-btn__icon {
-  width: 32px;
-  height: 32px;
+  width: 2rem;
+  height: 2rem;
   border-radius: 50%;
   background: var(--feria-color-surface);
   display: flex;
@@ -205,25 +205,25 @@
   position: absolute;
   font-size: 2.2rem;
   animation: feria-float 4s ease-in-out infinite;
-  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+  filter: drop-shadow(0 0.25rem 0.5rem rgba(0,0,0,0.1));
 }
 
 .shape-coin {
-  top: -30px;
-  left: -20px;
+  top: -1.875rem;
+  left: -1.25rem;
   animation-delay: 0s;
   font-size: 3rem;
 }
 
 .shape-sparkle {
-  top: 40px;
-  right: -25px;
+  top: 2.5rem;
+  right: -1.5625rem;
   animation-delay: 1.5s;
   font-size: 2.5rem;
 }
 
 .shape-graph {
-  bottom: -20px;
+  bottom: -1.25rem;
   left: 40%;
   animation-delay: 0.7s;
   font-size: 2.5rem;
@@ -232,7 +232,7 @@
 
 @keyframes feria-float {
   0% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-12px) rotate(8deg); }
+  50% { transform: translateY(-0.75rem) rotate(8deg); }
   100% { transform: translateY(0) rotate(0deg); }
 }
 
@@ -240,28 +240,28 @@
 .feature-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-top: 20px;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
   position: relative;
   z-index: 1;
 }
 
 .feature-item {
   background: var(--feria-color-surface-muted);
-  border: 2px solid var(--feria-color-border);
+  border: 0.125rem solid var(--feria-color-border);
   border-radius: var(--feria-radius-md);
-  padding: 18px 12px;
+  padding: 1.125rem 0.75rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 0.625rem;
   justify-content: center;
   transition: all var(--feria-duration-normal) var(--feria-ease-standard);
   cursor: default;
 }
 
 .feature-item:hover {
-  transform: translateY(-4px);
+  transform: translateY(-0.25rem);
   border-color: var(--feria-color-primary-tint);
   background: color-mix(in srgb, var(--feria-color-primary-tint) 10%, var(--feria-color-surface));
 }
@@ -286,7 +286,7 @@
 .login-footer {
   position: relative;
   z-index: 1;
-  margin-top: 36px;
+  margin-top: 2.25rem;
   text-align: center;
   animation: feria-fade-up 0.6s var(--feria-ease-decel) 0.2s both;
 }
@@ -310,8 +310,8 @@
   color: var(--feria-color-link);
   font-weight: 700;
   text-decoration: underline;
-  text-underline-offset: 3px;
-  text-decoration-thickness: 1.5px;
+  text-underline-offset: 0.1875rem;
+  text-decoration-thickness: 1.0.3125rem;
   cursor: pointer;
   transition: color var(--feria-duration-fast);
   vertical-align: baseline;
@@ -338,10 +338,10 @@
 }
 
 .legal-links {
-  margin-top: 22px;
+  margin-top: 1.375rem;
   display: flex;
   justify-content: center;
-  gap: 22px;
+  gap: 1.375rem;
 }
 
 .legal-links a {
@@ -371,7 +371,7 @@
 @keyframes feria-fade-up {
   from {
     opacity: 0;
-    transform: translateY(16px);
+    transform: translateY(1rem);
   }
   to {
     opacity: 1;
@@ -395,9 +395,9 @@
 }
 
 /* ─── Small Screens ─── */
-@media (max-width: 390px) {
+@media (max-width: 24.375rem) {
   .login-layout {
-    padding: 48px 20px 40px;
+    padding: 3rem 1.25rem 2.5rem;
   }
 
   .login-brand__title {
@@ -406,16 +406,16 @@
 
   .login-card {
     width: 92vw;
-    padding: 18px 16px 16px;
+    padding: 1.125rem 1rem 1rem;
   }
 
   .google-btn {
-    height: 50px;
+    height: 3.125rem;
     font-size: 0.94rem;
   }
 
   .feature-item {
-    min-height: 80px;
-    padding: 12px 10px;
+    min-height: 5rem;
+    padding: 0.75rem 0.625rem;
   }
 }

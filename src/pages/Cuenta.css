@@ -8,7 +8,7 @@
 
 .cuenta-body {
   padding-bottom: max(2rem, env(safe-area-inset-bottom));
-  max-width: 1000px;
+  max-width: 62.5rem;
   margin-inline: auto;
 }
 
@@ -33,28 +33,28 @@
 
 .cuenta-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
-  margin-bottom: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(17.5rem, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .cuenta-card {
-  padding: 16px;
+  padding: 1rem;
   background: var(--feria-color-surface);
-  border: 2px solid var(--feria-color-border);
-  border-radius: 16px;
-  box-shadow: 4px 4px 0px var(--feria-color-border);
+  border: 0.125rem solid var(--feria-color-border);
+  border-radius: 1rem;
+  box-shadow: 0.25rem 0.25rem 0rem var(--feria-color-border);
   transition: transform 0.1s;
 }
 
 .cuenta-card:hover {
-  transform: translate(-2px, -2px);
+  transform: translate(-0.125rem, -0.125rem);
   border-color: var(--feria-color-primary-tint);
-  box-shadow: 6px 6px 0px var(--feria-color-primary-tint);
+  box-shadow: 0.375rem 0.375rem 0rem var(--feria-color-primary-tint);
 }
 
 .cuenta-card__label {
-  margin: 0 0 6px;
+  margin: 0 0 0.375rem;
   font-size: var(--feria-font-caption);
   color: var(--feria-color-text-muted);
   text-transform: uppercase;
@@ -81,12 +81,12 @@
   margin-top: 2.5rem;
   --border-radius: var(--feria-radius-pill);
   font-weight: 700;
-  --border-width: 2px;
+  --border-width: 0.125rem;
   --border-color: var(--feria-color-border);
 }
 
 ion-item.feria-theme-field ion-label .feria-theme-field__title {
-  margin: 0 0 2px;
+  margin: 0 0 0.125rem;
   font-size: var(--feria-font-body-sm);
   font-weight: 600;
   color: var(--feria-color-text);

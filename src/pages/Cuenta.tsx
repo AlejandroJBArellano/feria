@@ -56,9 +56,9 @@ const Cuenta: React.FC = () => {
             <p className="cuenta-lead">Acá configuras tu perfil y cómo se ve la app. (Algunos datos son de prueba rey).</p>
           </IonText>
 
-          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '16px', gap: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem', gap: '1rem' }}>
             {displayPicture && (
-              <IonAvatar style={{ width: '64px', height: '64px' }}>
+              <IonAvatar style={{ width: '4rem', height: '4rem' }}>
                 <img alt="User profile" src={displayPicture} referrerPolicy="no-referrer" />
               </IonAvatar>
             )}

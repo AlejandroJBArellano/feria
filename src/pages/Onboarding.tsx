@@ -311,7 +311,7 @@ const Onboarding: React.FC = () => {
                     fontSize: '4rem',
                     transform: 'rotate(-10deg)',
                     display: 'inline-block',
-                    margin: '0 10px',
+                    margin: '0 0.625rem',
                   }}
                 >
                   🌮
@@ -328,7 +328,7 @@ const Onboarding: React.FC = () => {
                     fontSize: '4rem',
                     transform: 'rotate(15deg)',
                     display: 'inline-block',
-                    margin: '0 10px',
+                    margin: '0 0.625rem',
                   }}
                 >
                   🛵

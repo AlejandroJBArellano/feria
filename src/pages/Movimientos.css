@@ -9,14 +9,14 @@
 }
 
 .movimientos-body {
-  max-width: 1200px;
+  max-width: 75rem;
   margin-inline: auto;
   padding: 1.5rem var(--feria-space-page) max(1rem, env(safe-area-inset-bottom));
   display: grid;
   gap: 1.5rem;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 48rem) {
   .movimientos-body {
     grid-template-columns: 1fr 2fr;
     align-items: start;
@@ -33,7 +33,7 @@
 .movimientos-ai-strip {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.5rem;
   margin: 0 0 1rem;
   font-size: var(--feria-font-caption);
   color: var(--feria-color-text-muted);
@@ -49,7 +49,7 @@
 
 .movimientos-insight {
   margin: 0 0 1.25rem;
-  padding: 14px 16px;
+  padding: 0.875rem 1rem;
   border-radius: var(--feria-modal-radius-inner);
   border: 1px solid var(--feria-modal-border-color);
   background: var(--feria-modal-field-bg);
@@ -64,15 +64,15 @@
   left: 0;
   top: 0;
   bottom: 0;
-  width: 3px;
+  width: 0.1875rem;
   background: linear-gradient(180deg, var(--feria-color-primary), var(--feria-color-accent-dark));
-  border-radius: 2px 0 0 2px;
+  border-radius: 0.125rem 0 0 0.125rem;
   opacity: 0.9;
 }
 
 .movimientos-insight__text {
   margin: 0;
-  padding-left: 8px;
+  padding-left: 0.5rem;
   font-size: var(--feria-font-body-sm);
   line-height: 1.5;
   color: var(--feria-color-text-secondary);
@@ -82,12 +82,12 @@
 .movimientos-processing {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
+  gap: 0.75rem;
 }
 
 .movimientos-processing ion-spinner {
   flex-shrink: 0;
-  margin-top: 2px;
+  margin-top: 0.125rem;
 }
 
 .movimientos-processing .movimientos-insight__text {
@@ -97,11 +97,11 @@
 .movimientos-stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+  gap: 0.75rem;
   margin-bottom: 0;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 48rem) {
   .movimientos-stats {
     grid-template-columns: 1fr;
   }
@@ -109,17 +109,17 @@
 
 .movimientos-stat {
   text-align: center;
-  padding: 16px 12px;
-  border-radius: 16px;
-  border: 2px solid var(--feria-color-border);
+  padding: 1rem 0.75rem;
+  border-radius: 1rem;
+  border: 0.125rem solid var(--feria-color-border);
   background: var(--feria-color-surface);
-  box-shadow: 4px 4px 0px var(--feria-color-border);
+  box-shadow: 0.25rem 0.25rem 0rem var(--feria-color-border);
   transition: transform 0.1s;
 }
 
 .movimientos-stat:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 6px 6px 0px var(--feria-color-primary-tint);
+  transform: translate(-0.125rem, -0.125rem);
+  box-shadow: 0.375rem 0.375rem 0rem var(--feria-color-primary-tint);
   border-color: var(--feria-color-primary-tint);
 }
 
@@ -130,7 +130,7 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--feria-color-text-muted);
-  margin-bottom: 6px;
+  margin-bottom: 0.375rem;
 }
 
 .movimientos-stat__value {
@@ -172,19 +172,19 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 0.5rem;
 }
 
 .movimientos-card {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
-  padding: 16px 18px;
-  border-radius: 18px;
-  border: 2px solid var(--feria-color-border);
+  gap: 0.75rem;
+  padding: 1rem 1.125rem;
+  border-radius: 1.125rem;
+  border: 0.125rem solid var(--feria-color-border);
   background: var(--feria-color-surface);
-  box-shadow: 4px 4px 0px var(--feria-color-border);
+  box-shadow: 0.25rem 0.25rem 0rem var(--feria-color-border);
   transition: all 0.1s ease-out;
 }
 
@@ -194,7 +194,7 @@
 
 .movimientos-card:hover {
   border-color: var(--feria-color-primary-tint);
-  box-shadow: 4px 4px 0px var(--feria-color-primary-tint);
+  box-shadow: 0.25rem 0.25rem 0rem var(--feria-color-primary-tint);
   transform: translate(-1px, -1px);
 }
 
@@ -204,7 +204,7 @@
 
 .movimientos-card:hover {
   border-color: color-mix(in srgb, var(--feria-color-primary) 25%, var(--feria-modal-border-color));
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 0.25rem 1.25rem rgba(0, 0, 0, 0.06);
 }
 
 .movimientos-card__left {
@@ -213,7 +213,7 @@
 }
 
 .movimientos-card__concept {
-  margin: 0 0 4px;
+  margin: 0 0 0.25rem;
   font-size: var(--feria-font-body-sm);
   font-weight: 600;
   color: var(--feria-color-text);
@@ -224,7 +224,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 6px;
+  gap: 0.375rem;
 }
 
 .movimientos-card__chip {
@@ -232,11 +232,11 @@
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  padding: 4px 10px;
-  border-radius: 99px;
+  padding: 0.25rem 0.625rem;
+  border-radius: 6.1875rem;
   background: var(--feria-color-primary);
   color: var(--feria-color-on-primary);
-  box-shadow: 2px 2px 0px var(--feria-color-primary-shade);
+  box-shadow: 0.125rem 0.125rem 0rem var(--feria-color-primary-shade);
 }
 
 .ion-palette-dark .movimientos-card__chip {
@@ -244,7 +244,7 @@
 }
 
 .movimientos-card__hint {
-  margin: 6px 0 0;
+  margin: 0.375rem 0 0;
   font-size: 0.7rem;
   line-height: 1.35;
   color: var(--feria-color-text-hint);
@@ -278,5 +278,5 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--feria-color-text-hint);
-  margin-top: 2px;
+  margin-top: 0.125rem;
 }
