@@ -1,15 +1,14 @@
-import { IonIcon, IonPage, IonRefresher, IonRefresherContent, IonSpinner, IonText } from '@ionic/react';
-import { sparklesOutline } from 'ionicons/icons';
+import { IonPage, IonRefresher, IonRefresherContent, IonSpinner, IonText } from '@ionic/react';
 import type { ReactElement } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { ApiMovement } from '../api/feriaApi';
 import { getVoiceJob, isFeriaApiConfigured, listMovements } from '../api/feriaApi';
 import { FeriaAppShell } from '../components/FeriaAppShell';
 import {
-    DUMMY_MOVEMENTS,
-    type DummyMovement,
-    groupByDate,
-    summarizeMovements,
+  DUMMY_MOVEMENTS,
+  type DummyMovement,
+  groupByDate,
+  summarizeMovements,
 } from '../data/dummyMovements';
 import { clearPendingVoiceJobId, getPendingVoiceJobId } from '../voice/voiceJobStorage';
 import './Movimientos.css';
@@ -195,13 +194,13 @@ const Movimientos: React.FC = () => {
         <div className="movimientos-body ion-padding">
           <div className="movimientos-grid-col-summary">
             <div className="movimientos-ai-strip">
-              <span aria-hidden="true" style={{ fontSize: '1.2rem'}}>✨</span>
+              <span aria-hidden="true" style={{ fontSize: '1.2rem' }}>✨</span>
               <span>
                 {isProcessingVoice
-                  ? 'FerIA está procesando tu audio en chinga...'
+                  ? 'FerIA está procesando tu audio en corto...'
                   : demoMode
-                  ? 'Modo prueba: Así se verá tu lana'
-                  : 'Todo chido, esta es tu lana registrada'}
+                    ? 'Modo prueba: Así se verá tu lana'
+                    : 'Todo chido, esta es tu lana registrada'}
               </span>
             </div>
 
