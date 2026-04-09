@@ -1,45 +1,27 @@
-# Catálogo MVP de Logros
+# Catálogo de Logros V1
 
-Aquí definimos cómo se evalúan las metas iniciales y los logros para la v1 de Feria. Procesamos esto basándonos directamente en los datos de la tabla de DynamoDB (`movementDate` y `amount`). 
+Para este MVP, decidimos saltarnos cualquier idea de poner sistemas súper complejos de puntos RPG o mil niveles. Feria simplemente busca incentivar que la gente se enganche a anotar y empiece a ver hacia dónde va su dinero. Todo esto lo mostramos de forma fluida validando fechas y montos reales directamente de la base de datos (DynamoDB).
 
-Evacuamos la idea de crear sistemas de puntos hiper gamificados o RPG. Simplemente buscamos incentivar constancia ("registro el día a día") y control ("noto si estoy gastando de más").
+## Lista de Logros
 
-## Metas Disponibles e IDs
+1. **El rompehielo**
+   - Se gana automáticamente al anotar el primer movimiento (gasto o ingreso) con tu cuenta.
+   - Mensaje al usuario: "Registraste tu primer movimiento."
 
-### 1. `first_movement` (El rompehielo)
-- **Comportamiento**: Un logro del tipo one-shot.
-- **Regla**: Existe como mínimo un registro con el ID del usuario.
-- **Feedback UI**: "Registraste tu primer movimiento."
+2. **Una Semana Consecutiva**
+   - Requiere haber entrado a la app y registrado al menos algo por 7 días seguidos (hace la validación en base a días calendario).
+   - Mensaje al usuario: "Sumaste una semana seguida anotando."
 
-### 2. `streak_register_7` (Una Semana Consecutiva)
-- **Comportamiento**: Recurrente mensual.
-- **Regla**: Siete días consecutivos, cruzando cualquier hora del día pero verificando las fechas calendario (fijar el tz a `America/Mexico_City` de momento para la validación del cron job).
-- **Feedback UI**: "Sumás una semana seguida anotando."
+3. **Explorador Omnichannel**
+   - Se destraba cuando vemos que el usuario es curioso y metió al menos un movimiento anotado por teclado, y otro mandando directamente un audio.
+   - Mensaje al usuario: "Estás usando todas las herramientas: probaste el registro por voz y también el manual."
 
-### 3. `voice_or_manual_diversity` (Explorador Omnichannel)
-- **Comportamiento**: One-shot.
-- **Regla**: Un movimiento cuyo endpoint fuente es voz cruzado con al menos uno manual.
-- **Feedback UI**: "Productor y director: usaste el registro por voz y el manual."
+4. **Radar Prendido**
+   - Fomenta anotar variabilidad (cobertura total de la billetera). Salta si el historial detecta que tus movimientos cruzan 5 categorías completamente diferentes en el mismo mes.
+   - Mensaje al usuario: "Tus finanzas son de varios colores: registraste más de 5 áreas distintas de tu día a día."
 
-### 4. `category_coverage_5` (Radar Prendido)
-- **Comportamiento**: Mensual (se reinicia).
-- **Regla**: Registro en al menos cinco categorías dispares durante un mismo mes.
-- **Feedback UI**: "Tus finanzas son de varios colores: registraste más de 5 áreas diferentes."
+5. **El Amigo Fiel**
+   - Para introducir el acompañamiento IA. Se gana al enviar tu primera consulta en la zona del chat con el tutor.
+   - Mensaje al usuario: "Conversaste con tu tutor por primera vez."
 
-### 5. `week_spend_below_category_cap` (Categoría Controlada)
-- **Comportamiento**: Reto Dinámico.
-- **Regla**: Automático en MVP sin armar un panel en la UI. Agarramos la categoría top de la semana pasada, multiplicamos el promedio mensual por 0.9. Si el usuario se mantiene abajo de esa línea, gana el logro de la semana. Solo corre si hay datos suficientes.
-- **Feedback UI**: "Mantuviste tus gastos en 'X' por debajo del radar, ¡buen trabajo!"
-
-### 6. `tutor_first_conversation` (El Amigo Fiel)
-- **Comportamiento**: One-shot.
-- **Regla**: Se detona al crear el primer thread/message en la tabla de chat al interactuar con el AI de Bedrock.
-- **Feedback UI**: "Conversaste con tu tutor por vez primera."
-
----
-
-## Qué quedó por fuera en este sprint
-
-Cosas que nos quedaron sin poder implementar por límites de tiempo (pasan a la V2 o V1.5):
-- Metas de ahorro complejas `savings_goal_progress_80`. Requerirá armar nueva estructura tabular para las metas asociadas.
-- Logro de `month_clarity_complete` por completar todo un mes; los umbrales eran medios frágiles para probar en dos días de código.
+Los retos semanales más complejos o alertas sobre cuotas quedaron a la espera de las próximas versiones de la plataforma. Por ahora empezamos con lo básico y efectivo.
