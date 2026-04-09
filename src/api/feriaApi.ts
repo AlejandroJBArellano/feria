@@ -301,6 +301,7 @@ export type EngagementDashboard = {
   registrationWeekTrend: 'up' | 'down' | 'same';
   hasUsedTutor: boolean;
   impulseIndex: number;
+  dailyInsight?: string;
 };
 
 export type EngagementSummary = {

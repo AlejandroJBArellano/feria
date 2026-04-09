@@ -10,6 +10,7 @@ import {
 } from 'ionicons/icons';
 import type { EngagementDashboard } from '../api/feriaApi';
 import type { VisitDeltas } from '../pages/logrosSnapshot';
+import { MarkdownRenderer } from './MarkdownRenderer';
 
 type Props = {
   dashboard: EngagementDashboard;
@@ -118,6 +119,15 @@ const LogrosDashboard = ({
           <p className="logros-dash__tier-sub">{tier.sub}</p>
         </div>
       </div>
+
+      {dashboard.dailyInsight && (
+        <div className="logros-dash__insight">
+          <h3 className="logros-dash__insight-heading">Resumen Diario con IA</h3>
+          <div className="logros-dash__insight-content chat-bubble--assistant">
+            <MarkdownRenderer text={dashboard.dailyInsight} />
+          </div>
+        </div>
+      )}
 
       <div className="logros-dash__tiles">
         <div className="logros-dash__tile">
