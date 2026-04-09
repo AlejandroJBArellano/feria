@@ -277,6 +277,10 @@ const Onboarding: React.FC = () => {
     return <Redirect to="/home" />;
   }
 
+  const handleContinue = () => {
+    markOnboardingComplete();
+  }
+
   const listening = voicePhase === 'recording';
   const busy = voicePhase === 'uploading' || voicePhase === 'processing';
   const showReview = lastSummary != null && voicePhase === 'idle' && !voiceError;
