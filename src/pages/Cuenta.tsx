@@ -1,7 +1,7 @@
 import {
+  IonAvatar,
   IonButton,
   IonIcon,
-  IonNote,
   IonPage,
   IonSpinner,
   IonText
@@ -42,7 +42,14 @@ const Cuenta: React.FC = () => {
             <p className="cuenta-lead">Acá configuras tu perfil y cómo se ve la app. (Algunos datos son de prueba rey).</p>
           </IonText>
 
-          <h2 className="cuenta-section-title">Tu perfil</h2>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '16px', gap: '16px' }}>
+            {user?.picture && (
+              <IonAvatar style={{ width: '64px', height: '64px' }}>
+                <img alt="User profile" src={user.picture} referrerPolicy="no-referrer" />
+              </IonAvatar>
+            )}
+            <h2 className="cuenta-section-title" style={{ margin: 0 }}>Tu perfil</h2>
+          </div>
           <div className="cuenta-grid">
             <div className="cuenta-card">
               <p className="cuenta-card__label">Nombre</p>
@@ -52,43 +59,10 @@ const Cuenta: React.FC = () => {
               <p className="cuenta-card__label">Correo</p>
               <p className="cuenta-card__value">{displayOrDash(user?.email)}</p>
             </div>
-            <div className="cuenta-card">
-              <p className="cuenta-card__label">Usuario (Cognito)</p>
-              <p className="cuenta-card__value cuenta-card__value--mono">{displayOrDash(user?.username)}</p>
-            </div>
-            <div className="cuenta-card">
-              <p className="cuenta-card__label">ID de usuario</p>
-              <p className="cuenta-card__value cuenta-card__value--mono">{displayOrDash(user?.userId)}</p>
-            </div>
-            <div className="cuenta-card">
-              <p className="cuenta-card__label">Proveedor</p>
-              <p className="cuenta-card__value">{displayOrDash(user?.provider)}</p>
-            </div>
-          </div>
-
-          <h2 className="cuenta-section-title">Tus datos (demo)</h2>
-          <div className="cuenta-grid">
-            <div className="cuenta-card">
-              <p className="cuenta-card__label">Teléfono</p>
-              <p className="cuenta-card__value">+52 ••• ••• •••• (demo)</p>
-            </div>
-            <div className="cuenta-card">
-              <p className="cuenta-card__label">Ciudad</p>
-              <p className="cuenta-card__value">Por definir (demo)</p>
-            </div>
-            <div className="cuenta-card">
-              <p className="cuenta-card__label">Zona horaria</p>
-              <p className="cuenta-card__value">America/Mexico_City (demo)</p>
-            </div>
           </div>
 
           <h2 className="cuenta-section-title">Ajustes</h2>
           <div className="cuenta-grid">
-            <div className="cuenta-card">
-              <p className="cuenta-card__label">Moneda</p>
-              <p className="cuenta-card__value">MXN (demo)</p>
-              <IonNote color="medium" style={{ fontSize: '0.7em', marginTop: 4 }}>Próximamente editable</IonNote>
-            </div>
             <div className="cuenta-card cuenta-card--theme">
               <ThemeToggle />
             </div>

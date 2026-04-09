@@ -409,6 +409,7 @@ export type UserProfileResponse = {
   userId: string;
   email: string | null;
   name: string | null;
+  picture: string | null;
   context: string | null;
   isOnboardingComplete: boolean;
   hasUserRow: boolean;
