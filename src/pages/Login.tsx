@@ -1,11 +1,19 @@
 import { IonContent, IonPage, IonSpinner } from '@ionic/react';
-import { useEffect, useLayoutEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { isCognitoConfigured } from '../auth/configureAmplify';
 import { FeriaAppShell } from '../components/FeriaAppShell';
 import ThemeToggle from '../components/ThemeToggle';
-import { isOnboardingComplete } from '../onboarding/onboardingStorage';
+import {
+  getUserProfile,
+  isFeriaApiConfigured,
+  syncUserProfile,
+} from '../api/feriaApi';
+import {
+  isOnboardingComplete,
+  syncOnboardingFlagFromServer,
+} from '../onboarding/onboardingStorage';
 import './Login.css';
 
 const Login: React.FC = () => {
@@ -29,16 +37,34 @@ const Login: React.FC = () => {
     }
   }, [oauthReturnPending, isLoading, isAuthenticated]);
 
-  useLayoutEffect(() => {
-    if (isLoading || !isAuthenticated) {
+  useEffect(() => {
+    if (isLoading || !isAuthenticated || history.location.pathname !== '/login') {
       return;
     }
-    if (history.location.pathname !== '/login') {
+    if (!isFeriaApiConfigured()) {
+      history.replace(isOnboardingComplete() ? '/home' : '/onboarding');
       return;
     }
-
-    history.replace(isOnboardingComplete() ? '/home' : '/onboarding');
-  }, [isLoading, isAuthenticated, history]);
+    let cancelled = false;
+    void (async () => {
+      try {
+        await syncUserProfile();
+        const p = await getUserProfile();
+        if (cancelled) {
+          return;
+        }
+        syncOnboardingFlagFromServer(p.isOnboardingComplete);
+        history.replace(p.isOnboardingComplete ? '/home' : '/onboarding');
+      } catch {
+        if (!cancelled) {
+          history.replace(isOnboardingComplete() ? '/home' : '/onboarding');
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [isLoading, isAuthenticated, history, history.location.pathname]);
 
   if (isLoading || oauthReturnPending) {
     return (

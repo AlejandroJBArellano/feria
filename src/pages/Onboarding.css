@@ -280,6 +280,14 @@
   font-size: 0.85rem;
 }
 
+.onboarding-back-intro {
+  margin: -0.25rem auto 0.5rem;
+  align-self: center;
+  --color: var(--feria-color-text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
 .onboarding-voice-orb-block {
   display: flex;
   flex-direction: column;

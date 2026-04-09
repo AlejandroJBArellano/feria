@@ -404,6 +404,30 @@ export async function pollVoiceJobUntilDone(
  * POST /profile/sync — creates DynamoDB Users row for Cognito sub if missing (signup alone does not).
  * Call after login so `context` and tutor profile have a stable row.
  */
+export type UserProfileResponse = {
+  userId: string;
+  email: string | null;
+  name: string | null;
+  context: string | null;
+  isOnboardingComplete: boolean;
+  hasUserRow: boolean;
+};
+
+/** GET /profile — Users row: context + isOnboardingComplete (Cognito JWT). */
+export async function getUserProfile(): Promise<UserProfileResponse> {
+  const base = apiBase();
+  if (!base) throw new Error('VITE_FERIA_API_URL is not set');
+  const res = await authorizedFetch(`${base}/profile`, {
+    method: 'GET',
+    headers: {},
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || `getUserProfile failed: ${res.status}`);
+  }
+  return res.json() as Promise<UserProfileResponse>;
+}
+
 export async function syncUserProfile(): Promise<{ ok: boolean; created: boolean }> {
   const base = apiBase();
   if (!base) throw new Error('VITE_FERIA_API_URL is not set');
