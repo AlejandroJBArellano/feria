@@ -18,6 +18,47 @@
   box-sizing: border-box;
 }
 
+.home-brand-banner {
+  width: min(24rem, 92vw);
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  margin: 0.875rem 0 1rem;
+  padding: 0.875rem 1rem;
+  border-radius: 1.25rem;
+  border: 1px solid var(--feria-color-border);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--feria-color-surface) 92%, transparent) 0%, var(--feria-color-surface) 100%);
+  box-shadow: 0 0.75rem 1.75rem rgba(44, 36, 24, 0.08);
+}
+
+.home-brand-banner__image {
+  width: 4.5rem;
+  height: 4.5rem;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.home-brand-banner__copy {
+  min-width: 0;
+}
+
+.home-brand-banner__eyebrow {
+  margin: 0 0 0.25rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--feria-color-primary-shade);
+}
+
+.home-brand-banner__text {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.35;
+  color: var(--feria-color-text-secondary);
+}
+
 /* ─── Gamified Stats Row ─── */
 .home-gamified-stats {
   display: flex;

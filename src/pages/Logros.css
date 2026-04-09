@@ -24,11 +24,63 @@
   padding-bottom: max(1rem, env(safe-area-inset-bottom));
 }
 
+.logros-brand-banner {
+  width: min(24rem, 100%);
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  margin: 0.25rem 0 1rem;
+  padding: 0.875rem 1rem;
+  border-radius: 1.25rem;
+  border: 1px solid var(--feria-color-border);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--feria-color-surface) 92%, transparent) 0%, var(--feria-color-surface) 100%);
+  box-shadow: 0 0.75rem 1.75rem rgba(44, 36, 24, 0.08);
+}
+
+.logros-brand-banner__image {
+  width: 4.25rem;
+  height: 4.25rem;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.logros-brand-banner__copy {
+  min-width: 0;
+}
+
+.logros-brand-banner__eyebrow {
+  margin: 0 0 0.25rem;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--feria-color-primary-shade);
+}
+
+.logros-brand-banner__text {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.35;
+  color: var(--feria-color-text-secondary);
+}
+
 @media (min-width: 48rem) {
   .logros-layout {
     grid-template-columns: 1fr 1fr;
     align-items: start;
     padding: 2.5rem;
+  }
+}
+
+@media (max-width: 30rem) {
+  .logros-brand-banner {
+    padding: 0.75rem 0.875rem;
+  }
+
+  .logros-brand-banner__image {
+    width: 3.75rem;
+    height: 3.75rem;
   }
 }
 

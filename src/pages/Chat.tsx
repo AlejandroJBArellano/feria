@@ -1,18 +1,18 @@
 import {
-  IonButton,
-  IonIcon,
-  IonPage,
-  IonSpinner,
-  IonText,
-  IonTextarea,
+    IonButton,
+    IonIcon,
+    IonPage,
+    IonSpinner,
+    IonText,
+    IonTextarea,
 } from '@ionic/react';
 import { addOutline, logOutOutline, paperPlaneOutline } from 'ionicons/icons';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
-  isFeriaApiConfigured,
-  listChatMessages,
-  sendChatMessage,
+    isFeriaApiConfigured,
+    listChatMessages,
+    sendChatMessage,
 } from '../api/feriaApi';
 import { useAuth } from '../auth/AuthContext';
 import { FeriaAppShell } from '../components/FeriaAppShell';
@@ -260,6 +260,14 @@ const Chat: React.FC = () => {
                   </p>
                 </IonText>
               </div>
+
+              <section className="chat-brand-banner" aria-label="Bienvenida de FerIA">
+                <img src="/principal.png" className="chat-brand-banner__image" alt="" aria-hidden="true" />
+                <div className="chat-brand-banner__copy">
+                  <p className="chat-brand-banner__eyebrow">Tu tutor FerIA</p>
+                  <p className="chat-brand-banner__text">Preguntá sobre tus movimientos y el sistema te responde con contexto.</p>
+                </div>
+              </section>
 
               <div className="chat-feed" role="log" aria-live="polite">
                 {messages.length === 0 && !historyLoading && !isStreaming ? (

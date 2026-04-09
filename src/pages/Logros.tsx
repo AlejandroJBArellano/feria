@@ -1,27 +1,26 @@
 import {
-  IonContent,
-  IonIcon,
-  IonPage,
-  IonPopover,
-  IonSpinner,
-  IonText,
-  useIonViewWillEnter,
+    IonContent,
+    IonPage,
+    IonPopover,
+    IonSpinner,
+    IonText,
+    useIonViewWillEnter
 } from '@ionic/react';
 import { useCallback, useEffect, useState } from 'react';
 import {
-  getEngagementSummary,
-  isFeriaApiConfigured,
-  type EngagementSummary,
+    getEngagementSummary,
+    isFeriaApiConfigured,
+    type EngagementSummary,
 } from '../api/feriaApi';
-import LogrosDashboard from '../components/LogrosDashboard';
 import { FeriaAppShell } from '../components/FeriaAppShell';
-import {
-  computeVisitDeltas,
-  persistVisitSnapshot,
-  readVisitSnapshot,
-  type VisitDeltas,
-} from './logrosSnapshot';
+import LogrosDashboard from '../components/LogrosDashboard';
 import './Logros.css';
+import {
+    computeVisitDeltas,
+    persistVisitSnapshot,
+    readVisitSnapshot,
+    type VisitDeltas,
+} from './logrosSnapshot';
 
 const Logros: React.FC = () => {
   const [data, setData] = useState<EngagementSummary | null>(null);
@@ -83,6 +82,14 @@ const Logros: React.FC = () => {
                 Con cada registro que haces, Feria te da puntos. Acá ves lo que vas juntando con tu compa.
               </p>
             </IonText>
+
+            <section className="logros-brand-banner" aria-label="Bienvenida de FerIA">
+              <img src="/principal.png" className="logros-brand-banner__image" alt="" aria-hidden="true" />
+              <div className="logros-brand-banner__copy">
+                <p className="logros-brand-banner__eyebrow">Tu progreso en claro</p>
+                <p className="logros-brand-banner__text">Medallas, rachas y claridad financiera en un solo vistazo.</p>
+              </div>
+            </section>
 
             {!apiReady && (
               <IonText color="medium">

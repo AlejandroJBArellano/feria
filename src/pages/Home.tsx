@@ -2,7 +2,6 @@ import {
     IonButton,
     IonContent,
     IonHeader,
-    IonIcon,
     IonInput,
     IonItem,
     IonLabel,
@@ -15,7 +14,7 @@ import {
     IonTitle,
     IonToolbar,
     useIonToast,
-    useIonViewWillEnter,
+    useIonViewWillEnter
 } from '@ionic/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
@@ -325,6 +324,14 @@ const Home: React.FC = () => {
       >
         <div className="home-layout">
           <p className="feria-text-label-caps">¡Qué onda, {displayName}!</p>
+
+          <section className="home-brand-banner" aria-label="Bienvenida de FerIA">
+            <img src="/principal.png" className="home-brand-banner__image" alt="" aria-hidden="true" />
+            <div className="home-brand-banner__copy">
+              <p className="home-brand-banner__eyebrow">Tu compa financiero</p>
+              <p className="home-brand-banner__text">Aquí ves tu movimiento, tu racha y lo que sigue.</p>
+            </div>
+          </section>
 
           {/* Gamified Stat Row */}
           <div className="home-gamified-stats" aria-label="Tus rachas y medallas">

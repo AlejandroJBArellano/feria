@@ -116,6 +116,48 @@
   max-width: 56.25rem;
 }
 
+.chat-brand-banner {
+  width: 100%;
+  max-width: 56.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  margin: 0 auto 1rem;
+  padding: 0.875rem 1rem;
+  border-radius: 1.25rem;
+  border: 1px solid var(--feria-color-border);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--feria-color-surface) 92%, transparent) 0%, var(--feria-color-surface) 100%);
+  box-shadow: 0 0.75rem 1.75rem rgba(44, 36, 24, 0.08);
+}
+
+.chat-brand-banner__image {
+  width: 4.25rem;
+  height: 4.25rem;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.chat-brand-banner__copy {
+  min-width: 0;
+}
+
+.chat-brand-banner__eyebrow {
+  margin: 0 0 0.25rem;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--feria-color-primary-shade);
+}
+
+.chat-brand-banner__text {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.35;
+  color: var(--feria-color-text-secondary);
+}
+
 .chat-user,
 .chat-status {
   margin: 0;
@@ -150,6 +192,17 @@
   width: 100%;
   max-width: 56.25rem;
   margin: 0 auto;
+}
+
+@media (max-width: 30rem) {
+  .chat-brand-banner {
+    padding: 0.75rem 0.875rem;
+  }
+
+  .chat-brand-banner__image {
+    width: 3.75rem;
+    height: 3.75rem;
+  }
 }
 
 /* Empty tutor: floating starter chips */
