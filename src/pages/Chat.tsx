@@ -1,10 +1,10 @@
 import {
   IonButton,
   IonIcon,
+  IonPage,
   IonSpinner,
   IonText,
   IonTextarea,
-  IonPage,
 } from '@ionic/react';
 import { addOutline, logOutOutline, paperPlaneOutline } from 'ionicons/icons';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -253,9 +253,6 @@ const Chat: React.FC = () => {
             <div className="chat-shell">
               <div className="chat-meta">
                 <IonText>
-                  <p className="chat-user">Tutor · {displayName}</p>
-                </IonText>
-                <IonText>
                   <p
                     className={`chat-status ${apiReady ? 'chat-status--ok' : 'chat-status--warn'}`}
                   >
@@ -292,12 +289,12 @@ const Chat: React.FC = () => {
                   messages.map((message) => {
                     const renderMarkdown = (text: string) => {
                       if (!text) return null;
-                      
+
                       const lines = text.split('\n');
                       const elements = [];
                       let inTable = false;
                       let tableRows = [];
-                      
+
                       const processText = (str: string) => {
                         // Very basic bold and italic replacement
                         let parsed = str.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
@@ -308,7 +305,7 @@ const Chat: React.FC = () => {
 
                       for (let i = 0; i < lines.length; i++) {
                         const line = lines[i];
-                        
+
                         if (line.startsWith('|')) {
                           inTable = true;
                           if (!line.includes('---')) {
@@ -344,7 +341,7 @@ const Chat: React.FC = () => {
                           elements.push(<p key={`p-${i}`}>{processText(line)}</p>);
                         }
                       }
-                      
+
                       // Catch trailing table
                       if (inTable && tableRows.length > 0) {
                         elements.push(
@@ -366,12 +363,12 @@ const Chat: React.FC = () => {
                     };
 
                     return (
-                    <article
-                      key={message.id}
-                      className={`chat-bubble chat-bubble--${message.role}`}
-                    >
-                      {message.pending ? <p>Generando...</p> : renderMarkdown(message.content)}
-                    </article>
+                      <article
+                        key={message.id}
+                        className={`chat-bubble chat-bubble--${message.role}`}
+                      >
+                        {message.pending ? <p>Generando...</p> : renderMarkdown(message.content)}
+                      </article>
                     );
                   })
                 )}
