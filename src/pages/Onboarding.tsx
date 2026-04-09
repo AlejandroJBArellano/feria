@@ -6,8 +6,8 @@ import {
   IonText,
   useIonToast,
 } from '@ionic/react';
-import { Redirect, useHistory } from 'react-router-dom';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { Redirect, useHistory } from 'react-router-dom';
 import {
   completeOnboarding,
   createVoiceJob,
@@ -277,6 +277,10 @@ const Onboarding: React.FC = () => {
     return <Redirect to="/home" />;
   }
 
+  const handleContinue = () => {
+    markOnboardingComplete();
+  }
+
   const listening = voicePhase === 'recording';
   const busy = voicePhase === 'uploading' || voicePhase === 'processing';
   const showReview = lastSummary != null && voicePhase === 'idle' && !voiceError;
@@ -285,21 +289,45 @@ const Onboarding: React.FC = () => {
   return (
     <IonPage className="onboarding-page">
       <div className="onboarding-ai-bg" aria-hidden />
-      <FeriaAppShell contentClassName="onboarding-content onboarding-voice-flow">
-        <div className="onboarding-ai-layout onboarding-voice-layout">
-          <div className="onboarding-voice-progress" aria-hidden>
-            {ONBOARDING_QUESTIONS.map((stepQ, i) => (
-              <span
-                key={stepQ.id}
-                className={`onboarding-voice-dot ${i === stepIndex ? 'is-active' : ''} ${i < stepIndex ? 'is-done' : ''}`}
-              />
-            ))}
+      <FeriaAppShell contentClassName="onboarding-content">
+        <div className="onboarding-ai-layout">
+          <div className="onboarding-ai-hero">
+            <div className="onboarding-gamified-images" aria-hidden>
+              {/* Flotating emojis instead of an abstract orb */}
+              <span className="onboarding-emoji" style={{ fontSize: '4rem', transform: 'rotate(-10deg)', display: 'inline-block', margin: '0 10px' }}>🌮</span>
+              <span className="onboarding-emoji" style={{ fontSize: '4.5rem', zIndex: 2, position: 'relative' }}>💰</span>
+              <span className="onboarding-emoji" style={{ fontSize: '4rem', transform: 'rotate(15deg)', display: 'inline-block', margin: '0 10px' }}>🛵</span>
+            </div>
+            <p className="onboarding-ai-eyebrow">Tu compa para la lana</p>
+            <h1 className="onboarding-ai-title">
+              ¡Pásale a <span className="onboarding-ai-title__brand">FerIA</span>!
+            </h1>
+            <p className="onboarding-ai-lead">
+              Lleva el control de tu chamba sin complicaciones. Registra lo que cae y lo que sale con notas de voz o teclado en caliente.
+            </p>
           </div>
 
-          <div className="onboarding-voice-card" key={q.id}>
-            <p className="onboarding-ai-eyebrow">Paso {stepIndex + 1} de {ONBOARDING_QUESTION_COUNT}</p>
-            <h1 className="onboarding-voice-title">{q.title}</h1>
-            <p className="onboarding-voice-prompt">{q.prompt}</p>
+          <div className="onboarding-ai-glass">
+            <ul className="onboarding-ai-pills" aria-label="Beneficios">
+              <li className="onboarding-ai-pill">
+                <span aria-hidden>🎙️</span>
+                Háblale y ella anota
+              </li>
+              <li className="onboarding-ai-pill">
+                <span aria-hidden>🏅</span>
+                Gana rachas y medallas
+              </li>
+              <li className="onboarding-ai-pill">
+                <span aria-hidden>📱</span>
+                Privado y seguro
+              </li>
+            </ul>
+            <IonButton expand="block" className="onboarding-ai-cta" onClick={handleContinue}>
+              ¡A darle!
+            </IonButton>
+            <p className="onboarding-ai-footnote">
+              Más al rato puedes ajustar tu cuenta y tema en tu perfil.
+            </p>
           </div>
 
           {!apiReady && (

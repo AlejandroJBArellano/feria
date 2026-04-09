@@ -76,72 +76,78 @@ const Logros: React.FC = () => {
   return (
     <IonPage className="logros-page">
       <FeriaAppShell contentClassName="logros-content">
-        <div className="logros-layout" style={{ padding: '12px 12px 24px' }}>
-          <IonText>
-            <h1 className="logros-title">Logros y claridad</h1>
-            <p className="feria-text-label-caps" style={{ marginBottom: 16 }}>
-              Basados en lo que realmente registras en Feria.
-            </p>
-          </IonText>
-
-          {!apiReady && (
-            <IonText color="medium">
-              <p>Configura VITE_FERIA_API_URL para ver tus logros.</p>
+        <div className="logros-layout ion-padding">
+          <div className="logros-grid-col-summary">
+            <IonText>
+              <h1 className="logros-title">¡Tus Medallas y Rachas!</h1>
+              <p className="feria-text-label-caps" style={{ marginBottom: 16 }}>
+                Con cada registro que haces, Feria te da puntos. Acá ves lo que vas juntando con tu compa.
+              </p>
             </IonText>
-          )}
 
-          {apiReady && loading && !data && (
-            <div style={{ display: 'flex', justifyContent: 'center', padding: 24 }}>
-              <IonSpinner name="crescent" />
-            </div>
-          )}
+            {!apiReady && (
+              <IonText color="medium">
+                <p>Conecta la API (VITE_FERIA_API_URL) para desbloquear tus medallas.</p>
+              </IonText>
+            )}
 
-          {error && (
-            <IonText color="danger">
-              <p>{error}</p>
-            </IonText>
-          )}
+            {apiReady && loading && !data && (
+              <div style={{ display: 'flex', justifyContent: 'center', padding: 24 }}>
+                <IonSpinner name="crescent" />
+              </div>
+            )}
+
+            {error && (
+              <IonText color="danger">
+                <p>{error}</p>
+              </IonText>
+            )}
+
+            {data && (
+              <>
+                <IonText>
+                  <p style={{ marginBottom: 12, fontSize: '0.9rem', color: 'var(--feria-color-primary-shade)', fontWeight: '800' }}>
+                    <span style={{ fontSize: '1.2rem', marginRight: 6 }}>🏆</span>
+                    ¡Tienes {unlockedCount} de {total} medallas!
+                  </p>
+                </IonText>
+
+                {data.dashboard ? (
+                  <LogrosDashboard
+                    dashboard={data.dashboard}
+                    clarityScore={data.axes.clarityScore}
+                    controlScore={data.axes.controlScore}
+                    visitDeltas={visitDeltas}
+                  />
+                ) : (
+                  <div className="logros-axes">
+                    <div className="logros-axis">
+                      <span className="logros-axis__label">Claridad</span>
+                      <div className="logros-axis__track">
+                        <div
+                          className="logros-axis__fill"
+                          style={{ width: `${data.axes.clarityScore}%` }}
+                        />
+                      </div>
+                    </div>
+                    <div className="logros-axis">
+                      <span className="logros-axis__label">Control del mes</span>
+                      <div className="logros-axis__track">
+                        <div
+                          className="logros-axis__fill"
+                          style={{ width: `${data.axes.controlScore}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
 
           {data && (
-            <>
-              <IonText>
-                <p style={{ marginBottom: 12, fontSize: '0.9rem' }}>
-                  <IonIcon icon={trophyOutline} style={{ verticalAlign: 'text-bottom', marginRight: 6 }} />
-                  {unlockedCount} de {total} desbloqueados
-                </p>
-              </IonText>
-
-              {data.dashboard ? (
-                <LogrosDashboard
-                  dashboard={data.dashboard}
-                  clarityScore={data.axes.clarityScore}
-                  controlScore={data.axes.controlScore}
-                  visitDeltas={visitDeltas}
-                />
-              ) : (
-                <div className="logros-axes">
-                  <div className="logros-axis">
-                    <span className="logros-axis__label">Claridad</span>
-                    <div className="logros-axis__track">
-                      <div
-                        className="logros-axis__fill"
-                        style={{ width: `${data.axes.clarityScore}%` }}
-                      />
-                    </div>
-                  </div>
-                  <div className="logros-axis">
-                    <span className="logros-axis__label">Control del mes</span>
-                    <div className="logros-axis__track">
-                      <div
-                        className="logros-axis__fill"
-                        style={{ width: `${data.axes.controlScore}%` }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              <h2 className="logros-section-title">Medallas</h2>
+            <div className="logros-grid-col-list">
+              <h2 className="logros-section-title">El Medallero</h2>
 
               <div className="logros-grid" role="list">
                 {data.achievements.map((a) => {
@@ -186,7 +192,7 @@ const Logros: React.FC = () => {
                   );
                 })}
               </div>
-            </>
+            </div>
           )}
         </div>
       </FeriaAppShell>

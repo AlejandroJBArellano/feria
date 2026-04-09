@@ -325,7 +325,19 @@ const Home: React.FC = () => {
         }
       >
         <div className="home-layout">
-          <p className="feria-text-label-caps">Hola, {displayName}</p>
+          <p className="feria-text-label-caps">¡Qué onda, {displayName}!</p>
+
+          {/* Gamified Stat Row */}
+          <div className="home-gamified-stats" aria-label="Tus rachas y medallas">
+            <div className="stat-pill stat-pill--streak">
+              <span className="stat-pill__emoji">🔥</span>
+              <span className="stat-pill__value">Racha de 3 días</span>
+            </div>
+            <div className="stat-pill stat-pill--coins">
+              <span className="stat-pill__emoji">🪙</span>
+              <span className="stat-pill__value">12 registros</span>
+            </div>
+          </div>
 
           {apiReady && activeReminder && (
             <div className="home-engagement-reminder" role="status">
@@ -333,6 +345,7 @@ const Home: React.FC = () => {
               <div className="home-engagement-reminder__actions">
                 <IonButton
                   size="small"
+                  className="feria-btn-playful"
                   onClick={() => {
                     history.push(activeReminder.ctaPath);
                   }}
@@ -350,13 +363,13 @@ const Home: React.FC = () => {
                     });
                   }}
                 >
-                  Cerrar
+                  Luego
                 </IonButton>
               </div>
             </div>
           )}
 
-          <h1 className="home-hero-line">Registra un ingreso o un gasto</h1>
+          <h1 className="home-hero-line">¿Qué movimiento traemos hoy?</h1>
 
           <div
             className={`siri-orb-wrap ${listening ? 'siri-orb-wrap--active' : ''}`}

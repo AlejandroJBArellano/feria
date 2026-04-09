@@ -16,13 +16,29 @@
   color: var(--feria-color-text-muted);
 }
 
-/* ─── Gamified dashboard ─── */
+.logros-layout {
+  max-width: 1200px;
+  margin-inline: auto;
+  display: grid;
+  gap: 1.5rem;
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+@media (min-width: 768px) {
+  .logros-layout {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+    padding: 2.5rem;
+  }
+}
+
 .logros-page .logros-dash {
   margin-bottom: 24px;
-  padding: 16px 14px 18px;
-  border-radius: 16px;
-  background: var(--feria-color-surface-muted);
-  border: 1px solid var(--feria-color-border);
+  padding: 20px 18px;
+  border-radius: 20px;
+  background: var(--feria-color-surface);
+  border: 2px solid var(--feria-color-border);
+  box-shadow: 4px 4px 0px var(--feria-color-border);
 }
 
 .logros-page .logros-dash__heading {
@@ -123,10 +139,18 @@
   display: flex;
   flex-direction: row;
   gap: 12px;
-  padding: 12px 12px;
-  border-radius: 12px;
+  padding: 14px 16px;
+  border-radius: 16px;
   background: var(--feria-color-surface);
-  border: 1px solid var(--feria-color-border);
+  border: 2px solid var(--feria-color-border);
+  box-shadow: 3px 3px 0px var(--feria-color-border);
+  transition: transform 0.1s;
+}
+
+.logros-page .logros-dash__tile:hover {
+  transform: translate(-2px, -2px);
+  border-color: var(--feria-color-primary-shade);
+  box-shadow: 5px 5px 0px var(--feria-color-primary-shade);
 }
 
 .logros-page .logros-dash__tile-icon {
@@ -319,14 +343,22 @@
   gap: 12px;
   width: 100%;
   margin: 0;
-  padding: 10px 6px 14px;
-  border: none;
-  border-radius: 14px;
-  background: transparent;
+  padding: 16px 10px;
+  border: 2px solid var(--feria-color-border);
+  border-radius: 18px;
+  background: var(--feria-color-surface);
+  box-shadow: 4px 4px 0px var(--feria-color-border);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   font: inherit;
   color: var(--feria-color-text);
+  transition: transform 0.1s ease-out, border-color 0.1s;
+}
+
+.logros-page .logros-tile__hit:hover {
+  transform: translate(-2px, -2px);
+  border-color: var(--feria-color-primary-tint);
+  box-shadow: 6px 6px 0px var(--feria-color-primary-tint);
 }
 
 .logros-page .logros-tile__hit:active {
