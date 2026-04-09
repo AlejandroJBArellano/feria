@@ -422,9 +422,12 @@
 }
 
 .logros-page .logros-hex-medal__icon {
-  width: 2.75rem;
-  height: 2.75rem;
+  font-size: 2.5rem;
+  line-height: 1;
   color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .logros-page .logros-hex-medal--locked {
