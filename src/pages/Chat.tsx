@@ -1,18 +1,18 @@
 import {
-    IonButton,
-    IonIcon,
-    IonPage,
-    IonSpinner,
-    IonText,
-    IonTextarea,
+  IonButton,
+  IonIcon,
+  IonPage,
+  IonSpinner,
+  IonText,
+  IonTextarea,
 } from '@ionic/react';
 import { addOutline, logOutOutline, paperPlaneOutline } from 'ionicons/icons';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
-    isFeriaApiConfigured,
-    listChatMessages,
-    sendChatMessage,
+  isFeriaApiConfigured,
+  listChatMessages,
+  sendChatMessage,
 } from '../api/feriaApi';
 import { useAuth } from '../auth/AuthContext';
 import { FeriaAppShell } from '../components/FeriaAppShell';
@@ -41,7 +41,7 @@ const TUTOR_STARTER_PROMPTS: readonly string[] = [
 
 const Chat: React.FC = () => {
   const history = useHistory();
-  const { signOutUser, user } = useAuth();
+  const { signOutUser } = useAuth();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [draft, setDraft] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
@@ -71,10 +71,6 @@ const Chat: React.FC = () => {
     }
     return 'Listo';
   }, [apiReady, historyLoading]);
-
-  const displayName = useMemo(() => {
-    return user?.email ?? user?.username ?? 'usuario';
-  }, [user?.email, user?.username]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
@@ -265,7 +261,7 @@ const Chat: React.FC = () => {
                 <img src="/principal.png" className="chat-brand-banner__image" alt="" aria-hidden="true" />
                 <div className="chat-brand-banner__copy">
                   <p className="chat-brand-banner__eyebrow">Tu tutor FerIA</p>
-                  <p className="chat-brand-banner__text">Preguntá sobre tus movimientos y el sistema te responde con contexto.</p>
+                  <p className="chat-brand-banner__text">Pregunta sobre tus movimientos y el sistema te responde con contexto.</p>
                 </div>
               </section>
 
