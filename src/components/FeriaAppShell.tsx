@@ -1,4 +1,4 @@
-import { IonContent, IonFooter, IonHeader, IonIcon, IonToolbar } from '@ionic/react';
+import { IonContent, IonFooter, IonHeader, IonToolbar } from '@ionic/react';
 import type { ReactElement, ReactNode } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
@@ -75,6 +75,7 @@ export function FeriaAppShell({
       <IonHeader className="feria-app-header">
         <IonToolbar className="feria-app-toolbar">
           <div className="feria-app-logo" slot="start">
+          <img src='principal.png' width={20}/>
             Fer<span className="feria-app-logo__accent">IA</span>
           </div>
           {headerEnd ? (

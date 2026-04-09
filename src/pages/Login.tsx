@@ -90,6 +90,7 @@ const Login: React.FC = () => {
       <FeriaAppShell contentClassName="login-content">
         <main className="login-layout">
           <section className="login-brand">
+          <img src='festivo.png'/>
             <h1 className="login-brand__title">
               Bienvenido a <span className="login-brand__accent">FerIA</span>
             </h1>
