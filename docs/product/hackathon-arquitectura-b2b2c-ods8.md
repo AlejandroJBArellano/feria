@@ -1,109 +1,62 @@
-# Arquitectura y Modelo B2B2C (Feria)
+# Arquitectura y Modelo (Feria)
 
-Feria es una plataforma de educación y acompañamiento financiero. El proyecto está dividido en dos repos para agilizar el desarrollo:
-- `feria`: Frontend, experiencia de usuario y conexión a APIs.
-- `feria-infraestructure`: Backend, AWS CDK, Lambdas y base de datos.
+Feria es una plataforma de educación y acompañamiento financiero. Separamos el proyecto en dos repositorios para no pisarnos durante el desarrollo:
+- `feria`: Donde vive todo el frontend web y app móvil.
+- `feria-infraestructure`: Todo el backend en AWS (base de datos, Lambdas, IA).
 
 ## Tech Stack
 
 ### Frontend
-- **Framework**: Ionic React 8, React 19, React Router 5
-- **Build Tool**: Vite 5 con TypeScript
-- **Movilidad**: Capacitor 8
-- **Autenticación**: AWS Amplify (Cognito Hosted UI)
-- **Testing**: Vitest, React Testing Library, Cypress
+- **Framework**: Ionic React 8, React 19.
+- **Build**: Vite 5 con TypeScript.
+- **App móvil**: Capacitor 8.
+- **Autenticación**: AWS Amplify con Cognito Hosted UI.
 
 ### Backend e IA
-- **API**: Amazon API Gateway REST
-- **Compute**: AWS Lambda (Node.js 20)
-- **Base de Datos**: DynamoDB (on-demand)
-- **Storage**: Amazon S3
-- **IA y Voz**: Amazon Bedrock (Tutor/Clasificador), Amazon Transcribe / AssemblyAI
+- **API**: Amazon API Gateway REST.
+- **Código Serverless**: AWS Lambda (Node.js 20).
+- **Base de Datos**: DynamoDB (tablas en modo on-demand).
+- **Archivos**: Amazon S3.
+- **IA**: Amazon Bedrock para el tutor conversacional y Amazon Transcribe para procesar los audios de los gastos.
 
-### Infraestructura
-- **IaC**: AWS CDK v2 (TypeScript)
-- **CI/CD**: GitHub Actions desplegando a S3 + CloudFront
+### DevOps e Infraestructura
+- **IaC**: AWS CDK v2 para tener toda la infraestructura como código usando TypeScript.
+- **CI/CD**: GitHub Actions desplegando hacia nuestro S3 + CloudFront.
 
-## Diagrama de Despliegue
+## Diagrama Funcional
 
 ```mermaid
 flowchart LR
-  %% Clientes
-  U1[Usuario final - Web] --> CF[CloudFront]
-  U2[Usuario final - App movil via Capacitor] --> CF
+  U1[Usuario final] --> CF[CloudFront]
   CF --> S3WEB[S3 Web Bucket]
 
-  %% Auth
-  U1 --> COG[Cognito User Pool + Hosted UI]
-  U2 --> COG
+  U1 --> COG[Cognito]
+  U1 --> APIGW[API Gateway]
+  COG -. Autorización .-> APIGW
 
-  %% API
-  U1 --> APIGW[API Gateway REST /prod]
-  U2 --> APIGW
-  COG -. JWT Authorizer .-> APIGW
+  APIGW --> L_INGEST[Lambda Movimientos]
+  APIGW --> L_VOICE_API[Lambda Voz]
+  APIGW --> L_CHAT[Lambda Chat]
+  APIGW --> L_ENG[Lambda Logros]
 
-  %% Lambdas
-  APIGW --> L_INGEST[Lambda IngestionHandler]
-  APIGW --> L_VOICE_API[Lambda Voice API]
-  APIGW --> L_CHAT[Lambda Chat REST]
-  APIGW --> L_ENG[Lambda Engagement]
-  APIGW --> L_TYPES[Lambda Tipos Movimiento]
-  APIGW --> L_USERS[Lambda Users API]
-
-  %% Persistencia
-  L_INGEST --> DDB_MAIN[(DynamoDB FeriaData)]
-  L_VOICE_API --> DDB_MAIN
+  L_INGEST --> DDB_MAIN[(DynamoDB)]
   L_CHAT --> DDB_MAIN
   L_ENG --> DDB_MAIN
 
-  L_CHAT --> DDB_CHAT_C[(DynamoDB ChatConversations)]
-  L_CHAT --> DDB_CHAT_M[(DynamoDB ChatMessages)]
-  L_ENG --> DDB_ENG[(DynamoDB FeriaEngagement)]
-  L_TYPES --> DDB_TYPES[(DynamoDB TiposMovimiento)]
-  L_USERS --> DDB_USERS[(DynamoDB UsersTable)]
-
-  %% Voz
-  L_VOICE_API --> S3VOICE[(S3 VoiceAudioBucket)]
-  S3VOICE --> EVT[S3 ObjectCreated]
-  EVT --> L_VOICE_PROC[Lambda Voice Processor]
-  L_VOICE_PROC --> DDB_MAIN
-  L_VOICE_PROC --> DDB_TYPES
-
-  %% STT e IA
-  L_VOICE_PROC --> TR[Amazon Transcribe]
-  L_VOICE_PROC --> AAI[AssemblyAI]
-  L_CHAT --> BR[Amazon Bedrock]
-  L_ENG --> BR
-  L_VOICE_PROC --> BR
-
-  %% CI/CD
-  GH[GitHub Actions] --> BUILD[Vite build]
-  BUILD --> S3WEB
-  GH --> INV[CloudFront invalidation]
-  INV --> CF
+  L_VOICE_API --> S3VOICE[(Colas / S3)]
+  S3VOICE --> L_VOICE_PROC[Lambda de Procesamiento]
+  
+  L_VOICE_PROC --> TR[Transcribe]
+  L_CHAT --> BR[Bedrock IA]
 ```
 
-## Modelo B2B2C
+## Decisiones Técnicas
 
-- **Usuario final (C)**: Personas que buscan mejorar su salud financiera mediante registro de gastos, tutor de IA y retos.
-- **Cliente (B)**: Empresas (neobancos, fintechs, programas de bienestar) que distribuyen la herramienta a sus usuarios.
+Elegimos usar Ionic + React con Capacitor porque nos dejaba mantener una base de código central y probar rápido tanto en la web como en el celular. Al delegarle todo el manejo de usuarios a AWS Cognito nos saltamos el dolor de cabeza de tener que armar esquemas de contraseñas y flujos de reseteo, lo cual nos ahorró un montón de tiempo valioso en el hackathon.
 
-La idea es que los usuarios obtienen claridad y motivación. Las empresas consiguen un canal de engagement recurrente y datos agregados sobre cómo sus usuarios interactúan con la plataforma. De esta manera el valor core no depende de anuncios invasivos.
+Por el lado del backend fuimos completamente por Serverless. Cuesta casi cero mientras programamos y escala solo si hay pico de uso. Todo el trabajo pesado de IA (como la API que te transcribe un gasto que dictaste por voz) se ejecuta "de fondo" reaccionando a un evento almacenado en S3, garantizando que el usuario jamás se quede viendo una pantalla de carga congelada.
 
-## Decisiones de Arquitectura
+## Tareas Pendientes
 
-- Elegimos **Ionic + React + Capacitor** para mantener una sola base de código en web y móvil. Esto nos dio mucha velocidad de iteración.
-- Delegar el login a **Cognito + Amplify** fue clave para ahorrarnos temas de seguridad e implementar flujos de OAuth rápidamente.
-- La capa serverless (API Gateway + Lambdas + DynamoDB on-demand) mantiene los costos prácticamente en cero durante el desarrollo y absorbe picos de tráfico de manera natural.
-- Todo lo que es procesamiento de voz corre de fondo (**event-driven**). El usuario sube el audio a S3 (mediante pre-signed URLs) y un evento levanta un Lambda para transcribir y clasificar el gasto sin bloquear la UI.
-- Finalmente, exponer el dashboard via S3 + CloudFront garantiza un SLA excelente y distribución por CDN automatizada mediante Actions.
-
-## Trabajo Pendiente / Próximos Pasos
-
-- Habilitar un entorno formal `staging`.
-- Limpiar políticas IAM y sacar secretos como variables del proyecto a algo nativo como Secrets Manager o System Manager.
-- Definir un modo offline-first para guardar gastos cuando no hay red y sincronizarlos después.
-
-## Alineación con ODS 8
-
-Nuestro foco está en reducir el estrés financiero para construir ambientes de trabajo y vidas más sanas. Promovemos el **Trabajo decente y crecimiento económico** aportando herramientas claras a personas de distinto nivel de alfabetización financiera, priorizando SIEMPRE la privacidad e intimidad de sus transacciones. No se venden los datos individuales.
+- Mover un par de secretos al Parameter Store de AWS.
+- Idear un flujo offline: poder abrir la app, tocar "Registrar", que se guarde un borrador en la memoria del celular y se suba a la nube cuando estemos devuelta con Wi-Fi o datos.
