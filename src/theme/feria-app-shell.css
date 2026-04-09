@@ -21,12 +21,23 @@ ion-app {
 }
 
 .feria-app-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   font-family: var(--feria-font-family);
   font-size: 1.3rem;
   font-weight: 900;
   letter-spacing: -0.03em;
   color: var(--feria-color-text);
   margin-inline-start: 6px;
+}
+
+.feria-app-logo__mark {
+  width: 1.35rem;
+  height: 1.35rem;
+  object-fit: contain;
+  display: block;
+  flex-shrink: 0;
 }
 
 .feria-app-logo__accent {

@@ -74,10 +74,62 @@
 /* ─── Brand Section ─── */
 .login-brand {
   text-align: center;
-  margin-bottom: 2.25rem;
+  margin-bottom: 2rem;
   position: relative;
   z-index: 1;
   animation: feria-fade-up 0.6s var(--feria-ease-decel) both;
+}
+
+.login-brand__art {
+  margin: 0 auto 1rem;
+  width: min(18rem, 76vw);
+  aspect-ratio: 1;
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.login-brand__art-frame {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  border-radius: 1.5rem;
+  background: color-mix(in srgb, var(--feria-color-surface) 84%, transparent);
+  box-shadow:
+    0 1.25rem 2.25rem rgba(44, 36, 24, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  border: 1px solid color-mix(in srgb, var(--feria-color-border) 75%, transparent);
+  backdrop-filter: blur(6px);
+}
+
+.login-brand__art-frame--main {
+  inset: 0.75rem 1.25rem 0 1.25rem;
+  border-radius: 2rem;
+  z-index: 2;
+}
+
+.login-brand__art-frame--left {
+  width: 38%;
+  aspect-ratio: 0.82;
+  left: 0;
+  bottom: 0;
+  transform: rotate(-10deg) translateX(-8%);
+  z-index: 1;
+}
+
+.login-brand__art-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.login-brand__art-image--main {
+  padding: 1rem;
+}
+
+.login-brand__art-image--secondary {
+  padding: 0.65rem;
 }
 
 .login-brand__title {
@@ -124,6 +176,42 @@
   padding: 1.375rem 1.25rem 1.25rem;
   border: 1px solid var(--feria-color-border);
   animation: feria-fade-up 0.6s var(--feria-ease-decel) 0.1s both;
+}
+
+.login-card__image-hint {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.login-card__image-hint-shape {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--feria-color-accent-soft) 40%, var(--feria-color-surface));
+  border: 1px solid color-mix(in srgb, var(--feria-color-border) 85%, transparent);
+  color: var(--feria-color-primary);
+  box-shadow: 0 0.75rem 1.5rem rgba(44, 36, 24, 0.08);
+}
+
+.login-card__image-hint-shape span {
+  font-size: 1.15rem;
+}
+
+.login-card__image-hint-shape--left {
+  top: -0.7rem;
+  right: -0.65rem;
+  transform: rotate(12deg);
+}
+
+.login-card__image-hint-shape--right {
+  bottom: -0.85rem;
+  left: -0.7rem;
+  transform: rotate(-8deg);
+  color: var(--feria-color-success);
 }
 
 .ion-palette-dark .login-card {
@@ -187,56 +275,6 @@
 
 .google-btn__label {
   font-family: var(--feria-font-family);
-}
-
-/* ─── Floating Gamified Elements ─── */
-.login-floating-shapes {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 0;
-  overflow: visible;
-}
-
-.floating-shape {
-  position: absolute;
-  font-size: 2.2rem;
-  animation: feria-float 4s ease-in-out infinite;
-  filter: drop-shadow(0 0.25rem 0.5rem rgba(0,0,0,0.1));
-}
-
-.shape-coin {
-  top: -1.875rem;
-  left: -1.25rem;
-  animation-delay: 0s;
-  font-size: 3rem;
-  color: var(--feria-color-primary);
-}
-
-.shape-sparkle {
-  top: 2.5rem;
-  right: -1.5625rem;
-  animation-delay: 1.5s;
-  font-size: 2.5rem;
-  color: var(--feria-color-primary-tint);
-}
-
-.shape-graph {
-  bottom: -1.25rem;
-  left: 40%;
-  animation-delay: 0.7s;
-  font-size: 2.5rem;
-  opacity: 0.8;
-  color: var(--feria-color-success);
-}
-
-@keyframes feria-float {
-  0% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-0.75rem) rotate(8deg); }
-  100% { transform: translateY(0) rotate(0deg); }
 }
 
 /* ─── Feature Grid ─── */
@@ -409,6 +447,10 @@
 @media (max-width: 24.375rem) {
   .login-layout {
     padding: 3rem 1.25rem 2.5rem;
+  }
+
+  .login-brand__art {
+    width: min(15rem, 80vw);
   }
 
   .login-brand__title {

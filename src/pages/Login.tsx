@@ -90,7 +90,22 @@ const Login: React.FC = () => {
       <FeriaAppShell contentClassName="login-content">
         <main className="login-layout">
           <section className="login-brand">
-          <img src='festivo.png'/>
+            <figure className="login-brand__art" aria-hidden="true">
+              <div className="login-brand__art-frame login-brand__art-frame--main">
+                <img
+                  src="/festivo.png"
+                  alt=""
+                  className="login-brand__art-image login-brand__art-image--main"
+                />
+              </div>
+              <div className="login-brand__art-frame login-brand__art-frame--left">
+                <img
+                  src="/pensativo.png"
+                  alt=""
+                  className="login-brand__art-image login-brand__art-image--secondary"
+                />
+              </div>
+            </figure>
             <h1 className="login-brand__title">
               Bienvenido a <span className="login-brand__accent">FerIA</span>
             </h1>
@@ -98,11 +113,13 @@ const Login: React.FC = () => {
           </section>
 
           <section className="login-card">
-            {/* Playful Floating Elements for Gamified Feel */}
-            <div className="login-floating-shapes" aria-hidden="true">
-              <span className="floating-shape shape-coin material-symbols-rounded">monetization_on</span>
-              <span className="floating-shape shape-sparkle material-symbols-rounded">auto_awesome</span>
-              <span className="floating-shape shape-graph material-symbols-rounded">trending_up</span>
+            <div className="login-card__image-hint" aria-hidden="true">
+              <span className="login-card__image-hint-shape login-card__image-hint-shape--left">
+                <span className="material-symbols-rounded">auto_awesome</span>
+              </span>
+              <span className="login-card__image-hint-shape login-card__image-hint-shape--right">
+                <span className="material-symbols-rounded">trending_up</span>
+              </span>
             </div>
 
             <button

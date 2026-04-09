@@ -75,7 +75,7 @@ export function FeriaAppShell({
       <IonHeader className="feria-app-header">
         <IonToolbar className="feria-app-toolbar">
           <div className="feria-app-logo" slot="start">
-          <img src='principal.png' width={20}/>
+            <img src="/principal.png" className="feria-app-logo__mark" alt="" aria-hidden="true" />
             Fer<span className="feria-app-logo__accent">IA</span>
           </div>
           {headerEnd ? (
