@@ -1,15 +1,14 @@
 import { IonContent, IonPage, IonSpinner } from '@ionic/react';
 import { useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
-import { useAuth } from '../auth/AuthContext';
-import { isCognitoConfigured } from '../auth/configureAmplify';
-import { FeriaAppShell } from '../components/FeriaAppShell';
-import ThemeToggle from '../components/ThemeToggle';
 import {
   getUserProfile,
   isFeriaApiConfigured,
   syncUserProfile,
 } from '../api/feriaApi';
+import { useAuth } from '../auth/AuthContext';
+import { isCognitoConfigured } from '../auth/configureAmplify';
+import { FeriaAppShell } from '../components/FeriaAppShell';
 import {
   isOnboardingComplete,
   syncOnboardingFlagFromServer,
@@ -161,16 +160,6 @@ const Login: React.FC = () => {
 
           <section className="login-footer">
             <p className="login-footer__signup">
-              ¿No tienes cuenta?{' '}
-              <button
-                type="button"
-                id="link-registro"
-                className="login-footer__register-link"
-                disabled={!isCognitoConfigured}
-                onClick={() => void signIn('Google')}
-              >
-                Continuar con Google
-              </button>
               <span className="login-footer__signup-hint"> La primera vez se crea tu cuenta al completar el acceso.</span>
             </p>
             <nav aria-label="Legal" className="legal-links">
@@ -179,10 +168,6 @@ const Login: React.FC = () => {
               <a href="#ayuda" id="link-ayuda">AYUDA</a>
             </nav>
           </section>
-
-          <div className="login-theme-footer">
-            <ThemeToggle variant="inline" />
-          </div>
         </main>
       </FeriaAppShell>
     </IonPage>
