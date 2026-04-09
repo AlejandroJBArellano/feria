@@ -1,60 +1,76 @@
+<div align="center">
+
+<img src="./public/favicon.png" alt="Feria Logo" align="center" height="64" />
+
 # Feria Frontend
 
-> La configuracion de infraestructura y CDK de este proyecto esta en: https://github.com/jesus1612/feria-infraestructure.  
-> En la entrega solo podiamos adjuntar un unico link como entregable, por eso se separo la referencia de infraestructura en ese repositorio.
+[![TypeScript](https://img.shields.io/badge/TypeScript-blue?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![React](https://img.shields.io/badge/React-19-blue?style=flat-square&logo=react)](https://react.dev)
+[![Ionic](https://img.shields.io/badge/Ionic-8-3880ff?style=flat-square&logo=ionic)](https://ionicframework.com)
+[![Vite](https://img.shields.io/badge/Vite-5-646CFF?style=flat-square&logo=vite)](https://vitejs.dev)
 
-## Tecnologías Principales
+Feria is a B2B2C financial education and tracking platform with a custom Neo-Brutalist design. 
 
-- **Framework**: React 19 + Ionic React + Vite
-- **Lenguaje**: TypeScript
-- **Diseño UI/UX**: Estilo Neo-Brutalista (CSS Custom)
-- **Backend e Integración**: AWS Amplify (Autenticación, API)
-- **Testing**: Cypress (E2E) y Vitest (Unitario)
-- **Mobile**: Capacitor
+[Overview](#overview) • [Getting Started](#getting-started) • [Scripts](#scripts) • [Documentation](#documentation)
 
-## Requisitos Previos
+</div>
 
-- [Node.js](https://nodejs.org/) (Versión 18 o superior recomendada)
-- npm (o pnpm/yarn)
+This repository contains the front-end application built with React 19, Ionic, Vite, and Capacitor. It provides the user experience, authentication via AWS Amplify, API integrations, and mobile deployments.
 
-## Instalación y Uso
+> [!NOTE]
+> The CDK infrastructure for this project is hosted at [feria-infraestructure](https://github.com/jesus1612/feria-infraestructure). Due to hackathon constraints requiring a single deliverable link, the infrastructure code was separated into its own repository.
 
-1. Clona el repositorio e ingresa al directorio del proyecto:
+## Overview
+
+Feria combines a modern web and mobile experience to help users track finances naturally. It features:
+- **Authentication**: Managed securely with AWS Amplify using Cognito Hosted UI.
+- **Mobile First**: Uses Capacitor 8 to bridge native features like Haptics and Status Bar without rewriting code.
+- **Testing**: Quality assurance with Cypress for E2E and Vitest for unit testing.
+- **Neo-Brutalist Design**: A unique, high-contrast, playful user interface.
+
+## Getting Started
+
+> [!IMPORTANT]
+> You need Node.js 18 or higher to run the application locally.
+
+1. **Clone the repository**
    ```bash
-   git clone <url-del-repo>
+   git clone <repo-url>
    cd feria
    ```
 
-2. Instala las dependencias:
+2. **Install dependencies**
+   We recommend using `npm`.
    ```bash
    npm install
    ```
 
-3. Configura las variables de entorno. Copia el archivo `.env.example` a `.env` y ajusta los valores necesarios:
+3. **Configure environment**
+   Copy the example environment variables and fill in your AWS Amplify and API details.
    ```bash
    cp .env.example .env
    ```
 
-4. Inicia el servidor de desarrollo:
+4. **Start the development server**
    ```bash
    npm run dev
    ```
 
-## Scripts Disponibles
+## Scripts
 
-- `npm run dev`: Inicia el servidor de desarrollo en modo local.
-- `npm run build`: Compila el proyecto con TypeScript y Vite para producción.
-- `npm run preview`: Previsualiza la aplicación compilada localmente.
-- `npm run test.e2e`: Corre las pruebas de end-to-end usando Cypress.
-- `npm run test.unit`: Ejecuta las pruebas unitarias con Vitest.
-- `npm run lint`: Revisa el código en busca de errores usando ESLint.
+- `npm run dev`: Starts the local Vite development server.
+- `npm run build`: Compiles TypeScript and builds the production app with Vite.
+- `npm run preview`: Previews the local production build.
+- `npm run test.e2e`: Runs Cypress tests.
+- `npm run test.unit`: Runs Vitest unit tests.
+- `npm run lint`: Checks for code formatting and linting errors.
 
-## Documentación del Proyecto
+## Documentation
 
-El proyecto incluye documentación extensa sobre la arquitectura y las reglas de negocio, alojada en la carpeta `docs/product`:
+The `docs/product` folder contains detailed technical and product specifications:
 
-- [Arquitectura B2B2C y ODS8](./docs/product/hackathon-arquitectura-b2b2c-ods8.md)
-- [Catálogo MVP de Logros](./docs/product/mvp-achievements-catalog.md)
-- [Especificación de Recordatorios](./docs/product/reminders-v1-spec.md)
-- [Guía de Tono del Tutor](./docs/product/tutor-tone-guide.md)
-- [Política de Consentimiento de Hubs y Partners](./docs/product/consent-partners-policy.md)
+- [Architecture & B2B2C Model](./docs/product/hackathon-arquitectura-b2b2c-ods8.md)
+- [MVP Achievements Catalog](./docs/product/mvp-achievements-catalog.md)
+- [Reminders Specification](./docs/product/reminders-v1-spec.md)
+- [Tutor Tone Guide](./docs/product/tutor-tone-guide.md)
+- [Partner Consent Policy](./docs/product/consent-partners-policy.md)
